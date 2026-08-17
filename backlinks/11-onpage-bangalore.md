@@ -101,7 +101,7 @@ Keyword front-loaded, person survives truncation, one separator. "EEAT Minds"
 drops out of the title and lives in the H1 and schema instead, which costs
 nothing because nobody searches your brand yet.
 
-**Meta description (156 characters):**
+**Meta description (158 characters):**
 
 ```
 Freelance digital marketing in Bangalore, run by Shreyas V Patil. SEO, paid ads and content for startups and SMBs. Working since 2015, 66+ brands. Free audit.
