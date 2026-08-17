@@ -1,15 +1,20 @@
-move,target,tier,submission_url,da_claimed,da_verified,link_type,link_type_verified,requires_account,assets_needed,draft_status,submitted_date,status,live_listing_url,anchor_text,first_seen_gsc,notes
-1,Google Business Profile,A,,100,,entity,no,yes,"logo,hours,address",not_started,,pending,,,,"skip if no address or service area"
-1,LinkedIn Company Page,A,,98,,no-follow,no,yes,"logo,short_desc",not_started,,pending,,,,
-1,GitHub org,A,,96,,no-follow,no,yes,"logo,one_liner",not_started,,pending,,,,"only material for dev-facing products"
-1,Crunchbase,A,,91,,no-follow,no,yes,"logo,long_desc,founded,team_size",not_started,,pending,,,,"do-follow historically paid-tier only - verify"
-1,Trustpilot,A,,93,,no-follow,no,yes,"logo,short_desc",not_started,,pending,,,,
-1,Wikidata,A,,,,no-follow,no,yes,"sameAs_set",not_started,,pending,,,,"needs genuine notability - do not force"
-1,G2,B-saas,,90,,unknown,no,yes,"logo,screenshots,pricing,category",not_started,,pending,,,,"claim early - empty profile still earns the link"
-1,Capterra,B-saas,,88,,unknown,no,yes,"logo,screenshots,pricing",not_started,,pending,,,,"one submission also covers GetApp + Software Advice"
-1,Product Hunt,B-saas,,91,,unknown,no,yes,"logo,screenshots,one_liner,long_desc",not_started,,pending,,,,"ONE SHOT - do not launch before ready"
-1,AlternativeTo,B-saas,,,,unknown,no,yes,"logo,short_desc,category",not_started,,pending,,,,
-1,SaaSHub,B-saas,,,,unknown,no,yes,"logo,short_desc",not_started,,pending,,,,
-1,F6S,B-saas,,,,unknown,no,yes,"logo,long_desc",not_started,,pending,,,,
-1,FoundrList,B-saas,,,,unknown,no,yes,"logo,short_desc",not_started,,pending,,,,
-1,Indie Hackers,B-saas,,,,unknown,no,yes,"one_liner",not_started,,pending,,,,"only if you will actually participate"
+move,tier,target,submission_url,link_type,link_type_verified,da_verified,priority,requires_review,assets_needed,draft_status,submitted_date,status,live_listing_url,first_seen_gsc,notes
+0,prep,Branded email shreyas@eeatminds.in,,n/a,n/a,,1,no,domain_dns,ready,,pending,,,"BLOCKS Clutch + GoodFirms verification - do this first"
+0,prep,Confirm proof-point numbers,,n/a,n/a,,1,no,,ready,,pending,,,"10+ yrs / Google+Meta cert / 66+ brands / 25+ team - all unverified"
+1,1,Google Business Profile,https://business.google.com,entity,n/a,,1,no,"logo,photos,hours,service_area",ready,,pending,,,"highest leverage - local intent query wins the map pack"
+1,1,Clutch,https://clutch.co,unknown,no,,1,YES,"logo,headshot,price_range,portfolio",ready,,pending,,,"needs verified client reviews to rank - start outreach now"
+1,1,GoodFirms,https://www.goodfirms.co,unknown,no,,1,YES,"logo,headshot,price_range",ready,,pending,,,"strongest India coverage"
+1,1,LinkedIn company page,https://www.linkedin.com/company/eeat-minds/,no-follow,no,,1,no,"logo,banner,long_desc",ready,,EXISTS,https://www.linkedin.com/company/eeat-minds/,,"already live - optimize do not recreate"
+1,1,Bing Places,https://www.bingplaces.com,entity,n/a,,1,no,"logo,hours,service_area",ready,,pending,,,"feeds ChatGPT + Copilot - AI search lever"
+1,2,DesignRush,https://www.designrush.com,unknown,no,,2,no,"logo,portfolio,price_range",ready,,pending,,,
+1,2,Sortlist,https://www.sortlist.com,unknown,no,,2,no,"logo,portfolio",ready,,pending,,,
+1,2,The Manifest,https://themanifest.com,unknown,no,,2,no,"logo,price_range",ready,,pending,,,"Clutch sister property - reuses Clutch data"
+1,2,Agency Spotter,https://www.agencyspotter.com,unknown,no,,2,no,"logo,portfolio",ready,,pending,,,
+1,3,JustDial,https://www.justdial.com,unknown,no,,3,no,"logo,phone,address",ready,,pending,,,"expect sales calls after listing"
+1,3,Sulekha,https://www.sulekha.com,unknown,no,,3,no,"logo,phone",ready,,pending,,,"17700+ competing listings - low visibility but cheap citation"
+1,3,IndiaMART,https://www.indiamart.com,unknown,no,,3,no,"logo,phone",ready,,pending,,,"B2B skew - weaker fit for services"
+1,3,TradeIndia,https://www.tradeindia.com,unknown,no,,4,no,"logo,phone",ready,,pending,,,"lowest priority"
+1,4,Crunchbase,https://www.crunchbase.com,no-follow,no,,3,no,"logo,founded_year,team_size",ready,,pending,,,"do-follow historically paid-tier only"
+1,4,Shreyas V Patil personal LinkedIn,https://www.linkedin.com,no-follow,no,,2,no,"headshot,bio",ready,,pending,,,"founder-led practice - person is the brand"
+1,4,Wikidata,https://www.wikidata.org,no-follow,no,,4,no,"sameAs_set",hold,,pending,,,"ONLY with genuine notability - rejected entry worse than none"
+2,-,Roundup + journalist pitches,,,,,,,,blocked,,pending,,,"needs Source of Sources + Foundation live first"
