@@ -1,0 +1,6 @@
+# credentials - never commit
+service_account*.json
+client_secret*.json
+oauth-token.json
+google-api.json
+.env

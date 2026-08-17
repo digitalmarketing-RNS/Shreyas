@@ -40,10 +40,11 @@ assumes claude.ai + connectors. Measured differences:
 | `WebSearch` | ✅ works | Prospecting, roundup discovery, directory research all viable |
 | `WebFetch` / direct HTTPS | ❌ blocked for most hosts | Cannot open directory pages, Moz, GSC, Bing, Source of Sources |
 | `github.com` | ✅ reachable | Step 4 (host the board on Pages) is viable from here |
-| Moz Links API | ❌ no key, host blocked | **Cannot verify DA myself.** All DA figures below are quoted from the guide, unverified |
-| Google Search Console | ❌ not connected | No landed-link tracking from this session |
-| Bing Webmaster | ❌ not connected | Same |
-| DataForSEO MCP | ❌ not installed | No competitor link-gap depth |
+| Moz Links API | ❌ `api.moz.com` blocked | **Cannot verify DA from here.** All DA figures are quoted, unverified |
+| Google Search Console | ⚠️ **connectable** | API hosts reachable; venv built and verified. Needs credentials — see `03-data-connection.md` |
+| GA4 / PSI / CrUX / Indexing | ⚠️ **connectable** | Same Google auth path |
+| Bing Webmaster | ❌ `ssl.bing.com` blocked | Export from UI and paste; cannot connect |
+| DataForSEO | ❌ `api.dataforseo.com` blocked | No competitor link-gap depth from here |
 
 **What this means practically.** The drafting, structuring, prospect research and
 board-building all work here. The *live data* half of the guide — DA ranking,
