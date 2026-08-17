@@ -7,7 +7,7 @@ move,tier,target,submission_url,link_type,link_type_verified,da_verified,priorit
 1,1,LinkedIn company page,https://www.linkedin.com/company/eeat-minds/,no-follow,no,,1,no,"logo,banner,long_desc",ready,,EXISTS,https://www.linkedin.com/company/eeat-minds/,,"already live - optimize do not recreate"
 1,1,Bing Places,https://www.bingplaces.com,entity,n/a,,1,no,"logo,hours,service_area",ready,,pending,,,"feeds ChatGPT + Copilot - AI search lever"
 1,2,DesignRush,https://www.designrush.com,unknown,no,,2,no,"logo,portfolio,price_range",ready,,pending,,,
-1,2,Sortlist,https://www.sortlist.com,unknown,no,,2,no,"logo,portfolio",ready,,pending,,,
+1,2,Sortlist,https://www.sortlist.com/providers,unknown,no,,4,no,"logo,portfolio",ready,,BLOCKED_PAYWALL,,,"DEPRIORITIZED - free profile exists but directory appearance + leads gated behind Sortlist+ from EUR99/mo. Verify free profile is indexable and carries a link BEFORE paying. Do NOT use the buyer brief form at sortlist.com - that is the client intake, not agency signup"
 1,2,The Manifest,https://themanifest.com,unknown,no,,2,no,"logo,price_range",ready,,pending,,,"Clutch sister property - reuses Clutch data"
 1,2,Agency Spotter,https://www.agencyspotter.com,unknown,no,,2,no,"logo,portfolio",ready,,pending,,,
 1,3,JustDial,https://www.justdial.com,unknown,no,,3,no,"logo,phone,address",ready,,pending,,,"expect sales calls after listing"
