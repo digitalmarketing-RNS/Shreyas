@@ -38,6 +38,8 @@ assumes claude.ai + connectors. Measured differences:
 | `seo-backlinks` skill | ✅ available | Scoring + framework ready |
 | `humanizer` skill | ✅ available | Pitch drafting ready |
 | `WebSearch` | ✅ works | Prospecting, roundup discovery, directory research all viable |
+| Firecrawl **search** (platform connector) | ✅ works | Runs server-side, outside this container's egress. Page inventory + index data viable — see `13-page-inventory.md` |
+| Firecrawl **scrape / crawl / map** | ❌ not exposed | Connector offers `search` + 5 `research_*` tools only. Self-hosting does not help: it would fetch *from* this container and inherit the block |
 | `WebFetch` / direct HTTPS | ❌ blocked for most hosts | Cannot open directory pages, Moz, GSC, Bing, Source of Sources |
 | `github.com` | ✅ reachable | Step 4 (host the board on Pages) is viable from here |
 | Moz Links API | ❌ `api.moz.com` blocked | **Cannot verify DA from here.** All DA figures are quoted, unverified |
@@ -113,3 +115,6 @@ and it's correct. They make you findable. Move 2 is what moves rankings.
 
 - `01-foundation-targets.md` — pre-staged Foundation universe + submission asset checklist
 - `02-tracker.csv` — link tracker, one row per target
+- `13-page-inventory.md` — 43-URL page inventory from the Firecrawl search index, plus
+  four index-level findings (www/non-www split, cannibalization pairs, cross-domain
+  duplicate, Wix constraint). Search-index data, not a crawl — read its caveats first.
