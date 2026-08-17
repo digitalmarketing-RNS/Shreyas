@@ -1,216 +1,245 @@
-# On-page plan: ranking eeatminds.in for "digital marketing freelancer in Bangalore"
+# On-page plan: eeatminds.in for "digital marketing freelancer in Bangalore"
 
 **Primary:** digital marketing freelancer in Bangalore
 **Secondary:** digital marketing freelancer in India · freelance digital marketer in Bangalore · freelance digital marketing in Bangalore
 
-Basis: SERP analysis plus your indexed titles and meta descriptions, both read
-from search results. The site itself is blocked from this session, so anything
-requiring HTML (H1s, schema, internal links, word count) is marked as needing
-your paste.
+Rebuilt against live SERP data supplied 2026-08-17. Supersedes the earlier
+version, which used stale indexed titles.
 
 ---
 
-## Where you actually stand
+## Correction to the earlier draft
 
-You already rank on page one for the primary term. This is not a visibility
-problem, it is a positioning problem, which is a much better place to start.
+Your homepage title has changed since the index I was reading. Corrected:
 
-The SERP for "digital marketing freelancer in Bangalore":
+| | Title | Length | Contains exact primary keyword |
+|---|---|---|---|
+| I had (stale) | Digital Marketing Freelancer in Bangalore \| EEAT Minds — Shreyas V Patil | 72 | Yes |
+| **Actual now** | **Hire Digital Marketer Bangalore \| Shreyas V Patil** | **49** | **No** |
 
-| Ranking page | Pattern |
-|---|---|
-| dileepkumardigital.com | Root domain, exact-match title |
-| digitalwithsbn.com | Root domain |
-| avsumanthdigital.com/best-digital-marketing-freelancer-bangalore/ | Exact-match slug |
-| mrkhan.digital/digital-marketing-freelancer-in-bangalore/ | Exact-match slug |
-| **eeatminds.in** | **Root domain, you** |
-| sathishdigi.com/digital-marketing-freelancer-in-bangalore/ | Exact-match slug |
-| aravindsubramanian.com/blog/digital-marketing-freelancer-in-bangalore/ | Roundup |
-| luckyushaniya.com | Root domain |
-
-**Page-type consensus: personal-brand service page.** Not an agency page, not a
-blog post. Every competitor leads with a named individual. Your homepage is the
-right page type, so no restructuring needed. The work is making it the best one.
+The length problem I flagged is already fixed. A more serious one replaced it.
 
 ---
 
-## Priority 1: keyword cannibalisation, and you have two pairs
+## Finding 1: your title no longer contains the keyword you are targeting
 
-This is the highest-impact fix on the page and it costs nothing but redirects.
+This is the highest-value fix on the page.
 
-**Pair one, SEO service:**
-- `/seo-freelancer-in-bangalore` — "SEO Freelancer in Bangalore, India | Rank #1 with Shreyas"
-- `/seo-expert-in-bangalore` — "SEO Expert in Bangalore | SEO Freelancers | Eeat minds"
+"Hire Digital Marketer Bangalore" does not contain "digital marketing freelancer
+in Bangalore". You dropped both "freelancer" and the phrase "digital marketing".
 
-**Pair two, social media:**
-- `/freelance-social-media-marketing`
-- `/freelancer-for-social-media-marketing`
+Every competitor ranking above you has the exact phrase in the title:
 
-Both pairs serve one intent each. "SEO freelancer in Bangalore" and "SEO expert
-in Bangalore" return substantially the same results, so Google has to pick one
-of your pages and the signals split between them. Same for the two social pages.
-
-**Fix:** pick the stronger page in each pair, 301 the weaker one into it, merge
-any unique content, and repoint every internal link. Check Search Console first
-to see which URL already earns more impressions, and keep that one.
-
-Expect this alone to move you, because you are currently competing with
-yourself for two of your own service terms.
-
-## Priority 2: the secondary keywords do not need pages
-
-The instinct will be to build a page per keyword. Do not.
-
-| Keyword | Intent | Where it belongs |
+| Site | Title | Exact phrase |
 |---|---|---|
-| digital marketing freelancer in Bangalore | Primary | Homepage |
-| freelance digital marketer in Bangalore | **Same intent as primary** | Homepage, as an H2 and in body copy |
-| freelance digital marketing in Bangalore | **Same intent as primary** | Homepage, as an H2 and in body copy |
-| digital marketing freelancer in India | Genuinely broader | One national page, see below |
+| luckyushaniya.com | Digital Marketing Freelancer in Bangalore \| Lucky Suthar | Yes |
+| mahammadjunaid.com | Digital Marketing Freelancer in Bangalore \| Certified Expert | Yes |
+| avsumanthdigital.com | Best Digital Marketing Freelancer in Bangalore - AV. Sumanth | Yes |
+| mrkhan.digital | Best Digital Marketing Freelancer In Bangalore India | Yes |
+| **eeatminds.in** | **Hire Digital Marketer Bangalore \| Shreyas V Patil** | **No** |
 
-Two of your three secondaries are grammatical variants of the primary, not
-separate queries. Building pages for them creates a third cannibalisation pair.
-Google matches intent, not strings.
+Exact-match titles are not a magic lever, but when the entire top of a SERP
+shares one pattern and you are the single exception, that is a signal worth
+matching rather than fighting. You are asking Google to infer relevance the
+others state outright.
 
-**The India term has a conflict already.** Your blog post
-`/post/digital-marketing-freelancers-in-india` is a roundup of other
-freelancers, and it targets the same phrase you want to rank for as a service.
-Google will read that page as a list, not an offer. Either retitle the post so it
-stops competing, or decide the post owns the term and stop targeting it
-commercially. Do not leave both.
-
-## Priority 3: homepage title and meta
-
-Current title:
-
-```
-Digital Marketing Freelancer in Bangalore | EEAT Minds — Shreyas V Patil
-```
-
-72 characters. Google truncates around 60, so "Shreyas V Patil" is being cut off
-in results, which is exactly the part the SERP rewards. Every competitor above
-you leads with a person. It also mixes two separators, a pipe and an em dash.
-
-**Replace with (59 characters):**
+**Change to (59 characters):**
 
 ```
 Digital Marketing Freelancer in Bangalore | Shreyas V Patil
 ```
 
-Keyword front-loaded, person survives truncation, one separator. "EEAT Minds"
-drops out of the title and lives in the H1 and schema instead, which costs
-nothing because nobody searches your brand yet.
+Keeps your name, which the SERP clearly rewards since every ranking result is a
+named individual. Same length band as the competitors. "Hire" moves into the H1
+or the CTA where it does commercial work without costing you the keyword.
 
-**Meta description (158 characters):**
-
-```
-Freelance digital marketing in Bangalore, run by Shreyas V Patil. SEO, paid ads and content for startups and SMBs. Working since 2015, 66+ brands. Free audit.
-```
-
-That deliberately places "freelance digital marketing in Bangalore" in the
-description, covering a secondary variant without a separate page. Meta
-descriptions are not a ranking factor, but they are a click-through factor, and
-CTR on a page-one listing is worth more to you right now than any on-page tweak.
-
-## Priority 4: brand name casing is inconsistent
-
-Across your indexed titles the brand appears as **"EEAT Minds"**, **"Eeat Minds"**
-and **"Eeat minds"**. Pick one, use it everywhere, including schema `name`,
-directory listings and social profiles. Entity consistency is what lets Google
-and AI search treat you as one thing rather than three similar ones. It is a
-thirty minute fix with disproportionate value given how much of your strategy
-rests on entity signals.
-
-## Priority 5: title stuffing on inner pages
+If you want the experience signal in the title, this also fits at 61:
 
 ```
-Web development freelancers | Freelance web developers india | Web developers in bangalore
+Digital Marketing Freelancer in Bangalore | 10+ Yrs | Shreyas
 ```
 
-91 characters, three separate keyword phrases, no brand. This reads as written
-for a crawler rather than a person and it will truncate badly. `/seo-expert-in-bangalore`
-has the same problem in milder form.
+Slight truncation risk. I would use the 59 version.
 
-Rule: one primary phrase, one qualifier, brand or name. Under 60 characters.
+---
 
-## Priority 6: schema
+## Finding 2: you are absent from the local pack, and that is the biggest gap
 
-Needs your HTML to confirm what exists. Assuming a typical setup, the target is:
+All three Bangalore queries return a three-business map pack **above the organic
+results**. You are not in it. These are:
 
-- **Person** for Shreyas V Patil, with `jobTitle`, `knowsAbout`, `alumniOf` if
-  relevant, and `sameAs` pointing at every profile from the directory work.
-  This is your strongest E-E-A-T asset and most competitors will not have it
-- **ProfessionalService** (a LocalBusiness subtype, more accurate than plain
-  LocalBusiness for a consultancy) with `areaServed` covering Bangalore and the
-  other cities, `founder` linked to the Person, `priceRange`
-- **Organization** with the canonical brand name and full `sameAs` set
+| Business | Rating | Reviews | GBP category | Signals |
+|---|---|---|---|---|
+| Mrkhan | 5.0 | 39 | Internet marketing service | 7+ yrs, address, phone, open 24h, on-site, **online appointments** |
+| Ankith | 4.8 | 29 | Marketing agency | 3+ yrs, address, phone, open 24h, on-site, **online appointments** |
+| AV Sumanth | 4.8 | 17 | Branding agency | Address, phone, open 24h |
+
+Three things to take from this.
+
+**The barrier is low.** Seventeen reviews gets you into this pack. Not hundreds.
+You have worked with 66+ brands. Twenty happy clients leaving reviews over the
+next two months puts you in contention with the whole pack.
+
+**All three set "Open 24 hours."** Businesses open at search time rank better in
+local results, and all three have taken that setting. It is a deliberate tactic
+and it costs nothing.
+
+**Two have "Online appointments" enabled.** That is a GBP booking integration.
+It is a conversion feature and a completeness signal.
+
+Also note the categories: Internet marketing service, Marketing agency, Branding
+agency. Primary category is the strongest single local pack factor. Pick
+deliberately rather than accepting the first suggestion.
+
+**This outranks everything else in this document.** The pack sits above organic
+on all three primary queries. Moving from organic position five to three is worth
+less than appearing in a three-result block above all of it.
+
+---
+
+## Finding 3: your pricing is a real moat and you are under-using it
+
+Your snippet reads: *"Entry-Level: ₹500-₹1,000/hour"*. You are the only result on
+that SERP exposing a rate.
+
+Now look at People Also Ask across the three Bangalore queries:
+
+- What is the average cost of digital marketing in Bangalore?
+- How much does a freelance digital marketer charge?
+
+Cost questions appear in PAA on **every** Bangalore variant. Nobody ranking is
+answering them properly on-page, and you already have the data.
+
+Build a real pricing section on the homepage, or a dedicated `/pricing` page
+linked from it: hourly bands, typical monthly retainer, what a first engagement
+actually costs, what changes the number. Answer each PAA question in a
+self-contained 40 to 60 word block under a question-phrased H2.
+
+This is the clearest featured-snippet opportunity on the SERP and it filters
+your leads at the same time.
+
+---
+
+## Finding 4: the SERP has split intent, and half of it is not your buyer
+
+Indeed and Naukri rank on these queries. Several PAA entries are job-seeker
+questions: "How to earn 1 lakh per month in digital marketing", "How do I start
+freelance digital marketing", "Can I earn 10 lakh per month".
+
+That means a meaningful share of this traffic is people wanting to **become**
+freelancers, not hire one.
+
+Do not chase those questions. Writing "how to become a digital marketing
+freelancer" content will bring traffic that never converts and will muddy what
+Google thinks your page is for. Answer only the hiring-intent questions: who is
+best, what it costs, what a freelancer does versus an agency.
+
+---
+
+## Finding 5: your India ranking uses a Bangalore title
+
+For "digital marketing freelancer india" you rank with **"Hire Digital Marketer
+Bangalore | Shreyas V Patil"**, and Google is rewriting your description to a
+definition pulled from body copy rather than using your meta.
+
+Two implications. Google found your body content more relevant than your meta
+description, which means the meta is not doing its job. And a city-specific
+title is a weak match for a national query.
+
+Given you also have Hyderabad and Chennai pages, the cleanest structure is one
+national page targeting the India term with those cities as internal links,
+leaving the homepage free to own Bangalore outright.
+
+**Conflict to resolve first:** your post `/post/digital-marketing-freelancers-in-india`
+is a roundup of other freelancers targeting the same phrase. Google reads it as
+a list, not an offer. Decide which page owns the term.
+
+---
+
+## Finding 6: two link opportunities visible in your own SERP
+
+**bringseo.com** ranks for all four of your target queries with roundup posts and
+carries 5.0 from 232 reviews. Their "Top 10 Digital Marketing Freelancers in
+India" lists **you at number 3**. Check whether that mention links to you. If not,
+that is Email 1 from `06-outreach.md`, and it is the highest-probability link on
+your list.
+
+**aravindsubramanian.com** also lists you. Same check.
+
+Note what Bring SEO is doing: ranking their own roundups for your target
+keywords and placing themselves at number 1 in each. It works, and it is the
+same pattern flagged in `06-outreach.md`. Worth understanding, not copying.
+
+---
+
+## Finding 7: cannibalisation, unchanged
+
+Still stands, and does not depend on index freshness:
+
+- `/seo-freelancer-in-bangalore` and `/seo-expert-in-bangalore` serve one intent
+- `/freelance-social-media-marketing` and `/freelancer-for-social-media-marketing`
+  serve one intent
+
+Pick the stronger page in each pair from Search Console impressions, 301 the
+other into it, merge unique content, repoint internal links.
+
+Also confirm your canonical host. The SERP now displays `eeatminds.in` while the
+index carried `www.eeatminds.in`. Pick one, 301 the other, make canonicals and
+every directory listing match.
+
+---
+
+## Finding 8: the secondary keywords still do not need pages
+
+| Keyword | Intent | Target |
+|---|---|---|
+| digital marketing freelancer in Bangalore | Primary | Homepage |
+| freelance digital marketer in Bangalore | Same as primary | Homepage H2 and body |
+| freelance digital marketing in Bangalore | Same as primary | Homepage H2 and body |
+| digital marketing freelancer in India | Broader | One national page |
+
+Confirmed by your own data: all three Bangalore queries return substantially the
+same results and the same map pack. Google treats them as one intent. Separate
+pages would create a third cannibalisation pair.
+
+---
+
+## Schema
+
+Needs your HTML to confirm what exists. Target:
+
+- **Person** for Shreyas V Patil with `jobTitle`, `knowsAbout`, and `sameAs`
+  across every profile. Your strongest E-E-A-T asset, and the SERP is entirely
+  named individuals
+- **ProfessionalService** with `areaServed`, `founder` linked to the Person,
+  `priceRange` matching your published rates, `aggregateRating` once reviews exist
+- **Organization** with one canonical brand spelling
 - **BreadcrumbList** on service pages
-- **WebSite** at root
 
-**Do not add FAQPage expecting rich results.** Google retired FAQ rich results
-for all sites on 7 May 2026. Keep FAQ content if it helps users, but it earns no
-SERP feature now. **Do not add HowTo** either, removed September 2023. Most
-Indian agency sites still recommend both, which is a differentiator you can use
-in sales conversations.
-
-## Priority 7: the city pages
-
-You now have Bangalore, Chennai and Hyderabad. Run the swap test on each: replace
-the city name with another city and read it. If it still makes sense, Google
-reads it as a doorway page.
-
-Three pages is well under the 30-page warning threshold, so there is no crisis.
-But you are selling SEO, so getting demoted for doorway pages is a story you
-cannot afford. Each city page needs something that could only be written about
-that city: a named local client, area-specific pricing, a local case study, a
-market observation about that city's businesses.
-
-If you cannot write that for Chennai and Hyderabad, consolidate them into one
-"across India" page and keep Bangalore as the deep one.
-
-## Priority 8: homepage content structure
-
-Needs HTML to confirm, but target this shape:
-
-- **One H1** containing the primary phrase and your name
-- **H2s using the natural variants**: "Why hire a freelance digital marketer in
-  Bangalore", "What freelance digital marketing in Bangalore costs", "Areas I
-  cover across Bangalore"
-- **A direct answer block in the first 60 words.** State plainly what you do,
-  where, and for whom. This serves both the featured snippet and AI-search
-  citation, which reward self-contained extractable passages
-- **Specific local proof**: named Bangalore neighbourhoods or business districts,
-  a local client, something that could not appear on a Delhi freelancer's page
-- **Pricing or a starting figure.** Almost nobody in this SERP publishes one.
-  It filters your leads and it is the kind of concrete detail both users and AI
-  answers favour
+Do not add **FAQPage** expecting rich results (retired for all sites 7 May 2026)
+or **HowTo** (removed September 2023). Keep FAQ content for users and for the
+PAA opportunity above, just do not expect a SERP feature from the markup.
 
 ---
 
-## What I could not check
+## Order of work
 
-These need the rendered HTML. Paste it and I will finish the audit:
+1. **Google Business Profile.** Claim, set primary category deliberately, add
+   address and phone, set open 24 hours, enable online appointments, then start
+   review outreach. Target 20 reviews. This is above all organic results
+2. **Homepage title** to the 59-character version. Ten minutes
+3. **Fix both cannibalisation pairs** and settle the www question
+4. **Pricing content** answering the cost PAA questions in snippet-shaped blocks
+5. **Resolve the India-term conflict**, then build the national page
+6. **Person and ProfessionalService schema**
+7. Reclaim the Bring SEO and Aravind Subramanian mentions
 
-- H1 count and content per page
-- Existing schema blocks and their validity
-- Internal link structure and anchor text
-- Actual word counts
-- Canonical tags
-- Image alt text
-- Core Web Vitals, which need PageSpeed Insights at pagespeed.web.dev regardless
+Items 1 and 2 are most of the available gain. Everything below 4 is refinement.
 
 ---
 
-## Do these in this order
+## Still outstanding
 
-1. **Fix both cannibalisation pairs.** Free, and you are competing with yourself
-2. **Resolve the India-term conflict** between the blog post and your service pages
-3. **Homepage title and meta**, using the strings above
-4. **Brand casing** everywhere
-5. **Person and ProfessionalService schema**
-6. **Google Business Profile.** Still the largest single lever on a local-intent
-   query, and it sits above every organic result on this SERP
-7. City pages, and inner-page titles
-
-One to five are on-page and cost you an afternoon. Six is the one that outranks
-all of them for this specific keyword.
+Send your homepage `<head>` block and I will finish: H1 count, existing schema,
+canonical tag, OG tags, internal link structure and word count. Core Web Vitals
+need pagespeed.web.dev regardless, since no HTML fetch can measure them.
