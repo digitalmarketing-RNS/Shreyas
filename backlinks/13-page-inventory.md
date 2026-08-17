@@ -143,7 +143,34 @@ differently than on self-hosted. Worth knowing before planning remediation.
 
 ## URL inventory
 
-**43 unique URLs observed.** A floor, not a complete count.
+**47 unique URLs observed.** A floor, not a complete count.
+
+### Inventory is a floor — demonstrated, not assumed
+
+The first pass found 43 URLs. Two additional queries on untouched topics
+(pricing/testimonials, and email/content/SEM) returned **4 more posts** that the
+first pass had missed entirely. The count rose 43 → 47 purely by asking different
+questions.
+
+This is how a search index behaves: each query returns a *relevance-ranked slice*,
+never the full set. There is no exhaustive enumeration available — that needs
+`sitemap.xml` (unreachable) or a crawler (not exposed). **Assume more pages exist
+than are listed here.**
+
+Two related observations from the same passes:
+
+- The homepage returned **different content on different queries** — one pass
+  surfaced a "Real Results. Real Businesses. Real Growth." section with three case
+  examples that earlier passes did not.
+- Its indexed **title varied between queries** — `"Hire Digital Marketer Bangalore
+  | Shreyas V Patil"` on some, plain `"EEAT Minds"` on others. Could be index
+  variants or a genuinely changing title; **not diagnosable without page access.**
+
+Also newly surfaced, worth noting alongside the other quantified claims:
+`/post/eeat-seo-strategies-for-indian-tech-startups` asserts *"startups that
+establish verifiable technical authority achieve a 340% higher citation rate in
+AI"*, attributed to "our 2026 research at EEAT Minds". If that research is not
+published, it is an unsourced statistic on a page about verifiable authority.
 
 ### Service and money pages (13)
 
@@ -208,6 +235,12 @@ Educational / top-of-funnel:
 
 Vertical:
 - `digital-marketing-for-doctors-india`
+
+Found on a later pass (see "Inventory is a floor" below):
+- `what-is-eeat-in-seo`
+- `how-to-do-seo-for-android-app`
+- `how-does-social-media-marketing-affect-small-businesses`
+- `ai-insights-from-digital-marketing-experts`
 
 **Worth a look:** `/post/top-5-freelance-digital-marketer-bangalore` and
 `/post/top-digital-marketing-freelancers-in-chennai` are listicles targeting the
