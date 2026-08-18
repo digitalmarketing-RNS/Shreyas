@@ -1,0 +1,308 @@
+{
+ "summary": {
+  "health_score": 71,
+  "business_type": "Service-Area Business - solo-practitioner digital marketing consultancy (Bangalore, multi-city), Wix platform",
+  "audit_date": "2026-08-17",
+  "coverage": "86/86 sitemap URLs crawled (100%)",
+  "scoring_note": "Performance (10% weight) withheld - PageSpeed keyless quota exhausted, no CWV field data. Score renormalised over remaining 90%.",
+  "top_findings": [
+   "8 commercial pages carry zero structured data - every geo page except Bangalore, every vertical page without exception (verified with JSON-LD parser)",
+   "No visible author bylines or dates on any of the 68 blog posts, on a site named EEAT Minds",
+   "Four duplicate-topic page pairs live in the sitemap, including a service page and blog post on the identical Hyderabad slug where the post is 553 words longer",
+   "Business email is eeatminds.in@gmail.com, blocking Clutch/GoodFirms verification and the staged Foundation link campaign",
+   "llms.txt exists but is Wix-auto-generated and links only the homepage - none of the 17 service pages or 68 articles"
+  ],
+  "quick_wins": [
+   "Add an H1 to /seo-service-for-dentists - only page of 85 without one",
+   "Alt text on /ppc-services (9 of 10 images) and /outsource-digital-marketing-services (10 of 12)",
+   "Trim the 247-character homepage meta description to ~155",
+   "301 the two singular/plural post pairs into their longer versions",
+   "Remove /paidadvertising-1 from the sitemap - it 301s away"
+  ]
+ },
+ "categories": [
+  {
+   "name": "Technical SEO",
+   "score": 90,
+   "what_works": [
+    "0 missing canonicals across 85 pages",
+    "0 accidental noindex",
+    "0 duplicate titles or meta descriptions",
+    "Correct eeatminds.in to www 301 with matching canonical",
+    "robots.txt blocks PetalBot and throttles Ahrefs/Semrush/dotbot",
+    "Valid sitemap index with 3 children"
+   ],
+   "findings": [
+    {
+     "title": "Redirecting URL listed in sitemap",
+     "severity": "Low",
+     "description": "/paidadvertising-1 is in pages-sitemap.xml but 301s to /seo-freelancer-in-bangalore. Leftover Wix auto-slug.",
+     "recommendation": "Remove from sitemap; sitemaps should list only canonical 200 URLs."
+    },
+    {
+     "title": "No lastmod values in sitemap",
+     "severity": "Low",
+     "description": "No recrawl priority signal given to crawlers.",
+     "recommendation": "Emit lastmod per URL."
+    },
+    {
+     "title": "Four security headers absent",
+     "severity": "Info",
+     "description": "CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy missing. HSTS and X-Content-Type-Options present.",
+     "recommendation": "Hardening only, not ranking factors, and largely Wix-controlled. No action required."
+    },
+    {
+     "title": "Wix returns 429 to non-browser User-Agents",
+     "severity": "Info",
+     "description": "A crawler identifying as SEO-audit/1.0 got 429 on all 86 URLs; a Chrome UA got 200. Wix also throttles sustained crawling regardless of UA.",
+     "recommendation": "For your own audits set a browser UA and throttle to ~0.2 req/s."
+    }
+   ]
+  },
+  {
+   "name": "Content Quality",
+   "score": 68,
+   "what_works": [
+    "Median 1,347 words across 86 pages",
+    "Google Partner certification stated WITH a verifiable link",
+    "12 named client logos",
+    "Real named practitioner with 7 sameAs profiles including two .edu.in author pages",
+    "Homepage readability: 18.0 words per sentence"
+   ],
+   "findings": [
+    {
+     "title": "No author bylines or dates on 68 blog posts",
+     "severity": "High",
+     "description": "Zero matches for author/byline/updated text across all posts. All carry BlogPosting schema but show no visible attribution. Most incongruent finding on a site named EEAT Minds.",
+     "recommendation": "Visible byline linked to an author page, plus published/updated dates, with author and datePublished/dateModified in BlogPosting schema."
+    },
+    {
+     "title": "Four duplicate-topic page pairs",
+     "severity": "High",
+     "description": "on-page-optimization-service (1,100w) vs -services (2,336w); which-on-page-element-carries (1,572w) vs -elements-carry (1,117w); /digital-marketing-freelancer-in-hyderabad (1,918w service) vs /post/ same slug (2,471w); digital-marketing-freelancers-in-india vs hire-digital-marketing-freelancer-in-india.",
+     "recommendation": "301 the weaker into the stronger, but confirm with GSC impressions first."
+    },
+    {
+     "title": "Five thin commercial pages",
+     "severity": "Medium",
+     "description": "/freelance-web-designers-in-bangalore 405 words, /social-media-marketing-for-doctors 689, /seo-service-for-dentists 814, /ppc-services 876, /best-digital-marketer-in-india 885 - against 2,234 for the page that ranks.",
+     "recommendation": "Expand toward the depth of /seo-freelancer-in-bangalore, prioritising /ppc-services."
+    },
+    {
+     "title": "Unsourced quantified claims",
+     "severity": "Medium",
+     "description": "'ROI on SEO alone can be 5-10x within 12 months'; '340% higher citation rate in AI' attributed to unpublished in-house research; '40-60% lower cost than a full-service agency'.",
+     "recommendation": "Publish the research, cite a third party, or soften to a defensible range."
+    }
+   ]
+  },
+  {
+   "name": "On-Page SEO",
+   "score": 76,
+   "what_works": [
+    "0 duplicate titles across 85 pages",
+    "0 duplicate meta descriptions",
+    "83 of 85 pages have exactly one H1",
+    "Clean readable keyword-relevant URLs",
+    "Alt text quality is good where present"
+   ],
+   "findings": [
+    {
+     "title": "/seo-service-for-dentists has no H1",
+     "severity": "Medium",
+     "description": "Only page of 85 missing an H1. Also has no schema and 814 words.",
+     "recommendation": "Add an H1 matching the page's target term."
+    },
+    {
+     "title": "121 of 974 images lack alt text",
+     "severity": "Medium",
+     "description": "/ppc-services 9 of 10 missing; /outsource-digital-marketing-services 10 of 12; /best-digital-marketer-in-india 24 of 44; /freelance-social-media-marketing 14 of 35.",
+     "recommendation": "Accessibility obligation first. Start with the two near-empty pages."
+    },
+    {
+     "title": "25 meta descriptions exceed 160 characters",
+     "severity": "Low",
+     "description": "Homepage is 247 characters, so roughly a third never displays. Hyderabad 243, Chennai 241. Separately, 7 descriptions are under 70 characters.",
+     "recommendation": "Rewrite to 150-160 characters, homepage first."
+    },
+    {
+     "title": "36 of 85 titles exceed 60 characters",
+     "severity": "Low",
+     "description": "Longest 82 characters. Truncation costs click-through, not ranking.",
+     "recommendation": "Batch-fix when editing pages for other reasons."
+    }
+   ]
+  },
+  {
+   "name": "Schema / Structured Data",
+   "score": 45,
+   "what_works": [
+    "Homepage @graph is excellent: LocalBusiness+ProfessionalService with full NAP, geo, opening hours, contactPoint in 7 languages, OfferCatalog, proper @id cross-referencing",
+    "All 68 blog posts carry BlogPosting + Organization + ImageObject",
+    "/seo-freelancer-in-bangalore has ProfessionalService + FAQPage + City + Country",
+    "No parse errors - existing markup is syntactically valid"
+   ],
+   "findings": [
+    {
+     "title": "8 commercial pages have zero structured data",
+     "severity": "Critical",
+     "description": "Verified with a JSON-LD parser walking nested and array-form @type: /digital-marketing-freelancer-in-chennai (1,984w), -hyderabad (1,918w), /real-estate-seo-services (1,588w), /outsource-digital-marketing-services (1,275w), /seo-services-for-doctors (1,224w), /best-digital-marketer-in-india (885w), /seo-service-for-dentists (814w), /social-media-marketing-for-doctors (689w). Zero JSON-LD blocks, no microdata.",
+     "recommendation": "Clone the /seo-freelancer-in-bangalore @graph, changing areaServed, name, description and service type per page. Template already proven on this domain."
+    },
+    {
+     "title": "ProfessionalService on 3 of 85 pages, FAQPage on 1",
+     "severity": "High",
+     "description": "Structured data is complete wherever Wix automates it and absent wherever it needed manual work.",
+     "recommendation": "Add Service entities to /ppc-services and /freelance-web-designers-in-bangalore (breadcrumbs only), and extend FAQPage to pages that already have visible FAQ blocks."
+    }
+   ]
+  },
+  {
+   "name": "AI Search Readiness",
+   "score": 55,
+   "what_works": [
+    "llms.txt exists (200) - ahead of most sites",
+    "Wix Site MCP endpoint at /_api/mcp lets agents query live content",
+    "All AI crawlers permitted under User-agent: * Allow: /",
+    "Strong entity signals: 7 sameAs on the Person including two .edu.in author pages and a featured.com profile"
+   ],
+   "findings": [
+    {
+     "title": "llms.txt links only the homepage",
+     "severity": "Medium",
+     "description": "Wix-auto-generated. Lists one URL; none of the 17 service pages or 68 articles. Roughly 80% is boilerplate Wix MCP documentation.",
+     "recommendation": "Author a real llms.txt listing money pages and best articles with one-line descriptions. Single file, highest-leverage GEO action available."
+    },
+    {
+     "title": "No author attribution or dates - binding citability constraint",
+     "severity": "High",
+     "description": "Assistants preferentially cite attributed, dated content. 68 undated anonymous articles are structurally disadvantaged in AI answers regardless of quality.",
+     "recommendation": "Same fix as Content 2.2 - serves both categories."
+    },
+    {
+     "title": "robots.txt disallows the path llms.txt advertises",
+     "severity": "Low",
+     "description": "Disallow: /_api/* covers the /_api/mcp endpoint that llms.txt promotes. Agents calling directly are unaffected, but the two files disagree.",
+     "recommendation": "Reconcile the two."
+    },
+    {
+     "title": "AI crawler policy is implicit",
+     "severity": "Low",
+     "description": "No GPTBot, ClaudeBot, PerplexityBot, CCBot or Google-Extended directives. Access is allowed by default rather than by decision.",
+     "recommendation": "Declare it explicitly - also a client talking point for a business selling AI visibility."
+    }
+   ]
+  },
+  {
+   "name": "Images",
+   "score": 72,
+   "what_works": [
+    "Every sampled asset under 7 KB",
+    "Automatic resize and AVIF/WebP negotiation via Wix CDN",
+    "33 of 36 homepage images correctly lazy-loaded",
+    "Alt text quality is descriptive and not stuffed where present"
+   ],
+   "findings": [
+    {
+     "title": "35 of 36 images have no width/height attributes",
+     "severity": "Medium",
+     "description": "Browser cannot reserve layout space, so content reflows as images load. Classic CLS cause, applies site-wide.",
+     "recommendation": "Risk factor, not a measured failure. Check the GSC Core Web Vitals report before rebuilding anything."
+    },
+    {
+     "title": "Above-fold logo is lazy-loaded",
+     "severity": "Low",
+     "description": "First image in the DOM carries loading=lazy, deferring its request until layout and potentially delaying LCP.",
+     "recommendation": "Set loading=eager on the logo and any hero image."
+    }
+   ]
+  },
+  {
+   "name": "Local SEO",
+   "score": null,
+   "what_works": [
+    "Complete well-formed NAP in schema",
+    "Geo coordinates match the stated Kalyan Nagar address",
+    "areaServed Bangalore/India/Worldwide",
+    "contactPoint declares 7 languages"
+   ],
+   "findings": [
+    {
+     "title": "Business email is a gmail.com address",
+     "severity": "High",
+     "description": "eeatminds.in@gmail.com is published in the schema. Clutch, GoodFirms and other high-authority directories require a domain-matched email to verify a listing.",
+     "recommendation": "Move to shreyas@eeatminds.in, then update schema, contact page and footer. Gates the entire Foundation link campaign already staged in ../backlinks/."
+    },
+    {
+     "title": "Opening hours declared 00:00-23:59 seven days",
+     "severity": "Low",
+     "description": "Renders as 'Open 24 hours', not credible for a solo practitioner and inconsistent with how the business operates.",
+     "recommendation": "Declare genuine working hours."
+    },
+    {
+     "title": "Google Business Profile not assessed",
+     "severity": "Info",
+     "description": "Requires the GBP API or DataForSEO Maps; neither configured. Claim status, reviews, photos, categories and map-pack rank all unmeasured.",
+     "recommendation": "Audit separately - ../backlinks/02-tracker.csv already calls GBP the highest-leverage local asset."
+    }
+   ]
+  }
+ ],
+ "action_plan": {
+  "phases": [
+   {
+    "name": "Phase 1: Quick Wins",
+    "timeframe": "Week 1 (~3 hours)",
+    "items": [
+     "Add an H1 to /seo-service-for-dentists",
+     "Alt text on /ppc-services and /outsource-digital-marketing-services",
+     "Trim homepage meta description from 247 to ~155 characters",
+     "Remove /paidadvertising-1 from the sitemap",
+     "301 the two singular/plural post pairs (verify direction in GSC first)",
+     "Set loading=eager on the logo",
+     "Correct the declared opening hours"
+    ]
+   },
+   {
+    "name": "Phase 2: Highest-Impact Fixes",
+    "timeframe": "Weeks 2-3",
+    "items": [
+     "Propagate the /seo-freelancer-in-bangalore schema template to the 8 empty commercial pages (~4 hours, top priority)",
+     "Add Service entities to /ppc-services and /freelance-web-designers-in-bangalore",
+     "Add visible bylines and dates to all 68 posts - fixes three scored categories at once",
+     "Author a real llms.txt listing service pages and key articles",
+     "Switch to a branded email and update schema, contact page and footer"
+    ]
+   },
+   {
+    "name": "Phase 3: Content Depth",
+    "timeframe": "Month 2",
+    "items": [
+     "Resolve the Hyderabad, Chennai and Bangalore geo-commercial conflicts using GSC impression data",
+     "Expand /ppc-services and /freelance-web-designers-in-bangalore toward 2,000+ words",
+     "Strengthen /contact beyond 133 words with proof elements",
+     "Source or soften the three unsupported statistics",
+     "Clear the remaining 97 missing alt attributes and 36 long titles"
+    ]
+   },
+   {
+    "name": "Phase 4: Measurement",
+    "timeframe": "Ongoing",
+    "items": [
+     "Check the GSC Core Web Vitals report - closes the one unscored category, free",
+     "Add a free Moz API key to unblock the backlink health score",
+     "Connect GSC for the Phase 3 consolidation decisions",
+     "Audit Google Business Profile",
+     "Compare the iswadesh.com cross-domain duplicate",
+     "Re-run the internal link crawl at 5s intervals with a browser UA"
+    ]
+   }
+  ]
+ },
+ "artifacts": {
+  "findings_dir": "findings/",
+  "screenshots_dir": null,
+  "crawl_data": "../backlinks/14-crawl-data.csv",
+  "page_inventory": "../backlinks/13-page-inventory.md"
+ }
+}
