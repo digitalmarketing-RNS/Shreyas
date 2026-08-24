@@ -4,3 +4,6 @@ client_secret*.json
 oauth-token.json
 google-api.json
 .env
+
+# go build output
+xai-realtime/xai-realtime
