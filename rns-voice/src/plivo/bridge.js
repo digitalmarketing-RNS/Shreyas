@@ -30,8 +30,17 @@ function parseExtraHeaders(raw) {
  * as opaque base64 in either direction — no decode, no resample, no transcode.
  */
 export class PlivoBridge {
-  constructor(ws) {
+  constructor(ws, req) {
     this.ws = ws;
+    // Identity from the handshake URL. This is the reliable channel: we chose
+    // the URL, so Plivo connects with it verbatim.
+    this.urlParams = (() => {
+      try {
+        return new URL(req?.url ?? '', 'http://localhost').searchParams;
+      } catch {
+        return new URLSearchParams();
+      }
+    })();
     this.streamId = null;
     this.callId = null;
     this.session = null;
@@ -89,11 +98,33 @@ export class PlivoBridge {
     const start = message.start ?? message;
     this.streamId = start.streamId ?? message.streamId ?? null;
 
-    const headers = parseExtraHeaders(start.extraHeaders ?? start.extra_headers);
-    const callId = headers.callId;
+    // Plivo's own shape has moved between revisions, so record exactly what
+    // arrived. Without this a rejected stream looks like an unexplained
+    // dropped call.
+    log.info(
+      { keys: Object.keys(start), streamId: this.streamId, callUuid: start.callId },
+      'plivo stream start received',
+    );
 
-    if (!callId || !verifyCallToken(callId, headers.token)) {
-      log.warn({ callUuid: start.callId }, 'stream rejected: missing or invalid token');
+    // extraHeaders have appeared under several names and nestings; check them
+    // all rather than depending on one.
+    const headers = parseExtraHeaders(
+      start.extraHeaders ?? start.extra_headers ??
+      message.extraHeaders ?? message.extra_headers,
+    );
+
+    const callId = this.urlParams.get('callId') || headers.callId;
+    const token = this.urlParams.get('token') || headers.token;
+
+    if (!callId || !verifyCallToken(callId, token)) {
+      log.warn(
+        {
+          callUuid: start.callId,
+          fromUrl: Boolean(this.urlParams.get('callId')),
+          fromHeaders: Boolean(headers.callId),
+        },
+        'stream rejected: could not identify the call',
+      );
       this.ws.close(1008, 'unauthorised');
       return;
     }
@@ -214,6 +245,6 @@ export class PlivoBridge {
   }
 }
 
-export function handlePlivoStream(ws) {
-  new PlivoBridge(ws);
+export function handlePlivoStream(ws, req) {
+  new PlivoBridge(ws, req);
 }

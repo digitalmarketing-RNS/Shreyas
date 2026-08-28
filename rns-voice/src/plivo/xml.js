@@ -15,12 +15,18 @@ function escapeXml(value) {
  * `keepCallAlive` keeps the leg up while the agent thinks; without it Plivo
  * would hang up the moment the stream element finished.
  *
- * The call id travels in `extraHeaders` because Plivo delivers those in the
- * stream's `start` event, which is how the bridge learns which call it is on.
+ * The call id is carried in the WebSocket URL's query string. It used to ride
+ * in `extraHeaders` alone, but those arrive inside the `start` event under a
+ * key whose name and nesting vary, and a lookup that misses makes the bridge
+ * reject the stream — which ends the Stream element and drops the call, with
+ * the caller hearing a connect and then silence. The URL is chosen by us and
+ * arrives intact on the handshake, so it cannot go missing. extraHeaders is
+ * kept as a secondary source.
  */
 export function streamXml(callId) {
-  const url = `${wsOrigin()}/plivo/stream`;
   const token = signCallToken(callId);
+  const query = `callId=${encodeURIComponent(callId)}&token=${encodeURIComponent(token)}`;
+  const url = `${wsOrigin()}/plivo/stream?${query}`;
   const extra = `callId=${callId};token=${token}`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>

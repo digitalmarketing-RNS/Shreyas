@@ -80,7 +80,7 @@ const streamWss = new WebSocketServer({ noServer: true });
 const consoleWss = new WebSocketServer({ noServer: true });
 const echoWss = new WebSocketServer({ noServer: true });
 
-streamWss.on('connection', handlePlivoStream);
+streamWss.on('connection', (ws, req) => handlePlivoStream(ws, req));
 consoleWss.on('connection', handleConsoleSocket);
 
 // A trivial echo endpoint the dashboard uses to prove this host actually
