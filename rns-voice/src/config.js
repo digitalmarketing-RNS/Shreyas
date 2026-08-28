@@ -68,6 +68,25 @@ export const config = {
   xaiAgentId: env.XAI_AGENT_ID ?? '',
   xaiModel: env.XAI_MODEL ?? 'grok-voice-latest',
 
+  // ---- Response latency --------------------------------------------------
+  // 'none' asks the model to skip its thinking step before replying. Measured
+  // over 8 sessions this made no difference to time-to-first-audio (medians
+  // 644 ms for 'none' against 536 ms for 'high', with overlapping ranges), so
+  // it is exposed as a knob rather than as a speed fix. Network variance
+  // dominates at this scale. Set 'high' if answers need more care.
+  xaiReasoningEffort: env.XAI_REASONING_EFFORT ?? 'none',
+  // How long the caller must be silent before the agent takes its turn. This
+  // is a fixed wait on every turn, so unlike the knobs above it is a
+  // deterministic saving: the default was 700 ms and is now 500 ms. Too low
+  // and the agent interrupts people mid-sentence; 400-600 ms is the usable
+  // band on a phone line.
+  vadSilenceMs: int(env.VAD_SILENCE_MS, 500),
+  // Raise on a noisy line if the agent starts talking over background sound.
+  vadThreshold: Number(env.VAD_THRESHOLD ?? 0.5),
+  // Playback rate, 0.7-1.5. Above 1 the agent sounds brisker without any
+  // change to actual latency.
+  agentSpeed: Number(env.AGENT_SPEED ?? 1),
+
   // ---- Plivo -------------------------------------------------------------
   plivoAuthId: env.PLIVO_AUTH_ID ?? '',
   plivoAuthToken: env.PLIVO_AUTH_TOKEN ?? '',

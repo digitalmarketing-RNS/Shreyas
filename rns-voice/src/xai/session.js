@@ -41,16 +41,25 @@ export function buildSessionUpdate(options) {
   const audio = JSON.parse(JSON.stringify(PROFILES[options.profile]));
   const session = { audio };
 
+  // Skipping the thinking step is the largest single latency saving on a call.
+  session['reasoning.effort'] = config.xaiReasoningEffort;
+
   if (options.turnDetection !== null) {
     session.turn_detection = {
       type: 'server_vad',
-      threshold: 0.5,
-      // Phone lines carry constant background noise, so a longer silence window
-      // stops the agent cutting in while the person is still mid-sentence.
-      silence_duration_ms: options.profile === 'telephony' ? 700 : 500,
+      threshold: config.vadThreshold,
+      // The wait after the caller stops before the agent replies. It is dead
+      // air on every turn, so it dominates how fast the agent feels.
+      silence_duration_ms: config.vadSilenceMs,
+      // Audio kept from just before speech was detected, so the first syllable
+      // is not clipped. Cheap, and it does not delay the reply.
       prefix_padding_ms: 300,
       ...options.turnDetection,
     };
+  }
+
+  if (config.agentSpeed !== 1) {
+    audio.output.speed = Math.min(1.5, Math.max(0.7, config.agentSpeed));
   }
 
   if (options.instructions) session.instructions = options.instructions;

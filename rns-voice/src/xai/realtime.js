@@ -46,7 +46,14 @@ export class XaiSession extends EventEmitter {
     const ws = new WebSocket(url, {
       headers: { Authorization: `Bearer ${config.xaiApiKey}` },
       handshakeTimeout: 12_000,
+      // Audio arrives as 20 ms frames. Compressing each one costs CPU on both
+      // ends and buys nothing on already-compressed mu-law, so it is pure
+      // added latency on the hot path.
+      perMessageDeflate: false,
     });
+    // Send each frame immediately rather than letting Nagle's algorithm hold
+    // small packets back waiting for company.
+    ws.on('upgrade', () => ws._socket?.setNoDelay?.(true));
     this.ws = ws;
 
     ws.on('open', () => {
