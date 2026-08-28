@@ -86,6 +86,10 @@ export const config = {
   // Playback rate, 0.7-1.5. Above 1 the agent sounds brisker without any
   // change to actual latency.
   agentSpeed: Number(env.AGENT_SPEED ?? 1),
+  // Offers the agent a save_call_details function during calls. Turn off if
+  // the agent already defines its own tools in the xAI console, since sending
+  // a tools list may replace what is configured there.
+  agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, true),
 
   // ---- Plivo -------------------------------------------------------------
   plivoAuthId: env.PLIVO_AUTH_ID ?? '',

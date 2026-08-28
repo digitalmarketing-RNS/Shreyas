@@ -76,7 +76,9 @@ export function buildSessionUpdate(options) {
   if (options.speed !== undefined) {
     audio.output.speed = Math.min(1.5, Math.max(0.7, options.speed));
   }
-  if (options.tools?.length) session.tools = options.tools;
+  const tools = [...(options.tools ?? [])];
+  if (options.detailsTool) tools.push(CALL_DETAILS_TOOL);
+  if (tools.length) session.tools = tools;
 
   return { type: 'session.update', session };
 }
@@ -90,3 +92,38 @@ export function realtimeUrl({ agentId, conversationId } = {}) {
   if (conversationId) url.searchParams.set('conversation_id', conversationId);
   return url.toString();
 }
+
+/**
+ * Lets the agent hand structured data back mid-call — a booking time, a
+ * correction to the contact's name, a better number to reach them on.
+ *
+ * The call is already recorded with its number, duration and transcript, so
+ * this is for what only the conversation can reveal. Every field is optional
+ * because a caller rarely supplies all of them, and a tool that demands
+ * complete arguments makes the agent stall chasing them.
+ */
+export const CALL_DETAILS_TOOL = {
+  type: 'function',
+  name: 'save_call_details',
+  description:
+    'Record what was agreed on this call: an appointment, the contact details ' +
+    'given, and anything worth noting. Call this as soon as something is ' +
+    'settled, and again if it changes. Do not read the arguments aloud.',
+  parameters: {
+    type: 'object',
+    properties: {
+      outcome: {
+        type: 'string',
+        enum: ['booked', 'callback_requested', 'not_interested', 'wrong_number', 'other'],
+        description: 'How the call ended up.',
+      },
+      appointment_time: {
+        type: 'string',
+        description: 'When the meeting is, in the words the person used, e.g. "Tuesday 3pm".',
+      },
+      contact_name: { type: 'string', description: 'The name they gave, if it differs from the list.' },
+      callback_number: { type: 'string', description: 'A different number to reach them on.' },
+      notes: { type: 'string', description: 'Anything else worth keeping.' },
+    },
+  },
+};

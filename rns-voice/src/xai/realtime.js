@@ -166,6 +166,21 @@ export class XaiSession extends EventEmitter {
     this.send({ type: 'input_audio_buffer.append', audio: base64 });
   }
 
+  /**
+   * Puts information into the conversation without asking for a reply.
+   *
+   * Deliberately not sent as `instructions`: those would replace the prompt
+   * configured on the agent in the xAI console, which is where the actual
+   * behaviour lives. This adds a turn the agent can read instead, so the
+   * console configuration stays authoritative.
+   */
+  sendContext(text) {
+    this.send({
+      type: 'conversation.item.create',
+      item: { type: 'message', role: 'user', content: [{ type: 'input_text', text }] },
+    });
+  }
+
   sendText(text) {
     this.send({
       type: 'conversation.item.create',

@@ -357,7 +357,8 @@ function renderCallRows(list, target, compact) {
          <td class="sub">${new Date(c.startedAt).toLocaleString()}</td>
          <td>${c.durationSeconds ?? '—'}</td>
          <td><span class="badge ${c.status}">${esc(c.status)}</span></td>
-         <td><span class="badge ${c.disposition ?? ''}">${esc(c.disposition ?? '—')}</span></td>
+         <td><span class="badge ${c.disposition ?? ''}">${esc(c.disposition ?? '—')}</span>
+             ${c.details?.outcome ? `<div class="sub">${esc(c.details.outcome)}</div>` : ''}</td>
          <td style="white-space:nowrap">
            ${c.transcript?.length ? `<button class="btn sm" data-transcript="${c.id}">Transcript</button>` : ''}
            ${!c.endedAt ? `<button class="btn sm danger" data-hangup="${c.id}">End</button>` : ''}
@@ -382,6 +383,22 @@ $('callRows').addEventListener('click', async (e) => {
   } else if (button.dataset.transcript) {
     const call = await api(`/calls/${button.dataset.transcript}`);
     $('transcriptCard').classList.remove('hidden');
+
+    // Anything the agent reported through save_call_details, shown above the
+    // transcript because it is the part worth acting on.
+    const d = call.details;
+    $('callDetails').innerHTML = d
+      ? `<div class="note ok"><div><b>Recorded by the agent</b><br>${
+          [
+            d.outcome && `Outcome: ${esc(d.outcome)}`,
+            d.appointment_time && `Appointment: ${esc(d.appointment_time)}`,
+            d.contact_name && `Name: ${esc(d.contact_name)}`,
+            d.callback_number && `Callback number: ${esc(d.callback_number)}`,
+            d.notes && `Notes: ${esc(d.notes)}`,
+          ].filter(Boolean).join('<br>')
+        }</div></div>`
+      : '<p class="muted">The agent did not record any structured details on this call.</p>';
+
     $('transcriptFeed').innerHTML = call.transcript.map((t) =>
       `<div class="line"><span class="at">${new Date(t.at).toLocaleTimeString()}</span>
        <span class="${t.role}">${t.role === 'agent' ? 'Agent' : 'Person'}: ${esc(t.text)}</span></div>`).join('')

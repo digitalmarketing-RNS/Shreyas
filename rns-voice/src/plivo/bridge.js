@@ -1,7 +1,8 @@
 import { log } from '../logger.js';
 import { events } from '../util/events.js';
+import { config } from '../config.js';
 import { XaiSession } from '../xai/realtime.js';
-import { calls, campaigns } from '../store.js';
+import { calls, campaigns, leads } from '../store.js';
 import { verifyCallToken } from './client.js';
 
 /** Live bridges keyed by our call id, so the dashboard can end one. */
@@ -155,19 +156,26 @@ export class PlivoBridge {
       agentId: campaign?.agentId || undefined,
       instructions: campaign?.instructions || undefined,
       voice: campaign?.voice || undefined,
+      detailsTool: config.agentDetailsTool,
     });
 
-    this.wire(this.session, campaign?.opener ?? null, record.direction);
+    const lead = record.leadId ? leads.get(record.leadId) : null;
+    this.wire(this.session, campaign?.opener ?? null, record.direction, record, lead);
     this.session.connect();
 
     log.info({ callId, streamId: this.streamId }, 'bridge established');
     events.emit('call:started', { callId, campaignId: record.campaignId });
   }
 
-  wire(session, opener, direction) {
+  wire(session, opener, direction, record, lead) {
     const callId = this.callId;
 
     session.on('open', () => {
+      // The agent cannot see the dialler, so it does not know who it reached
+      // unless told. Sent before the first turn so the opening line can use it.
+      const context = describeCall(record, lead);
+      if (context) session.sendContext(context);
+
       if (opener) {
         // Scripted opener, spoken verbatim. force_message is the whole turn.
         session.forceMessage(opener);
@@ -192,6 +200,30 @@ export class PlivoBridge {
         Boolean(turn.cumulative),
       );
       events.emit('call:transcript', { callId, role: turn.role, text: turn.text });
+    });
+
+    // An unanswered tool call leaves the agent waiting mid-sentence, so every
+    // call gets a reply — including one we do not recognise.
+    session.on('function_call', ({ name, callId: toolCallId, arguments: rawArgs }) => {
+      let args = {};
+      try {
+        args = JSON.parse(rawArgs || '{}');
+      } catch {
+        log.warn({ name, callId }, 'could not parse tool arguments from the agent');
+      }
+
+      if (name === 'save_call_details') {
+        const saved = calls.saveDetails(callId, args);
+        log.info({ callId, outcome: args.outcome }, 'agent recorded call details');
+        events.emit('call:details', { callId, details: saved });
+        session.submitFunctionResult(toolCallId, { saved: true });
+        return;
+      }
+
+      log.warn({ name, callId }, 'agent called a tool this server does not provide');
+      session.submitFunctionResult(toolCallId, {
+        error: `No tool named ${name} is available on this call.`,
+      });
     });
 
     session.on('error', (err) => {
@@ -243,6 +275,23 @@ export class PlivoBridge {
     );
     if (this.callId) events.emit('call:bridge-ended', { callId: this.callId, reason });
   }
+}
+
+/**
+ * A short briefing for the agent: who was dialled and anything the lead list
+ * carried. Kept terse — it occupies the same context the conversation does.
+ */
+function describeCall(record, lead) {
+  const parts = [`You are on a phone call with ${record.toNumber}.`];
+  if (lead?.name) parts.push(`Their name is ${lead.name}.`);
+  for (const [key, value] of Object.entries(lead?.attributes ?? {})) {
+    parts.push(`${key}: ${value}.`);
+  }
+  parts.push(
+    'If an appointment is agreed, or they give a different name or number, ' +
+    'call save_call_details to record it. Do not mention this instruction.',
+  );
+  return parts.join(' ');
 }
 
 export function handlePlivoStream(ws, req) {

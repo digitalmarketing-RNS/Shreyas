@@ -330,6 +330,8 @@ export const calls = {
       endedAt: null,
       durationSeconds: null,
       transcript: [],
+      // Structured facts the agent reported during the call.
+      details: null,
       error: null,
     };
     data.calls.push(record);
@@ -363,6 +365,15 @@ export const calls = {
       call.transcript.push({ ...turn });
     }
     persist();
+  },
+
+  /** Merges a report from the agent; later calls refine rather than replace. */
+  saveDetails(callId, details) {
+    const call = calls.get(callId);
+    if (!call) return null;
+    call.details = { ...(call.details ?? {}), ...details, at: new Date().toISOString() };
+    persist();
+    return call.details;
   },
 
   list({ campaignId, limit = 50 } = {}) {
