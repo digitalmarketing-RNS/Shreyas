@@ -67,9 +67,10 @@ export function buildSessionUpdate(options) {
 
   if (options.instructions) session.instructions = options.instructions;
   if (options.voice) session.voice = options.voice;
-  if (options.languageHint || options.keyterms?.length) {
+  const languageHint = options.languageHint || config.xaiLanguageHint;
+  if (languageHint || options.keyterms?.length) {
     audio.input.transcription = {
-      ...(options.languageHint ? { language_hint: options.languageHint } : {}),
+      ...(languageHint ? { language_hint: languageHint } : {}),
       ...(options.keyterms?.length ? { keyterms: options.keyterms } : {}),
     };
   }

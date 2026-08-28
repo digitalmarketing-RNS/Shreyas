@@ -90,6 +90,17 @@ export const config = {
   // the agent already defines its own tools in the xAI console, since sending
   // a tools list may replace what is configured there.
   agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, true),
+  // The briefing sent before each call is written in English, which otherwise
+  // reads to the agent as the language to reply in. This adds an explicit
+  // instruction to mirror the caller instead. Turn off only if the agent
+  // should always answer in one fixed language.
+  agentMirrorLanguage: bool(env.AGENT_MIRROR_LANGUAGE, true),
+  // Optional BCP-47 hint for the transcriber, e.g. hi-IN. Leave unset for
+  // automatic detection, which is what a multilingual agent wants.
+  xaiLanguageHint: env.XAI_LANGUAGE_HINT ?? '',
+  // Opens the xAI session while the call is still being answered, so the
+  // connection and configuration are not on the critical path.
+  prewarmSessions: bool(env.PREWARM_SESSIONS, true),
 
   // ---- Plivo -------------------------------------------------------------
   plivoAuthId: env.PLIVO_AUTH_ID ?? '',

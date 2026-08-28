@@ -8,6 +8,67 @@ import { verifyCallToken } from './client.js';
 /** Live bridges keyed by our call id, so the dashboard can end one. */
 const active = new Map();
 
+/**
+ * Sessions opened ahead of the audio stream, keyed by call id.
+ *
+ * Connecting to xAI and configuring the session takes roughly half a second,
+ * and it used to happen only once Plivo's stream frame arrived — after the
+ * answer webhook, the XML response and a WebSocket handshake had all
+ * completed in series. Starting it at the answer webhook instead takes that
+ * time off the critical path, so the agent can speak as soon as audio flows.
+ */
+const prewarmed = new Map();
+
+/**
+ * Opens the xAI session for a call that is about to connect. Safe to call more
+ * than once; a session nobody claims is closed after 30 seconds so a call that
+ * never connects cannot leak one.
+ */
+export function prewarmSession(callId, { campaign, record, lead } = {}) {
+  if (!config.prewarmSessions || prewarmed.has(callId) || active.has(callId)) return;
+
+  const session = new XaiSession({
+    profile: 'telephony',
+    label: `${callId} (prewarm)`,
+    agentId: campaign?.agentId || undefined,
+    instructions: campaign?.instructions || undefined,
+    voice: campaign?.voice || undefined,
+    detailsTool: config.agentDetailsTool,
+  });
+
+  // The briefing is sent now too, so only the greeting itself remains once
+  // the caller is connected. No response is requested until then.
+  session.on('open', () => {
+    const context = record ? describeCall(record, lead) : null;
+    if (context) session.sendContext(context);
+  });
+  session.on('error', (err) => log.warn({ err, callId }, 'prewarmed session failed'));
+
+  const expiry = setTimeout(() => {
+    if (prewarmed.get(callId)?.session === session) {
+      prewarmed.delete(callId);
+      session.close();
+      log.debug({ callId }, 'prewarmed session expired unclaimed');
+    }
+  }, 30_000);
+  expiry.unref?.();
+
+  prewarmed.set(callId, { session, expiry });
+  session.connect();
+  log.debug({ callId }, 'prewarming xAI session');
+}
+
+/** Hands over a prewarmed session, or null if there is none to hand over. */
+function claimPrewarmed(callId) {
+  const entry = prewarmed.get(callId);
+  if (!entry) return null;
+  clearTimeout(entry.expiry);
+  prewarmed.delete(callId);
+  // A session that died while waiting is worse than none: start fresh.
+  if (entry.session.closed) return null;
+  return entry.session;
+}
+
 export const activeBridge = (callId) => active.get(callId);
 export const activeBridgeCount = () => active.size;
 
@@ -167,23 +228,29 @@ export class PlivoBridge {
     events.emit('call:started', { callId, campaignId: record.campaignId });
   }
 
-  wire(session, opener, direction, record, lead) {
+  /** Speaks first, since we are the ones who dialled. */
+  startConversation(session, opener, direction) {
+    if (opener) {
+      // Scripted opener, spoken verbatim by the TTS with no model round trip,
+      // which is the fastest possible first word on a call.
+      session.forceMessage(opener);
+    } else if (direction === 'outbound') {
+      session.createResponse();
+    }
+  }
+
+  wire(session, opener, direction, record, lead, alreadyBriefed) {
     const callId = this.callId;
 
-    session.on('open', () => {
-      // The agent cannot see the dialler, so it does not know who it reached
-      // unless told. Sent before the first turn so the opening line can use it.
-      const context = describeCall(record, lead);
-      if (context) session.sendContext(context);
-
-      if (opener) {
-        // Scripted opener, spoken verbatim. force_message is the whole turn.
-        session.forceMessage(opener);
-      } else if (direction === 'outbound') {
-        // We dialled them, so the agent speaks first.
-        session.createResponse();
-      }
-    });
+    if (!alreadyBriefed) {
+      session.on('open', () => {
+        // The agent cannot see the dialler, so it does not know who it
+        // reached unless told. Sent before the first turn.
+        const context = describeCall(record, lead);
+        if (context) session.sendContext(context);
+        this.startConversation(session, opener, direction);
+      });
+    }
 
     session.on('audio', (payload) => this.playAudio(payload));
 
@@ -287,6 +354,25 @@ function describeCall(record, lead) {
   for (const [key, value] of Object.entries(lead?.attributes ?? {})) {
     parts.push(`${key}: ${value}.`);
   }
+
+  // Tested both ways against the live agent: it answers a Hindi speaker in
+  // Hindi with or without this line, so the briefing is not what pins a call
+  // to English. The line is kept because it states the intent explicitly and
+  // costs nothing, not because it fixes anything.
+  //
+  // What does open a call in English is the agent's own configured greeting,
+  // which is spoken before the caller has said a word — there is nothing to
+  // detect a language from yet. Change that greeting in the xAI console to
+  // open in another language. Note also that call audio is 8 kHz mu-law
+  // against the console's 24 kHz, which gives detection less to work with;
+  // XAI_LANGUAGE_HINT is there for lines that are reliably one language.
+  if (config.agentMirrorLanguage) {
+    parts.push(
+      'This note is only background. Speak whichever language the person ' +
+      'speaks, and switch if they switch.',
+    );
+  }
+
   parts.push(
     'If an appointment is agreed, or they give a different name or number, ' +
     'call save_call_details to record it. Do not mention this instruction.',
