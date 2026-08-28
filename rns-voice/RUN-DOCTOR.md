@@ -40,6 +40,49 @@ project folder already.
 npm install
 ```
 
+
+### If PowerShell blocks npm on Windows
+
+You may see:
+
+```
+npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because running
+scripts is disabled on this system.
+```
+
+That is a Windows security policy blocking PowerShell scripts. It is not a
+problem with this project, and npm itself is fine. Pick whichever is easiest:
+
+**Use `npm.cmd`** — the same npm, as a batch file, which the policy does not
+touch. Nothing to change:
+
+```powershell
+npm.cmd install
+npm.cmd start
+```
+
+**Or use Command Prompt instead of PowerShell.** In VS Code the terminal
+dropdown (the `v` next to `+`) has a *Command Prompt* option. Plain `npm` works
+there.
+
+**Or allow signed scripts for your user only:**
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+This affects only your account, not the machine, and permits local scripts plus
+signed remote ones. Answer `Y` when prompted, then `npm install` works normally.
+
+`node doctor.js` and `node app.js` are unaffected either way — `node` is a
+program, not a script.
+
+### Avoid spaces in the folder path
+
+A path such as `C:\Users\PC\Downloads\rnsvoice (6)` contains a space and
+brackets, which some npm scripts on Windows handle badly. If you see odd
+failures, move the folder somewhere plain like `C:\rnsvoice`.
+
 **5. Create your `.env`.** Copy `.env.example` to `.env` and fill in the real
 values:
 
