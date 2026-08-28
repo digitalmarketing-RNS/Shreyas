@@ -184,7 +184,17 @@ returns 503.
 
 Work through these in order.
 
-### First: run the diagnostics
+### Where to look first
+
+**Deployments**, not Runtime logs. A build that failed leaves Runtime logs
+completely empty — "No logs found" with zero errors means the process never
+started, so it never had a chance to log anything. The reason will be on the
+Deployments page.
+
+### Run the diagnostics
+
+See [RUN-DOCTOR.md](RUN-DOCTOR.md) for the full walkthrough, including running
+it on your own machine in VS Code when the server gives you no terminal.
 
 Over SSH, or in hPanel's terminal if your plan has one:
 
