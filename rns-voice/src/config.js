@@ -1,7 +1,40 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+/**
+ * Loads a .env file sitting beside the application.
+ *
+ * Managed panels inject configuration as real environment variables, but
+ * editing a .env file is what most people reach for first, and silently
+ * ignoring that file makes a correctly-filled-in deployment look broken.
+ * Panel variables still win: this only fills in what is not already set.
+ */
+function loadDotEnv() {
+  const file = join(ROOT, '.env');
+  if (!existsSync(file)) return;
+  let text;
+  try {
+    text = readFileSync(file, 'utf8');
+  } catch {
+    return;
+  }
+  for (const line of text.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq < 1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    // Strip one layer of matching quotes, which people add out of habit.
+    if (value.length > 1 && /^(".*"|'.*')$/.test(value)) value = value.slice(1, -1);
+    if (process.env[key] === undefined) process.env[key] = value;
+  }
+}
+
+loadDotEnv();
 
 function bool(value, fallback) {
   if (value === undefined || value === '') return fallback;
@@ -76,6 +109,21 @@ export function wsOrigin() {
  */
 export function configWarnings() {
   const warnings = [];
+
+  // A leftover placeholder is worse than a blank: it looks configured and
+  // fails only when a call is already in flight.
+  for (const [name, value] of [
+    ['XAI_API_KEY', config.xaiApiKey],
+    ['PLIVO_AUTH_ID', config.plivoAuthId],
+    ['PLIVO_AUTH_TOKEN', config.plivoAuthToken],
+  ]) {
+    if (value && value.includes('REPLACE_ME')) {
+      warnings.push(
+        `${name} still contains "REPLACE_ME". Replace the whole value, do not paste alongside it.`,
+      );
+    }
+  }
+
   if (!config.xaiApiKey) {
     warnings.push('XAI_API_KEY is not set — the agent cannot connect.');
   } else if (!config.xaiApiKey.startsWith('xai-')) {

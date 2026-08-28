@@ -26,6 +26,13 @@ const fail = (label, detail, fix) => {
 };
 const warn = (label, detail) => console.log(`  WARN  ${label}${detail ? ` — ${detail}` : ''}`);
 
+// Load .env exactly as the app does, so the checks below see what it sees.
+try {
+  await import('./src/config.js');
+} catch {
+  /* reported properly in section 5 */
+}
+
 console.log('\nRNS Voice Agent — startup diagnostics\n');
 
 // 1. Node version ------------------------------------------------------------
@@ -88,8 +95,16 @@ for (const [name, why] of Object.entries(required)) {
   else pass(name, name.includes('KEY') || name.includes('TOKEN') ? 'set' : process.env[name]);
 }
 if (process.env.XAI_API_KEY && !process.env.XAI_API_KEY.startsWith('xai-')) {
-  fail('XAI_API_KEY looks wrong', 'It should start with "xai-".',
-    'You may have copied the key ID rather than the key. Create a new key at console.x.ai.');
+  fail('XAI_API_KEY is missing its "xai-" prefix',
+    'The key must begin with xai-. Yours does not.',
+    'Put xai- in front of it, or re-copy the whole key from console.x.ai.');
+}
+for (const name of ['XAI_API_KEY', 'PLIVO_AUTH_ID', 'PLIVO_AUTH_TOKEN', 'DASHBOARD_PASSWORD']) {
+  if (process.env[name]?.includes('REPLACE_ME')) {
+    fail(`${name} still contains REPLACE_ME`,
+      'The placeholder was pasted next to the real value instead of being replaced.',
+      'Delete everything after the = and paste only the real value.');
+  }
 }
 if (process.env.PUBLIC_BASE_URL && !process.env.PUBLIC_BASE_URL.startsWith('https://')) {
   fail('PUBLIC_BASE_URL is not https', 'Plivo refuses to stream audio to an insecure origin.');
