@@ -48,15 +48,15 @@ else {
 // 2. Dependencies ------------------------------------------------------------
 console.log('\n2. Dependencies');
 if (!existsSync(join(ROOT, 'node_modules'))) {
-  fail('node_modules is missing', 'Nothing has been installed.',
-    'Press NPM Install in hPanel, or run: npm install --omit=dev');
+  fail('node_modules is missing', 'Dependencies have not been installed yet.',
+    'Run:  npm install     (on the server: press NPM Install in hPanel)');
 } else {
   for (const dep of ['express', 'ws', 'csv-parse']) {
     try {
       await import(dep === 'csv-parse' ? 'csv-parse/sync' : dep);
       pass(dep);
     } catch (err) {
-      fail(`${dep} will not load`, err.message, 'Re-run: npm install --omit=dev');
+      fail(`${dep} will not load`, err.message, 'Run:  npm install');
     }
   }
 }
@@ -83,37 +83,52 @@ if (!wrote) fail('No writable directory', 'Campaigns cannot be saved.', 'Give th
 
 // 4. Environment -------------------------------------------------------------
 console.log('\n4. Environment variables');
+
+/**
+ * Values carried over from .env.example. A leftover template value is worse
+ * than a blank one: it looks configured, so nothing complains until a call is
+ * already in flight.
+ */
+const PLACEHOLDERS = [/REPLACE_ME/, /your-domain\.com/, /^xai-REPLACE/];
+
 const required = {
-  XAI_API_KEY: 'the agent cannot connect without it',
-  PLIVO_AUTH_ID: 'no calls can be placed',
-  PLIVO_AUTH_TOKEN: 'no calls can be placed',
-  PLIVO_PHONE_NUMBER: 'there is no caller ID',
-  PUBLIC_BASE_URL: 'Plivo cannot reach this server',
+  XAI_API_KEY: { why: 'the agent cannot connect without it', secret: true },
+  PLIVO_AUTH_ID: { why: 'no calls can be placed', secret: true },
+  PLIVO_AUTH_TOKEN: { why: 'no calls can be placed', secret: true },
+  PLIVO_PHONE_NUMBER: { why: 'there is no caller ID', secret: false },
+  PUBLIC_BASE_URL: { why: 'Plivo cannot reach this server', secret: false },
+  DASHBOARD_PASSWORD: { why: 'anyone finding the URL could place calls', secret: true },
 };
-for (const [name, why] of Object.entries(required)) {
-  if (!process.env[name]) fail(`${name} is not set`, why, 'Add it in hPanel → Node.js → environment variables.');
-  else pass(name, name.includes('KEY') || name.includes('TOKEN') ? 'set' : process.env[name]);
-}
-if (process.env.XAI_API_KEY && !process.env.XAI_API_KEY.startsWith('xai-')) {
-  fail('XAI_API_KEY is missing its "xai-" prefix',
-    'The key must begin with xai-. Yours does not.',
-    'Put xai- in front of it, or re-copy the whole key from console.x.ai.');
-}
-for (const name of ['XAI_API_KEY', 'PLIVO_AUTH_ID', 'PLIVO_AUTH_TOKEN', 'DASHBOARD_PASSWORD']) {
-  if (process.env[name]?.includes('REPLACE_ME')) {
-    fail(`${name} still contains REPLACE_ME`,
-      'The placeholder was pasted next to the real value instead of being replaced.',
-      'Delete everything after the = and paste only the real value.');
+
+for (const [name, { why, secret }] of Object.entries(required)) {
+  const value = process.env[name];
+
+  if (!value) {
+    fail(`${name} is not set`, why, 'Add it to your .env file, or to your host\'s environment variables.');
+    continue;
   }
-}
-if (process.env.PUBLIC_BASE_URL && !process.env.PUBLIC_BASE_URL.startsWith('https://')) {
-  fail('PUBLIC_BASE_URL is not https', 'Plivo refuses to stream audio to an insecure origin.');
-}
-if (process.env.PUBLIC_BASE_URL?.endsWith('/')) {
-  warn('PUBLIC_BASE_URL ends with a slash', 'Remove it, or webhook signatures will not verify.');
-}
-if (!process.env.DASHBOARD_PASSWORD) {
-  warn('DASHBOARD_PASSWORD is not set', 'Anyone who finds the URL could place calls.');
+  // One verdict per variable: a placeholder is not "set", it is unedited.
+  if (PLACEHOLDERS.some((pattern) => pattern.test(value))) {
+    fail(`${name} is still the template value`,
+      `It reads "${secret ? value.replace(/[^\W_]/g, '*').slice(0, 24) : value}" — straight from .env.example.`,
+      'Open .env and replace the whole value after the = with your real one.');
+    continue;
+  }
+  if (name === 'XAI_API_KEY' && !value.startsWith('xai-')) {
+    fail('XAI_API_KEY is missing its "xai-" prefix', 'The key must begin with xai-.',
+      'Put xai- in front of it, or re-copy the whole key from console.x.ai.');
+    continue;
+  }
+  if (name === 'PUBLIC_BASE_URL') {
+    if (!value.startsWith('https://')) {
+      fail('PUBLIC_BASE_URL is not https', 'Plivo refuses to stream audio to an insecure origin.');
+      continue;
+    }
+    if (value.endsWith('/')) {
+      warn('PUBLIC_BASE_URL ends with a slash', 'Harmless, but tidier without it.');
+    }
+  }
+  pass(name, secret ? 'set' : value);
 }
 
 // 5. Can the app be imported? ------------------------------------------------
