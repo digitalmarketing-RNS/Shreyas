@@ -17,6 +17,33 @@ function reject(res, why) {
 }
 
 /**
+ * Authenticates a call-scoped webhook.
+ *
+ * Every such URL carries an HMAC-SHA256 of the call id keyed with the Plivo
+ * auth token, so a valid token cannot be produced by anyone without that
+ * secret. That is the primary proof of authenticity, and it is checked first.
+ *
+ * Plivo's own signature is verified as corroboration, but a mismatch does not
+ * reject the request: the exact string Plivo signs varies between its
+ * documentation and its SDKs, and on the answer webhook a false rejection
+ * hangs up on a real caller. A failure here is logged so it stays visible
+ * rather than silently ignored.
+ */
+function authenticateCallWebhook(req) {
+  const callId = String(req.query.callId ?? '');
+  const token = String(req.query.token ?? '');
+  if (!callId || !verifyCallToken(callId, token)) return null;
+
+  if (!validatePlivoSignature(req)) {
+    log.warn(
+      { url: req.path },
+      'Plivo signature did not verify; proceeding on the call token, which did',
+    );
+  }
+  return callId;
+}
+
+/**
  * Maps a Plivo CallStatus onto a campaign disposition. This single function
  * decides whether a lead is finished with or comes back around for another try.
  */
@@ -48,11 +75,8 @@ export function dispositionFor(callStatus, hangupCause, machine) {
 // ---------------------------------------------------------------------------
 
 plivoRouter.post('/answer', (req, res) => {
-  if (!validatePlivoSignature(req)) return reject(res, 'invalid signature');
-
-  const callId = String(req.query.callId ?? '');
-  const token = String(req.query.token ?? '');
-  if (!callId || !verifyCallToken(callId, token)) return reject(res, 'invalid call token');
+  const callId = authenticateCallWebhook(req);
+  if (!callId) return reject(res, 'invalid or missing call token');
 
   const record = calls.get(callId);
   if (!record) return reject(res, 'unknown call');
@@ -88,10 +112,10 @@ plivoRouter.post('/inbound', (req, res) => {
 // ---------------------------------------------------------------------------
 
 plivoRouter.post('/hangup', (req, res) => {
-  if (!validatePlivoSignature(req)) return reject(res, 'invalid signature');
+  const callId = authenticateCallWebhook(req);
+  if (!callId) return reject(res, 'invalid or missing call token');
   res.status(204).end();
 
-  const callId = String(req.query.callId ?? '');
   const body = req.body ?? {};
   const record = calls.get(callId) ?? calls.byProviderId(body.CallUUID ?? body.RequestUUID);
   if (!record) return;

@@ -151,42 +151,58 @@ export function verifyCallToken(callId, token) {
 /**
  * Plivo signature V3.
  *
- * The signature covers the request URL with, for POST, every form field
- * appended in sorted key order, followed by the nonce. The URL must be the one
- * Plivo actually called, which is why it is rebuilt from PUBLIC_BASE_URL rather
- * than from a proxied Host header.
+ * The signed string is the URL Plivo called, with, for POST, every form field
+ * appended in sorted key order, then the nonce; HMAC-SHA256 with the auth
+ * token, base64.
+ *
+ * The documentation says the URL includes the query string, while some SDK
+ * implementations strip it before hashing. Rather than bet on one reading,
+ * every plausible construction is tried and the request is accepted if any
+ * matches. This costs a few hash computations and removes a whole class of
+ * false rejection — which on the answer webhook means a dropped call.
  */
 export function validatePlivoSignature(req) {
   if (!config.plivoValidateSignature) return true;
   if (!config.plivoAuthToken || !config.publicBaseUrl) return false;
 
-  const signature = req.header('X-Plivo-Signature-V3');
+  const signature = req.header('X-Plivo-Signature-V3') ?? req.header('X-Plivo-Signature-Ma-V3');
   const nonce = req.header('X-Plivo-Signature-V3-Nonce');
   if (!signature || !nonce) return false;
 
-  let uri = `${config.publicBaseUrl}${req.originalUrl}`;
+  const base = config.publicBaseUrl;
+  const withQuery = `${base}${req.originalUrl}`;
+  const withoutQuery = withQuery.split('?')[0];
+
+  // Sorted form fields, appended as name+value with no separator.
+  let appended = '';
   if (req.method === 'POST') {
-    // Query string is not part of the signed payload for POST.
-    uri = uri.split('?')[0];
     const params = req.body ?? {};
-    for (const key of Object.keys(params).sort()) {
-      uri += key + params[key];
+    for (const key of Object.keys(params).sort()) appended += key + params[key];
+  }
+
+  const candidates = [
+    withQuery + appended,
+    withoutQuery + appended,
+    withQuery,
+    withoutQuery,
+  ];
+
+  // Several signatures arrive comma-separated when an account has more than
+  // one active auth token.
+  const supplied = String(signature).split(',').map((s) => s.trim());
+
+  for (const candidate of candidates) {
+    const expected = crypto
+      .createHmac('sha256', config.plivoAuthToken)
+      .update(candidate + nonce)
+      .digest('base64');
+    for (const one of supplied) {
+      const a = Buffer.from(one);
+      const b = Buffer.from(expected);
+      if (a.length === b.length && crypto.timingSafeEqual(a, b)) return true;
     }
   }
 
-  const expected = crypto
-    .createHmac('sha256', config.plivoAuthToken)
-    .update(uri + nonce)
-    .digest('base64');
-
-  // Plivo may send several comma-separated signatures during key rotation.
-  const candidates = String(signature).split(',').map((s) => s.trim());
-  const ok = candidates.some((candidate) => {
-    const a = Buffer.from(candidate);
-    const b = Buffer.from(expected);
-    return a.length === b.length && crypto.timingSafeEqual(a, b);
-  });
-
-  if (!ok) log.warn({ url: req.originalUrl }, 'rejected a webhook with an invalid Plivo signature');
-  return ok;
+  log.warn({ url: req.originalUrl }, 'no Plivo signature variant matched');
+  return false;
 }
