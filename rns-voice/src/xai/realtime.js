@@ -1,0 +1,244 @@
+import { EventEmitter } from 'node:events';
+import WebSocket from 'ws';
+import { config } from '../config.js';
+import { log } from '../logger.js';
+import { buildSessionUpdate, realtimeUrl } from './session.js';
+
+/** Barge-in signals. Deployments emit one name or the other; both mean "stop talking". */
+const SPEECH_STARTED = new Set([
+  'input_audio_buffer.speech_started',
+  'input_audio_buffer.speech_start',
+]);
+
+/**
+ * One live conversation with the xAI realtime API.
+ *
+ * Events emitted:
+ *   open            session configured and ready
+ *   audio(base64)   agent audio in the negotiated codec
+ *   transcript({role, text, cumulative})
+ *   speech_started  the person started talking — stop playback
+ *   response_done
+ *   function_call({name, callId, arguments})
+ *   dtmf(digits)
+ *   error(Error)
+ *   close({code, reason})
+ */
+export class XaiSession extends EventEmitter {
+  constructor(options = {}) {
+    super();
+    this.options = options;
+    this.ws = null;
+    this.ready = false;
+    this.closed = false;
+    this.conversationId = null;
+    /** Audio appended before the socket opens, so nothing is lost on a slow handshake. */
+    this.pending = [];
+  }
+
+  connect() {
+    if (!config.xaiApiKey) {
+      this.emit('error', new Error('XAI_API_KEY is not configured'));
+      return;
+    }
+
+    const url = realtimeUrl(this.options);
+    const ws = new WebSocket(url, {
+      headers: { Authorization: `Bearer ${config.xaiApiKey}` },
+      handshakeTimeout: 12_000,
+    });
+    this.ws = ws;
+
+    ws.on('open', () => {
+      // Configure before anything else: audio sent ahead of session.update is
+      // decoded with the default 24 kHz settings and arrives as noise.
+      this.send(buildSessionUpdate(this.options));
+      this.ready = true;
+      for (const chunk of this.pending) this.appendAudio(chunk);
+      this.pending = [];
+      log.info({ label: this.options.label }, 'xAI session open');
+      this.emit('open');
+    });
+
+    ws.on('message', (raw) => this.onMessage(raw));
+
+    ws.on('error', (err) => {
+      log.error({ err, label: this.options.label }, 'xAI socket error');
+      this.emit('error', err);
+    });
+
+    ws.on('close', (code, reason) => {
+      this.ready = false;
+      this.closed = true;
+      const text = reason?.toString() ?? '';
+      log.info({ code, reason: text, label: this.options.label }, 'xAI session closed');
+      this.emit('close', { code, reason: text });
+    });
+  }
+
+  onMessage(raw) {
+    let event;
+    try {
+      event = JSON.parse(raw.toString());
+    } catch {
+      return;
+    }
+
+    if (SPEECH_STARTED.has(event.type)) {
+      this.emit('speech_started');
+      return;
+    }
+
+    switch (event.type) {
+      case 'response.output_audio.delta':
+        if (event.delta) this.emit('audio', event.delta);
+        break;
+
+      // Both names carry the agent's own words, depending on API revision.
+      case 'response.output_audio_transcript.delta':
+      case 'response.text.delta':
+        if (event.delta) this.emit('transcript', { role: 'agent', text: event.delta });
+        break;
+
+      case 'conversation.item.input_audio_transcription.updated': {
+        // Cumulative: each event restates the whole utterance so far.
+        const text = event.transcript ?? event.text ?? '';
+        if (text) this.emit('transcript', { role: 'caller', text, cumulative: true });
+        break;
+      }
+
+      case 'conversation.created':
+        this.conversationId = event.conversation?.id ?? null;
+        break;
+
+      case 'response.created':
+        this.emit('response_created');
+        break;
+
+      case 'response.done':
+        this.emit('response_done');
+        break;
+
+      case 'response.function_call_arguments.done':
+        this.emit('function_call', {
+          name: event.name ?? '',
+          callId: event.call_id ?? '',
+          arguments: event.arguments ?? '{}',
+        });
+        break;
+
+      case 'input_audio_buffer.dtmf_event_received':
+        this.emit('dtmf', event.digits ?? event.digit ?? '');
+        break;
+
+      case 'error': {
+        const message =
+          typeof event.error === 'string' ? event.error : (event.error?.message ?? 'unknown xAI error');
+        log.error({ event }, 'xAI reported an error');
+        this.emit('error', new Error(message));
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  send(payload) {
+    if (this.ws?.readyState !== WebSocket.OPEN) return;
+    this.ws.send(JSON.stringify(payload));
+  }
+
+  /** Appends a base64 chunk in the session's negotiated input codec. */
+  appendAudio(base64) {
+    if (!this.ready) {
+      // Bounded, so a stalled handshake cannot grow this without limit.
+      if (this.pending.length < 250) this.pending.push(base64);
+      return;
+    }
+    this.send({ type: 'input_audio_buffer.append', audio: base64 });
+  }
+
+  sendText(text) {
+    this.send({
+      type: 'conversation.item.create',
+      item: { type: 'message', role: 'user', content: [{ type: 'input_text', text }] },
+    });
+    this.createResponse();
+  }
+
+  createResponse() {
+    this.send({ type: 'response.create' });
+  }
+
+  /**
+   * Speaks an exact line with no model round-trip. Used for a campaign opener
+   * so every call starts identically, and for disclosures that must be spoken
+   * word for word.
+   *
+   * This *is* the turn — never follow it with response.create.
+   */
+  forceMessage(text, interruptible = true) {
+    this.send({
+      type: 'conversation.item.create',
+      item: {
+        type: 'force_message',
+        role: 'assistant',
+        interruptible,
+        content: [{ type: 'output_text', text }],
+      },
+    });
+  }
+
+  submitFunctionResult(callId, output) {
+    this.send({
+      type: 'conversation.item.create',
+      item: {
+        type: 'function_call_output',
+        call_id: callId,
+        output: typeof output === 'string' ? output : JSON.stringify(output),
+      },
+    });
+    this.createResponse();
+  }
+
+  get isOpen() {
+    return this.ws?.readyState === WebSocket.OPEN;
+  }
+
+  close() {
+    if (this.closed) return;
+    this.closed = true;
+    try {
+      this.ws?.close(1000, 'done');
+    } catch {
+      /* already gone */
+    }
+  }
+}
+
+/**
+ * Verifies the API key and agent by opening a session and closing it again.
+ * Surfaced in the dashboard so a bad key is obvious before a campaign runs
+ * rather than as silent failures on every call.
+ */
+export function probeXai(timeoutMs = 12_000) {
+  return new Promise((resolve) => {
+    if (!config.xaiApiKey) {
+      resolve({ ok: false, error: 'XAI_API_KEY is not set' });
+      return;
+    }
+    const session = new XaiSession({ profile: 'browser', label: 'probe' });
+    const done = (result) => {
+      clearTimeout(timer);
+      session.removeAllListeners();
+      session.close();
+      resolve(result);
+    };
+    const timer = setTimeout(() => done({ ok: false, error: 'timed out connecting to xAI' }), timeoutMs);
+
+    session.on('open', () => done({ ok: true, agentId: config.xaiAgentId || null }));
+    session.on('error', (err) => done({ ok: false, error: err.message }));
+    session.connect();
+  });
+}
