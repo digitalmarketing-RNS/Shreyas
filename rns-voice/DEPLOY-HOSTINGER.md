@@ -175,7 +175,86 @@ delayed.
 
 ---
 
-## Troubleshooting
+## "503 Service Unavailable"
+
+This page comes from Hostinger's proxy, not from the app. It means the Node
+process is not running — it either crashed on startup or was never started.
+The app itself never got a chance to respond, which is why even `/healthz`
+returns 503.
+
+Work through these in order.
+
+### First: run the diagnostics
+
+Over SSH, or in hPanel's terminal if your plan has one:
+
+```bash
+cd ~/your-app-folder
+node doctor.js
+```
+
+It reproduces the startup sequence step by step and prints exactly which step
+fails — Node version, missing dependencies, unwritable folders, missing
+environment variables, module import errors, and port binding. Anything marked
+`FAIL` is the cause. If it prints a module import error, that line *is* the
+crash.
+
+### If you cannot get a terminal
+
+After a failed start, the app writes `startup-error.log` next to `app.js`.
+Open it in hPanel → File Manager. If that file does not exist, the process
+never reached our code at all, which points at one of the first three causes
+below.
+
+### The usual causes
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `startup-error.log` absent, no logs anywhere | Dependencies were never installed | Press **NPM Install** in hPanel, then **Restart** |
+| `Cannot find module 'express'` | Same | As above |
+| `Unexpected token 'export'` or `Cannot use import` | Node too old, or the runner is not treating this as an ES module | Set Node to **18+** in hPanel and restart |
+| App shows as stopped in hPanel | Never started | Press **Restart** |
+| 503 persists with everything green | Application root or startup file is wrong | Startup file must be exactly `app.js`, and the root must be the folder containing it |
+
+### Check the hPanel settings match
+
+In **hPanel → Advanced → Node.js**:
+
+- **Application startup file**: `app.js` — not `server.js`, not `index.js`
+- **Application root**: the folder that directly contains `app.js`. If you
+  extracted the zip into a subfolder, the root must point *into* that subfolder,
+  not at its parent.
+- **Node version**: 18 or newer
+- **Status**: Running. If it is stopped, press Restart and watch whether it
+  stays running or flips back to stopped — flipping back means a startup crash,
+  so go and read `startup-error.log`.
+
+### Confirm the file layout
+
+Immediately inside your application root you should see:
+
+```
+app.js            <- the startup file
+doctor.js
+package.json
+src/
+public/
+node_modules/     <- only after NPM Install
+```
+
+If instead you see a single folder like `rns-voice/`, the zip was extracted one
+level too deep. Either move the contents up a level, or point the application
+root at that inner folder.
+
+### Still stuck
+
+Send over the output of `node doctor.js`, or the contents of
+`startup-error.log`, and the exact Node version and startup file shown in
+hPanel. That narrows it to one cause immediately.
+
+---
+
+## Other problems
 
 **The phone rings, then silence.**
 The audio socket is not getting through. Run check 3 in Settings & Health.

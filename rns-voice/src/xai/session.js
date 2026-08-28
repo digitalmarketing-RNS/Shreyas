@@ -35,7 +35,10 @@ const PROFILES = {
  * overrides them, so the agent keeps whatever was configured in the xAI console.
  */
 export function buildSessionUpdate(options) {
-  const audio = structuredClone(PROFILES[options.profile]);
+  // JSON round-trip rather than structuredClone: the profiles are plain data,
+  // and structuredClone does not exist before Node 17, which some shared hosts
+  // still run.
+  const audio = JSON.parse(JSON.stringify(PROFILES[options.profile]));
   const session = { audio };
 
   if (options.turnDetection !== null) {

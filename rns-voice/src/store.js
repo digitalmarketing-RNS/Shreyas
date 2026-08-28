@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { config } from './config.js';
@@ -16,13 +17,46 @@ import { log } from './logger.js';
  * Comfortable up to roughly 50k leads. Past that, move to a real database.
  */
 
-const FILE = join(config.dataDir, 'db.json');
-const TMP = `${FILE}.tmp`;
+/**
+ * Resolves a writable data directory.
+ *
+ * Shared hosting does not always allow the application root to be written to.
+ * This used to throw during module import, which killed the process before it
+ * could listen and surfaced only as a bare 503 from the host's proxy. Now it
+ * degrades: app directory, then the system temp directory, then memory only.
+ */
+function resolveDataDir() {
+  for (const candidate of [config.dataDir, join(tmpdir(), 'rns-voice')]) {
+    try {
+      mkdirSync(candidate, { recursive: true });
+      // Prove it is actually writable rather than merely present.
+      const probe = join(candidate, '.write-probe');
+      writeFileSync(probe, 'ok');
+      renameSync(probe, join(candidate, '.write-probe-ok'));
+      if (candidate !== config.dataDir) {
+        log.warn(
+          { configured: config.dataDir, using: candidate },
+          'data directory is not writable; falling back to temporary storage (campaigns will not survive a restart)',
+        );
+      }
+      return candidate;
+    } catch {
+      /* try the next candidate */
+    }
+  }
+  log.error('no writable data directory; running in memory only, nothing will be saved');
+  return null;
+}
+
+const DATA_DIR = resolveDataDir();
+export const storageWritable = DATA_DIR !== null;
+const FILE = DATA_DIR ? join(DATA_DIR, 'db.json') : null;
+const TMP = FILE ? `${FILE}.tmp` : null;
 
 const empty = () => ({ campaigns: [], leads: [], calls: [], dnc: [] });
 
 function load() {
-  if (!existsSync(FILE)) return empty();
+  if (!FILE || !existsSync(FILE)) return empty();
   try {
     const parsed = JSON.parse(readFileSync(FILE, 'utf8'));
     return { ...empty(), ...parsed };
@@ -36,7 +70,6 @@ function load() {
   }
 }
 
-mkdirSync(config.dataDir, { recursive: true });
 const data = load();
 
 let dirty = false;
@@ -48,7 +81,7 @@ export function persist() {
 }
 
 function flush() {
-  if (!dirty || flushing) return;
+  if (!dirty || flushing || !FILE) return;
   flushing = true;
   dirty = false;
   try {

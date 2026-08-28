@@ -6,6 +6,7 @@
  * the application startup file.
  */
 import express from 'express';
+import { appendFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
 import { WebSocketServer } from 'ws';
@@ -17,6 +18,34 @@ import { handleConsoleSocket } from './src/api/console.js';
 import { plivoRouter } from './src/plivo/routes.js';
 import { handlePlivoStream } from './src/plivo/bridge.js';
 import { reconcile, startDialer, stopDialer } from './src/campaign/dialer.js';
+
+/**
+ * Managed hosts report a crashed Node process as a bare 503 and put the real
+ * error somewhere the account holder often cannot reach. Writing it beside the
+ * application means it can be opened in a file manager.
+ */
+function recordStartupFailure(err) {
+  const message = `${new Date().toISOString()} startup failed: ${err?.stack ?? err}\n`;
+  try {
+    appendFileSync(new URL('startup-error.log', import.meta.url), message);
+  } catch {
+    /* the directory may be read-only; stderr is the fallback */
+  }
+  console.error(message);
+}
+
+let listening = false;
+
+process.on('uncaughtException', (err) => {
+  // Before the server is listening, any throw is fatal and worth recording.
+  // A flag rather than the `server` binding: that is a const declared further
+  // down, so reading it here during a startup crash would itself throw.
+  if (!listening) {
+    recordStartupFailure(err);
+    process.exit(1);
+  }
+  log.error({ err }, 'uncaught exception');
+});
 
 const app = express();
 app.disable('x-powered-by');
@@ -97,7 +126,13 @@ server.on('upgrade', (req, socket, head) => {
 // Start
 // ---------------------------------------------------------------------------
 
+server.on('error', (err) => {
+  recordStartupFailure(err);
+  process.exit(1);
+});
+
 server.listen(config.port, () => {
+  listening = true;
   log.info(
     {
       port: config.port,
@@ -130,4 +165,3 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 
 // A single bad webhook should never take the whole dialer down.
 process.on('unhandledRejection', (err) => log.error({ err }, 'unhandled promise rejection'));
-process.on('uncaughtException', (err) => log.error({ err }, 'uncaught exception'));
