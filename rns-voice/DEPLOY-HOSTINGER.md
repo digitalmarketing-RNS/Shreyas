@@ -184,6 +184,22 @@ returns 503.
 
 Work through these in order.
 
+### The most likely cause on a platform with a build step
+
+If the hosting panel shows a **Build and output settings** section, the deploy
+pipeline probably runs `npm run build` before starting the app. A package with
+no `build` script makes that command fail outright:
+
+```
+npm error Missing script: "build"
+```
+
+The deploy then stops, the app never starts, Runtime logs stay empty, and the
+site returns 503 — with the error recorded only on the Deployments page.
+
+This project ships a no-op `build` script precisely so that cannot happen. If
+you are running a build from before that was added, update to a current copy.
+
 ### Where to look first
 
 **Deployments**, not Runtime logs. A build that failed leaves Runtime logs

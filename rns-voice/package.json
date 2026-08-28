@@ -5,11 +5,15 @@
   "description": "RNS voice agent control panel - connects an xAI voice agent to a Plivo phone number, with outbound campaign dialling.",
   "type": "module",
   "main": "app.js",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
+    "build": "echo \"No build step needed - this project runs plain JavaScript.\"",
     "start": "node app.js",
     "dev": "node --watch app.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "doctor": "node doctor.js"
   },
   "dependencies": {
     "csv-parse": "^5.6.0",
