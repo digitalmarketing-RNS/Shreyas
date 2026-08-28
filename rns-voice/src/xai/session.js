@@ -48,9 +48,12 @@ export function buildSessionUpdate(options) {
     session.turn_detection = {
       type: 'server_vad',
       threshold: config.vadThreshold,
-      // The wait after the caller stops before the agent replies. It is dead
-      // air on every turn, so it dominates how fast the agent feels.
-      silence_duration_ms: config.vadSilenceMs,
+      // The wait after the speaker stops before the agent replies — dead air
+      // on every turn. A phone line carries constant background noise, so it
+      // needs a longer window than a browser microphone before silence can be
+      // trusted; tuning VAD_SILENCE_MS therefore applies to calls, while the
+      // browser console stays short because its audio is clean.
+      silence_duration_ms: options.profile === 'telephony' ? config.vadSilenceMs : 300,
       // Audio kept from just before speech was detected, so the first syllable
       // is not clipped. Cheap, and it does not delay the reply.
       prefix_padding_ms: 300,
