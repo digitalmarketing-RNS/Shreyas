@@ -3,7 +3,7 @@ import { config } from '../config.js';
 import { log } from '../logger.js';
 import { events } from '../util/events.js';
 import { fromPlivo } from '../util/phone.js';
-import { calls, campaigns, dnc, leads } from '../store.js';
+import { calls, dnc, leads } from '../store.js';
 import { onCallFinished } from '../campaign/dialer.js';
 import { activeBridge, prewarmSession } from './bridge.js';
 import { validatePlivoSignature, verifyCallToken } from './client.js';
@@ -95,7 +95,6 @@ plivoRouter.post('/answer', (req, res) => {
   // session connected and briefed. By the time audio arrives it is ready, and
   // the caller is not left listening to the connection being set up.
   prewarmSession(callId, {
-    campaign: record.campaignId ? campaigns.get(record.campaignId) : null,
     record,
     lead: record.leadId ? leads.get(record.leadId) : null,
   });

@@ -109,6 +109,11 @@ async function refreshStatus() {
   agent.className = `status-dot ${status.ready.xai ? '' : 'down'}`;
   agent.innerHTML = `<i></i> ${status.ready.xai ? 'Agent ready' : 'Agent not configured'}`;
 
+  // Names the one agent every call reaches, so the wizard is concrete about
+  // whose configuration is in charge.
+  const agentLabel = $('wizAgentId');
+  if (agentLabel) agentLabel.textContent = status.agentId ?? 'set in XAI_AGENT_ID';
+
   const line = $('lineStatus');
   line.className = `status-dot ${status.ready.plivo ? '' : 'down'}`;
   line.innerHTML = `<i></i> ${status.ready.plivo ? esc(status.number ?? 'Line ready') : 'Line not configured'}`;
@@ -259,12 +264,12 @@ async function refreshCampaigns() {
     </tr>`).join('')
     : '<tr><td colspan="5" class="empty">No campaigns yet.</td></tr>';
 
+  // Leads still need a campaign to belong to. Nothing else picks one, because
+  // nothing else varies per campaign any more.
   const options = campaignCache.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
   const keep = $('leadCampaign').value;
   $('leadCampaign').innerHTML = options || '<option value="">Create a campaign first</option>';
   if (keep) $('leadCampaign').value = keep;
-  $('testCampaign').innerHTML = `<option value="">Agent defaults</option>${options}`;
-  $('consoleCampaign').innerHTML = `<option value="">Agent defaults (as configured in xAI)</option>${options}`;
 }
 
 $('campaignSearch').addEventListener('input', renderCampaignTable);
@@ -429,7 +434,7 @@ function closeWizard() {
 }
 
 function resetWizard() {
-  for (const id of ['cName', 'cOpener', 'cNumbers', 'cInstructions']) $(id).value = '';
+  for (const id of ['cName', 'cNumbers']) $(id).value = '';
   $('cNameCount').textContent = '0';
   updateNumberCount();
   showStep(1);
@@ -480,8 +485,6 @@ $('wizCreate').addEventListener('click', async () => {
   const body = {
     name: $('cName').value.trim(),
     numbers,
-    opener: $('cOpener').value.trim() || null,
-    instructions: $('cInstructions').value.trim() || null,
     windowStart: $('cWinStart').value.trim(),
     windowEnd: $('cWinEnd').value.trim(),
     windowDays: selectedDays(),
@@ -694,7 +697,7 @@ $('placeCall').addEventListener('click', async () => {
   try {
     await api('/calls', {
       method: 'POST',
-      body: JSON.stringify({ to, campaignId: $('testCampaign').value || undefined }),
+      body: JSON.stringify({ to }),
     });
     toast('Calling now — your phone should ring shortly.', 'ok');
     await refreshCalls();
@@ -1009,7 +1012,7 @@ async function startMic() {
   socket = new WebSocket(`${proto}://${location.host}/ws/console${query}`);
 
   socket.onopen = () => socket.send(JSON.stringify({
-    type: 'start', campaignId: $('consoleCampaign').value || undefined,
+    type: 'start',
   }));
 
   socket.onmessage = (event) => {

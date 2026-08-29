@@ -73,7 +73,8 @@ dashboard comes up, run the WebSocket check before trusting it with a campaign.
 1. **Settings & Health → Run all checks.** Do not skip this.
 2. **Test Agent → Call a real phone.** Use your own mobile. This proves the
    whole chain in one call.
-3. **Campaigns → create one.** Opening line, calling window, attempts.
+3. **Campaigns → New campaign.** Name it, paste the numbers, choose how many
+   calls run at once. What the agent says is set in the xAI console, not here.
 4. **Leads → upload a CSV** with a `phone` column.
 5. **Campaigns → Start.**
 

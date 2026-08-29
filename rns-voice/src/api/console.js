@@ -1,5 +1,4 @@
 import { XaiSession } from '../xai/realtime.js';
-import { campaigns } from '../store.js';
 import { log } from '../logger.js';
 
 /**
@@ -18,23 +17,17 @@ export function handleConsoleSocket(ws) {
     if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(payload));
   };
 
-  const start = ({ campaignId } = {}) => {
+  const start = () => {
     if (session) return;
-    const campaign = campaignId ? campaigns.get(campaignId) : null;
 
-    session = new XaiSession({
-      profile: 'browser',
-      label: 'console',
-      agentId: campaign?.agentId || undefined,
-      instructions: campaign?.instructions || undefined,
-      voice: campaign?.voice || undefined,
-    });
+    // The same agent a real call reaches, with nothing layered on top. A test
+    // that could be configured differently from a call would not be a test of
+    // anything an operator is about to run.
+    session = new XaiSession({ profile: 'browser', label: 'console' });
 
     session.on('open', () => {
-      send({ type: 'ready', campaign: campaign?.name ?? null });
-      // Mirror a real outbound call: open with the scripted line if there is one.
-      if (campaign?.opener) session.forceMessage(campaign.opener);
-      else session.createResponse();
+      send({ type: 'ready' });
+      session.createResponse();
     });
     session.on('audio', (audio) => send({ type: 'audio', audio }));
     session.on('speech_started', () => send({ type: 'speech_started' }));
@@ -56,7 +49,7 @@ export function handleConsoleSocket(ws) {
       return;
     }
     switch (message.type) {
-      case 'start': start({ campaignId: message.campaignId }); break;
+      case 'start': start(); break;
       case 'audio': if (message.audio) session?.appendAudio(message.audio); break;
       case 'text': if (message.text) session?.sendText(String(message.text)); break;
       case 'stop': session?.close(); session = null; break;

@@ -31,14 +31,13 @@ const PROFILES = {
  * chipmunk agent and an unintelligible caller. It looks like a model fault but
  * is purely a config one, so do not "simplify" this back to the flat form.
  *
- * Everything else is deliberately absent. The audio format is the one thing
- * that MUST be negotiated here, because it describes the phone line rather
- * than the agent. Prompt, voice, language, reasoning effort, turn-taking and
- * speech rate all belong to the agent's configuration in the xAI console, and
- * this payload stays silent about them unless an operator explicitly sets the
- * matching variable. Sending a value "just to be safe" would silently
- * overwrite the console setting with ours, which is exactly what must not
- * happen: this service connects the call, it does not configure the agent.
+ * Everything else is deliberately absent, and there is no field left to add
+ * it through. The audio format is the one thing that MUST be negotiated here,
+ * because it describes the phone line rather than the agent — get it wrong
+ * and both sides hear garbled audio. Prompt, voice, language, reasoning
+ * effort, turn-taking and speech rate all belong to the agent's configuration
+ * in the xAI console. Not defaults left unset: no fields at all. This service
+ * connects the call; it does not configure the agent.
  */
 export function buildSessionUpdate(options) {
   // JSON round-trip rather than structuredClone: the profiles are plain data,
@@ -47,26 +46,6 @@ export function buildSessionUpdate(options) {
   const audio = JSON.parse(JSON.stringify(PROFILES[options.profile]));
   const session = { audio };
 
-  if (config.xaiReasoningEffort) session['reasoning.effort'] = config.xaiReasoningEffort;
-
-  // Turn-taking is the agent's own setting. We send a turn_detection block
-  // only for the values an operator actually set, and no block at all when
-  // none are — sending one with invented numbers would replace the console's
-  // VAD settings wholesale.
-  const turnDetection = {};
-  if (config.vadThreshold !== null) turnDetection.threshold = config.vadThreshold;
-  if (config.vadSilenceMs !== null) turnDetection.silence_duration_ms = config.vadSilenceMs;
-  Object.assign(turnDetection, options.turnDetection ?? {});
-  if (Object.keys(turnDetection).length) {
-    session.turn_detection = { type: 'server_vad', ...turnDetection };
-  }
-
-  if (config.agentSpeed !== null) {
-    audio.output.speed = Math.min(1.5, Math.max(0.7, config.agentSpeed));
-  }
-
-  if (options.instructions) session.instructions = options.instructions;
-  if (options.voice) session.voice = options.voice;
   // Transcription settings describe what xAI sends back to us, not how the
   // agent behaves, so they are ours to ask for. 'model' turns on the
   // live-caption event; without it the caller's words still arrive, but only
@@ -79,9 +58,6 @@ export function buildSessionUpdate(options) {
       ...(options.keyterms?.length ? { keyterms: options.keyterms } : {}),
     };
   }
-  if (options.speed !== undefined) {
-    audio.output.speed = Math.min(1.5, Math.max(0.7, options.speed));
-  }
   const tools = [...(options.tools ?? [])];
   if (options.detailsTool) tools.push(CALL_DETAILS_TOOL);
   if (options.callControl) tools.push(END_CALL_TOOL);
@@ -91,12 +67,21 @@ export function buildSessionUpdate(options) {
   return { type: 'session.update', session };
 }
 
-/** Realtime URL for an agent session, or a bare model session as a fallback. */
-export function realtimeUrl({ agentId, conversationId } = {}) {
+/**
+ * Realtime URL for the one configured agent.
+ *
+ * There is deliberately no per-call agent and no bare-model fallback. Falling
+ * back to a raw model when XAI_AGENT_ID was missing meant calls still
+ * connected and the caller still heard a voice — just not the agent that was
+ * built, with none of its prompt or settings, and nothing anywhere saying so.
+ * A missing agent id is a configuration error and now reads as one.
+ */
+export function realtimeUrl({ conversationId } = {}) {
+  if (!config.xaiAgentId) {
+    throw new Error('XAI_AGENT_ID is not set — there is no agent to connect the call to.');
+  }
   const url = new URL(config.xaiRealtimeUrl);
-  const agent = agentId || config.xaiAgentId;
-  if (agent) url.searchParams.set('agent_id', agent);
-  else url.searchParams.set('model', config.xaiModel);
+  url.searchParams.set('agent_id', config.xaiAgentId);
   if (conversationId) url.searchParams.set('conversation_id', conversationId);
   return url.toString();
 }

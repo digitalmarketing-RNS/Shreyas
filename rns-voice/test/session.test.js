@@ -1,6 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { describe, it } from 'node:test';
-import { buildSessionUpdate } from '../src/xai/session.js';
+import { buildSessionUpdate, realtimeUrl } from '../src/xai/session.js';
+import { config } from '../src/config.js';
 import { dispositionFor } from '../src/plivo/routes.js';
 
 describe('buildSessionUpdate', () => {
@@ -25,18 +26,16 @@ describe('buildSessionUpdate', () => {
     assert.deepEqual(session.audio.output.format, { type: 'audio/pcm', rate: 24000 });
   });
 
-  it('leaves prompt and voice alone so the xAI console config wins', () => {
-    const { session } = buildSessionUpdate({ profile: 'telephony' });
+  it('has no way to send a prompt or a voice, even when asked to', () => {
+    // Not "unset by default" — unsettable. These options used to be honoured
+    // as per-campaign overrides, which silently replaced the prompt and voice
+    // the operator built in the xAI console.
+    const { session } = buildSessionUpdate({
+      profile: 'telephony', instructions: 'Be brief.', voice: 'eve', speed: 1.4,
+    });
     assert.equal(session.instructions, undefined);
     assert.equal(session.voice, undefined);
-  });
-
-  it('applies a campaign override when one is given', () => {
-    const { session } = buildSessionUpdate({
-      profile: 'telephony', instructions: 'Be brief.', voice: 'eve',
-    });
-    assert.equal(session.instructions, 'Be brief.');
-    assert.equal(session.voice, 'eve');
+    assert.equal(session.audio.output.speed, undefined);
   });
 
   it('sends nothing but the codec when nothing is configured', () => {
@@ -79,9 +78,18 @@ describe('buildSessionUpdate', () => {
     }
   });
 
-  it('clamps speech speed to the supported range', () => {
-    const { session } = buildSessionUpdate({ profile: 'browser', speed: 9 });
-    assert.equal(session.audio.output.speed, 1.5);
+  it('connects to the one configured agent and never to a bare model', () => {
+    // A bare-model fallback meant a missing XAI_AGENT_ID still connected the
+    // call: the caller heard a voice, just not the agent that was built, and
+    // nothing said so. Both halves of that are asserted here, because which
+    // one applies depends on the environment the suite runs in.
+    if (config.xaiAgentId) {
+      const url = new URL(realtimeUrl());
+      assert.equal(url.searchParams.get('agent_id'), config.xaiAgentId);
+      assert.equal(url.searchParams.get('model'), null, 'must never fall back to a raw model');
+    } else {
+      assert.throws(() => realtimeUrl(), /XAI_AGENT_ID is not set/);
+    }
   });
 });
 

@@ -124,12 +124,11 @@ export const campaigns = {
       id: id('cmp'),
       name: input.name,
       status: 'draft',
-      // Left null so the agent's own console configuration is used. Only set
-      // these when a campaign genuinely needs to differ from the agent.
-      instructions: input.instructions ?? null,
-      opener: input.opener ?? null,
-      voice: input.voice ?? null,
-      agentId: input.agentId ?? null,
+      // A campaign is a list of numbers and a schedule. It carries nothing
+      // about how the agent speaks, because there is one agent, configured in
+      // the xAI console, and this app connects to it rather than reshaping it
+      // per campaign. Fields that used to live here — instructions, opener,
+      // voice, agentId — were exactly that reshaping.
       maxAttempts: input.maxAttempts ?? 3,
       retryDelayMinutes: input.retryDelayMinutes ?? 60,
       concurrency: input.concurrency ?? 2,
@@ -151,7 +150,7 @@ export const campaigns = {
     const campaign = campaigns.get(campaignId);
     if (!campaign) return null;
     const editable = [
-      'name', 'status', 'instructions', 'opener', 'voice', 'agentId',
+      'name', 'status',
       'maxAttempts', 'retryDelayMinutes', 'concurrency', 'windowStart',
       'windowEnd', 'windowDays', 'defaultTimezone', 'defaultCountryCode', 'hangupOnMachine',
     ];

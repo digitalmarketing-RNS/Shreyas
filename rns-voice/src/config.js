@@ -46,18 +46,6 @@ function int(value, fallback) {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
-/**
- * A number that stays unset when nobody set it.
- *
- * Used for the agent-behaviour knobs: null means "say nothing to xAI about
- * this", which is different from any numeric default we could invent.
- */
-function num(value) {
-  if (value === undefined || value === '') return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
 const env = process.env;
 
 /** Strips the leading + — Plivo expects bare digits on the wire. */
@@ -77,33 +65,10 @@ export const config = {
   // The agent already carries its prompt, voice and language from the xAI
   // console, so this service connects to it and does not override any of that
   // unless a campaign explicitly asks.
+  // The one agent this service connects to. There is no per-campaign override
+  // and no model fallback: this id, or the call does not go out.
   xaiAgentId: env.XAI_AGENT_ID ?? '',
-  xaiModel: env.XAI_MODEL ?? 'grok-voice-latest',
 
-  // ---- Agent behaviour: NOT ours to decide -------------------------------
-  // Everything in this block is unset by default and is sent to xAI only if
-  // you set it here. The agent's own configuration in the xAI console decides
-  // how it thinks, when it takes its turn and how fast it speaks; this service
-  // must not quietly override any of that. Leaving a value blank is not a
-  // missing default — it is the point. Set one only to deliberately override
-  // the console for this deployment.
-  //
-  // XAI_REASONING_EFFORT: 'none' skips the thinking step before replying.
-  // Measured over 8 sessions it made no difference to time-to-first-audio
-  // (medians 644 ms for 'none' against 536 ms for 'high', overlapping ranges),
-  // so it is not a speed fix.
-  xaiReasoningEffort: env.XAI_REASONING_EFFORT || null,
-  // VAD_SILENCE_MS: how long the caller must be silent before the agent takes
-  // its turn. This is a fixed wait on every single turn, so it is the one knob
-  // that reliably changes how quickly replies come back. 400-600 ms is the
-  // usable band on a phone line; below that the agent cuts people off.
-  vadSilenceMs: num(env.VAD_SILENCE_MS),
-  // VAD_THRESHOLD: raise on a noisy line if the agent talks over background
-  // sound.
-  vadThreshold: num(env.VAD_THRESHOLD),
-  // AGENT_SPEED: playback rate, 0.7-1.5. Changes how brisk the agent sounds,
-  // not how quickly it starts.
-  agentSpeed: num(env.AGENT_SPEED),
   // Offers the agent save_call_details, end_call and transfer_to_human as
   // functions it may call. It decides whether and when to use them; the
   // descriptions state only what each one does. Turn off if the agent defines
@@ -207,7 +172,7 @@ export function configWarnings() {
       'XAI_API_KEY does not start with "xai-". You may have copied the key ID from the xAI console instead of the key itself.',
     );
   }
-  if (!config.xaiAgentId) warnings.push('XAI_AGENT_ID is not set — falling back to a bare model session.');
+  if (!config.xaiAgentId) warnings.push('XAI_AGENT_ID is not set — no calls can connect, because there is no agent to connect them to.');
   if (!config.plivoAuthId || !config.plivoAuthToken) warnings.push('Plivo credentials are missing — no calls can be placed.');
   if (!config.plivoNumber) warnings.push('PLIVO_PHONE_NUMBER is not set — there is no caller ID to dial from.');
   if (!config.publicBaseUrl) {
@@ -227,22 +192,6 @@ export function configWarnings() {
     warnings.push(
       'DATA_DIR is inside the application folder, so every campaign, call record and opt-out is erased whenever this host redeploys or restarts. Point DATA_DIR at a persistent disk.',
     );
-  }
-
-  // An override set here beats the xAI console for every call, and the console
-  // still displays its own value, so the two disagree with nothing to say why.
-  // Anyone debugging "the agent ignores my settings" needs to see this.
-  for (const [name, value] of [
-    ['VAD_SILENCE_MS', config.vadSilenceMs],
-    ['VAD_THRESHOLD', config.vadThreshold],
-    ['AGENT_SPEED', config.agentSpeed],
-    ['XAI_REASONING_EFFORT', config.xaiReasoningEffort],
-  ]) {
-    if (value !== null) {
-      warnings.push(
-        `${name} is set to ${value}, which overrides the xAI console for every call. Clear it to let the agent's own configuration decide.`,
-      );
-    }
   }
   return warnings;
 }

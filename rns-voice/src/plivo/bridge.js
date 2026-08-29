@@ -2,7 +2,7 @@ import { log } from '../logger.js';
 import { events } from '../util/events.js';
 import { config } from '../config.js';
 import { XaiSession } from '../xai/realtime.js';
-import { calls, campaigns, dnc, leads } from '../store.js';
+import { calls, dnc, leads } from '../store.js';
 import { hangupCall, transferCall, verifyCallToken } from './client.js';
 
 /** Live bridges keyed by our call id, so the dashboard can end one. */
@@ -27,15 +27,12 @@ const HANGUP_CHECKPOINT = 'rns-goodbye';
  * than once; a session nobody claims is closed after 30 seconds so a call that
  * never connects cannot leak one.
  */
-export function prewarmSession(callId, { campaign, record, lead } = {}) {
+export function prewarmSession(callId, { record, lead } = {}) {
   if (!config.prewarmSessions || prewarmed.has(callId) || active.has(callId)) return;
 
   const session = new XaiSession({
     profile: 'telephony',
     label: `${callId} (prewarm)`,
-    agentId: campaign?.agentId || undefined,
-    instructions: campaign?.instructions || undefined,
-    voice: campaign?.voice || undefined,
     detailsTool: config.agentDetailsTool,
     callControl: config.agentCallControl,
     transferTo: config.transferNumber || undefined,
@@ -56,8 +53,7 @@ export function prewarmSession(callId, { campaign, record, lead } = {}) {
     // has already been answered by this point, so nothing is wasted.
     if (config.prewarmGreeting) {
       entry.greeted = true;
-      if (campaign?.opener) session.forceMessage(campaign.opener);
-      else session.createResponse();
+      session.createResponse();
     }
   });
   session.on('error', (err) => log.warn({ err, callId }, 'prewarmed session failed'));
@@ -247,29 +243,21 @@ export class PlivoBridge {
       callUuid: record.callUuid ?? start.callId ?? null,
     });
 
-    const campaign = record.campaignId ? campaigns.get(record.campaignId) : null;
-
     const lead = record.leadId ? leads.get(record.leadId) : null;
-    const opener = campaign?.opener ?? null;
 
     // A session opened at the answer webhook is already connected, briefed,
     // and may have the greeting waiting.
     const ready = claimPrewarmed(callId);
 
-    // Only pass overrides the campaign explicitly sets — anything left null
-    // keeps whatever the agent was configured with in the xAI console.
     this.session = ready?.session ?? new XaiSession({
       profile: 'telephony',
       label: callId,
-      agentId: campaign?.agentId || undefined,
-      instructions: campaign?.instructions || undefined,
-      voice: campaign?.voice || undefined,
       detailsTool: config.agentDetailsTool,
       callControl: config.agentCallControl,
       transferTo: config.transferNumber || undefined,
     });
 
-    this.wire(this.session, opener, record.direction, record, lead, Boolean(ready));
+    this.wire(this.session, record.direction, record, lead, Boolean(ready));
 
     if (ready) {
       // Play what the agent already said while the stream was still opening.
@@ -281,7 +269,7 @@ export class PlivoBridge {
       }
       // If it had not opened yet, its own handler still owes the greeting;
       // asking again here would produce two.
-      if (!ready.greeted) this.startConversation(this.session, opener, record.direction);
+      if (!ready.greeted) this.startConversation(this.session, record.direction);
     } else {
       this.session.connect();
     }
@@ -290,18 +278,19 @@ export class PlivoBridge {
     events.emit('call:started', { callId, campaignId: record.campaignId });
   }
 
-  /** Speaks first, since we are the ones who dialled. */
-  startConversation(session, opener, direction) {
-    if (opener) {
-      // Scripted opener, spoken verbatim by the TTS with no model round trip,
-      // which is the fastest possible first word on a call.
-      session.forceMessage(opener);
-    } else if (direction === 'outbound') {
-      session.createResponse();
-    }
+  /**
+   * Hands the agent the first turn, since we are the ones who dialled.
+   *
+   * This used to be able to speak a campaign's scripted opening line verbatim
+   * instead. That put words in the agent's mouth from outside the agent —
+   * the app talking, not the thing the operator built in the xAI console —
+   * so it is gone. How to open a call is the agent's to decide.
+   */
+  startConversation(session, direction) {
+    if (direction === 'outbound') session.createResponse();
   }
 
-  wire(session, opener, direction, record, lead, alreadyBriefed) {
+  wire(session, direction, record, lead, alreadyBriefed) {
     const callId = this.callId;
 
     if (!alreadyBriefed) {
@@ -310,7 +299,7 @@ export class PlivoBridge {
         // reached unless told. Sent before the first turn.
         const context = describeCall(record, lead);
         if (context) session.sendContext(context);
-        this.startConversation(session, opener, direction);
+        this.startConversation(session, direction);
       });
     }
 

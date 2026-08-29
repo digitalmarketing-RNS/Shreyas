@@ -47,10 +47,10 @@
           <input type="text" id="cName" maxlength="60" placeholder="e.g. Kalpataru Elaara — site visit follow-up" />
           <div class="hint"><span id="cNameCount">0</span>/60</div>
         </div>
-        <div class="field">
-          <label for="cOpener">Opening line <span class="muted" style="font-weight:400">(optional)</span></label>
-          <textarea id="cOpener" rows="3" placeholder="Hi, am I speaking with {name}? I'm calling from RNS about…"></textarea>
-          <div class="hint">Spoken word for word at the start of every call, with no model delay. Leave blank and your agent opens in its own words.</div>
+        <div class="callout">
+          Every call in this campaign is handled by your xAI agent
+          <b id="wizAgentId">as configured</b>. What it says, how it opens and
+          when it ends the call are all set there, not here.
         </div>
       </div>
 
@@ -103,11 +103,6 @@
               <option value="true">Hang up straight away</option>
               <option value="false">Let the agent talk</option>
             </select>
-          </div>
-          <div class="field">
-            <label for="cInstructions">Extra instructions <span class="muted" style="font-weight:400">(optional)</span></label>
-            <textarea id="cInstructions" rows="3" placeholder="Leave blank to use the prompt already configured on your xAI agent."></textarea>
-            <div class="hint">Only fill this in if this campaign should behave differently from your agent's own xAI configuration. Blank keeps the agent exactly as you built it.</div>
           </div>
         </details>
 
@@ -357,10 +352,6 @@
     <div class="split">
       <div class="card">
         <div class="section-head"><span class="dot"></span><h2>Talk in your browser</h2></div>
-        <div class="field">
-          <label for="consoleCampaign">Use settings from</label>
-          <select id="consoleCampaign"><option value="">Agent defaults (as configured in xAI)</option></select>
-        </div>
         <div class="actions">
           <button class="btn primary" id="micStart">Start microphone</button>
           <button class="btn" id="micStop" disabled>Stop</button>
@@ -379,10 +370,6 @@
           <label for="testNumber">Number to call</label>
           <input type="text" id="testNumber" placeholder="9876543210" />
           <div class="hint">Dials immediately, ignoring calling windows and attempt limits. Use your own phone first.</div>
-        </div>
-        <div class="field">
-          <label for="testCampaign">With settings from</label>
-          <select id="testCampaign"><option value="">Agent defaults</option></select>
         </div>
         <div class="actions"><button class="btn primary" id="placeCall">Place test call</button></div>
         <div class="note info" style="margin-top:16px">
