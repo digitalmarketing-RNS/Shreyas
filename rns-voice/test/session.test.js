@@ -39,11 +39,44 @@ describe('buildSessionUpdate', () => {
     assert.equal(session.voice, 'eve');
   });
 
-  it('allows a longer silence window on the phone than in the browser', () => {
-    // Phone lines carry noise; cutting in early makes the agent feel rude.
-    const phone = buildSessionUpdate({ profile: 'telephony' }).session;
-    const browser = buildSessionUpdate({ profile: 'browser' }).session;
-    assert.ok(phone.turn_detection.silence_duration_ms > browser.turn_detection.silence_duration_ms);
+  it('sends nothing but the codec when nothing is configured', () => {
+    // The invariant this whole service rests on: we connect the call, the xAI
+    // console configures the agent. The audio format is the sole exception,
+    // because it describes the phone line and not the agent. Anything else
+    // appearing here silently overrides a setting the operator made in the
+    // console, with no error and no way to see it happened.
+    const { session } = buildSessionUpdate({ profile: 'telephony' });
+    assert.deepEqual(Object.keys(session), ['audio']);
+  });
+
+  it('stays out of turn-taking, reasoning and speech rate unless told', () => {
+    const { session } = buildSessionUpdate({ profile: 'telephony' });
+    assert.equal(session.turn_detection, undefined, 'turn-taking is the agent\'s setting');
+    assert.equal(session['reasoning.effort'], undefined, 'reasoning effort is the agent\'s setting');
+    assert.equal(session.audio.output.speed, undefined, 'speech rate is the agent\'s setting');
+  });
+
+  it('offers no transfer tool unless a destination is configured', () => {
+    // Handing a caller to a person is not something to enable by default.
+    const { session } = buildSessionUpdate({ profile: 'telephony', detailsTool: true, callControl: true });
+    const names = (session.tools ?? []).map((t) => t.name);
+    assert.ok(!names.includes('transfer_to_human'));
+  });
+
+  it('describes what each tool does without saying when to use it', () => {
+    // The agent decides when to hang up, when to save details and when to
+    // transfer. A description that says "use this once the conversation has
+    // finished" is a rule of ours competing with the console prompt.
+    const { session } = buildSessionUpdate({
+      profile: 'telephony', detailsTool: true, callControl: true, transferTo: '911234',
+    });
+    const directives = /\b(use it|use this|call this|do not|don't|say goodbye|tell the person|first,)\b/i;
+    for (const tool of session.tools) {
+      assert.ok(
+        !directives.test(tool.description),
+        `${tool.name} description instructs the agent: ${tool.description}`,
+      );
+    }
   });
 
   it('clamps speech speed to the supported range', () => {

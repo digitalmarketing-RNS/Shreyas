@@ -118,6 +118,12 @@ function parseExtraHeaders(raw) {
 export class PlivoBridge {
   constructor(ws, req) {
     this.ws = ws;
+    // Send each 20 ms frame the moment it is ready. Nagle's algorithm is on by
+    // default and holds a small packet back waiting either for more data or
+    // for the previous packet's ACK — up to a round trip of added delay on
+    // every frame we play to the caller. The xAI leg already does this; this
+    // is the leg the caller actually hears.
+    ws._socket?.setNoDelay?.(true);
     // Identity from the handshake URL. This is the reliable channel: we chose
     // the URL, so Plivo connects with it verbatim.
     this.urlParams = (() => {
@@ -511,22 +517,18 @@ export class PlivoBridge {
 }
 
 /**
- * A short briefing for the agent: who was dialled and anything the lead list
- * carried. Kept terse — it occupies the same context the conversation does.
- */
-/**
  * The facts about this call, and nothing else.
  *
  * This used to carry instructions as well — how to handle language, when to
- * call which tool, not to mention the note. Those were rules of mine competing
+ * call which tool, not to mention the note. Those were rules of ours competing
  * with the prompt configured on the agent in the xAI console, written in
  * English, ahead of the caller's first word. The agent's own configuration
- * decides how it behaves; this only supplies what it has no other way to know,
+ * decides how it behaves; this supplies only what it has no other way to know,
  * which is who was dialled.
  *
- * Written as data rather than prose so it reads as a record, not an
- * instruction. Each tool's own description says when to use it, which is the
- * mechanism meant for that.
+ * Written as data rather than prose so it reads as a record and not as an
+ * instruction. Keep it that way: anything resembling "you should" belongs in
+ * the xAI console, not here.
  */
 function describeCall(record, lead) {
   if (config.agentBriefing === 'off') return null;

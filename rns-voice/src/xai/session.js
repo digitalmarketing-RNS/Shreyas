@@ -31,8 +31,14 @@ const PROFILES = {
  * chipmunk agent and an unintelligible caller. It looks like a model fault but
  * is purely a config one, so do not "simplify" this back to the flat form.
  *
- * Prompt, voice and language are intentionally left unset unless a campaign
- * overrides them, so the agent keeps whatever was configured in the xAI console.
+ * Everything else is deliberately absent. The audio format is the one thing
+ * that MUST be negotiated here, because it describes the phone line rather
+ * than the agent. Prompt, voice, language, reasoning effort, turn-taking and
+ * speech rate all belong to the agent's configuration in the xAI console, and
+ * this payload stays silent about them unless an operator explicitly sets the
+ * matching variable. Sending a value "just to be safe" would silently
+ * overwrite the console setting with ours, which is exactly what must not
+ * happen: this service connects the call, it does not configure the agent.
  */
 export function buildSessionUpdate(options) {
   // JSON round-trip rather than structuredClone: the profiles are plain data,
@@ -41,27 +47,21 @@ export function buildSessionUpdate(options) {
   const audio = JSON.parse(JSON.stringify(PROFILES[options.profile]));
   const session = { audio };
 
-  // Skipping the thinking step is the largest single latency saving on a call.
-  session['reasoning.effort'] = config.xaiReasoningEffort;
+  if (config.xaiReasoningEffort) session['reasoning.effort'] = config.xaiReasoningEffort;
 
-  if (options.turnDetection !== null) {
-    session.turn_detection = {
-      type: 'server_vad',
-      threshold: config.vadThreshold,
-      // The wait after the speaker stops before the agent replies — dead air
-      // on every turn. A phone line carries constant background noise, so it
-      // needs a longer window than a browser microphone before silence can be
-      // trusted; tuning VAD_SILENCE_MS therefore applies to calls, while the
-      // browser console stays short because its audio is clean.
-      silence_duration_ms: options.profile === 'telephony' ? config.vadSilenceMs : 300,
-      // Audio kept from just before speech was detected, so the first syllable
-      // is not clipped. Cheap, and it does not delay the reply.
-      prefix_padding_ms: 300,
-      ...options.turnDetection,
-    };
+  // Turn-taking is the agent's own setting. We send a turn_detection block
+  // only for the values an operator actually set, and no block at all when
+  // none are — sending one with invented numbers would replace the console's
+  // VAD settings wholesale.
+  const turnDetection = {};
+  if (config.vadThreshold !== null) turnDetection.threshold = config.vadThreshold;
+  if (config.vadSilenceMs !== null) turnDetection.silence_duration_ms = config.vadSilenceMs;
+  Object.assign(turnDetection, options.turnDetection ?? {});
+  if (Object.keys(turnDetection).length) {
+    session.turn_detection = { type: 'server_vad', ...turnDetection };
   }
 
-  if (config.agentSpeed !== 1) {
+  if (config.agentSpeed !== null) {
     audio.output.speed = Math.min(1.5, Math.max(0.7, config.agentSpeed));
   }
 
@@ -97,63 +97,68 @@ export function realtimeUrl({ agentId, conversationId } = {}) {
 }
 
 /**
- * Lets the agent hand structured data back mid-call — a booking time, a
- * correction to the contact's name, a better number to reach them on.
+ * Writes structured data onto the call record.
  *
- * The call is already recorded with its number, duration and transcript, so
- * this is for what only the conversation can reveal. Every field is optional
- * because a caller rarely supplies all of them, and a tool that demands
- * complete arguments makes the agent stall chasing them.
+ * Tool descriptions here state what the tool does and nothing about when to
+ * use it: whether a call is worth saving details from is the agent's
+ * judgement, made from its own configuration, not something this service
+ * should be steering from a description string.
+ *
+ * Every field is optional. A tool that demands complete arguments makes the
+ * agent stall chasing values the caller never gave.
  */
 export const CALL_DETAILS_TOOL = {
   type: 'function',
   name: 'save_call_details',
   description:
-    'Record what was agreed on this call: an appointment, the contact details ' +
-    'given, and anything worth noting. Call this as soon as something is ' +
-    'settled, and again if it changes. Do not read the arguments aloud.',
+    'Saves details onto this call\'s record in the dashboard. The number, ' +
+    'duration and full transcript are already saved without this; it stores ' +
+    'the fields below as structured data. May be called more than once — a ' +
+    'later call replaces the fields it sets.',
   parameters: {
     type: 'object',
     properties: {
       outcome: {
         type: 'string',
         enum: ['booked', 'callback_requested', 'not_interested', 'wrong_number', 'other'],
-        description: 'How the call ended up.',
+        description: 'Outcome recorded against the lead.',
       },
       appointment_time: {
         type: 'string',
-        description: 'When the meeting is, in the words the person used, e.g. "Tuesday 3pm".',
+        description: 'Appointment time, stored as free text, e.g. "Tuesday 3pm".',
       },
-      contact_name: { type: 'string', description: 'The name they gave, if it differs from the list.' },
-      callback_number: { type: 'string', description: 'A different number to reach them on.' },
-      notes: { type: 'string', description: 'Anything else worth keeping.' },
+      contact_name: { type: 'string', description: 'Contact name, stored against the lead.' },
+      callback_number: { type: 'string', description: 'Alternative number, stored against the lead.' },
+      notes: { type: 'string', description: 'Free-text note stored on the call record.' },
     },
   },
 };
 
 /**
- * Lets the agent end the call itself.
+ * Ends the phone call.
  *
- * Without this the line stays open after the conversation is finished, and
- * the person has to hang up on a silent agent. The bridge does not cut the
- * audio the moment this is called: it waits for the goodbye to finish playing
- * out first, so the last thing heard is a sentence rather than a click.
+ * The description tells the agent what happens, not when to do it — deciding
+ * a conversation is over is exactly the kind of judgement that belongs to the
+ * agent's own configuration.
+ *
+ * The bridge does not cut audio the moment this is called: it waits for
+ * whatever is still queued to finish playing, so a closing sentence is heard
+ * in full rather than clipped into a click.
  */
 export const END_CALL_TOOL = {
   type: 'function',
   name: 'end_call',
   description:
-    'Hang up. Say goodbye first, in the same turn, then call this. Use it once ' +
-    'the conversation has finished: the booking is made, they are not ' +
-    'interested, it is the wrong number, or they ask you to stop calling. ' +
-    'Do not use it while they are still asking things.',
+    'Ends the phone call. Anything already spoken in this turn finishes ' +
+    'playing before the line is released, so speech in the same turn is not ' +
+    'cut off. The call cannot be resumed afterwards.',
   parameters: {
     type: 'object',
     properties: {
       reason: {
         type: 'string',
         enum: ['completed', 'not_interested', 'wrong_number', 'do_not_call', 'voicemail', 'other'],
-        description: 'Why the call is ending.',
+        description: 'Recorded as the call disposition, and decides whether the lead is retried.',
       },
     },
     required: ['reason'],
@@ -169,13 +174,13 @@ export const TRANSFER_CALL_TOOL = {
   type: 'function',
   name: 'transfer_to_human',
   description:
-    'Transfer this call to a human colleague. Tell the person you are ' +
-    'putting them through, then call this. Use it when they ask for a human, ' +
-    'or when the question is beyond what you can answer.',
+    'Transfers this call to the operator\'s configured number. The ' +
+    'destination is set in this service and cannot be chosen here. Transfer ' +
+    'happens immediately once called, ending this conversation.',
   parameters: {
     type: 'object',
     properties: {
-      reason: { type: 'string', description: 'Why a human is needed.' },
+      reason: { type: 'string', description: 'Recorded on the call record.' },
     },
   },
 };

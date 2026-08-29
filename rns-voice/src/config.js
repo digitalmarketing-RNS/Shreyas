@@ -46,6 +46,18 @@ function int(value, fallback) {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
+/**
+ * A number that stays unset when nobody set it.
+ *
+ * Used for the agent-behaviour knobs: null means "say nothing to xAI about
+ * this", which is different from any numeric default we could invent.
+ */
+function num(value) {
+  if (value === undefined || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 const env = process.env;
 
 /** Strips the leading + — Plivo expects bare digits on the wire. */
@@ -68,27 +80,35 @@ export const config = {
   xaiAgentId: env.XAI_AGENT_ID ?? '',
   xaiModel: env.XAI_MODEL ?? 'grok-voice-latest',
 
-  // ---- Response latency --------------------------------------------------
-  // 'none' asks the model to skip its thinking step before replying. Measured
-  // over 8 sessions this made no difference to time-to-first-audio (medians
-  // 644 ms for 'none' against 536 ms for 'high', with overlapping ranges), so
-  // it is exposed as a knob rather than as a speed fix. Network variance
-  // dominates at this scale. Set 'high' if answers need more care.
-  xaiReasoningEffort: env.XAI_REASONING_EFFORT ?? 'none',
-  // How long the caller must be silent before the agent takes its turn. This
-  // is a fixed wait on every turn, so unlike the knobs above it is a
-  // deterministic saving: the default was 700 ms and is now 500 ms. Too low
-  // and the agent interrupts people mid-sentence; 400-600 ms is the usable
-  // band on a phone line.
-  vadSilenceMs: int(env.VAD_SILENCE_MS, 500),
-  // Raise on a noisy line if the agent starts talking over background sound.
-  vadThreshold: Number(env.VAD_THRESHOLD ?? 0.5),
-  // Playback rate, 0.7-1.5. Above 1 the agent sounds brisker without any
-  // change to actual latency.
-  agentSpeed: Number(env.AGENT_SPEED ?? 1),
-  // Offers the agent a save_call_details function during calls. Turn off if
-  // the agent already defines its own tools in the xAI console, since sending
-  // a tools list may replace what is configured there.
+  // ---- Agent behaviour: NOT ours to decide -------------------------------
+  // Everything in this block is unset by default and is sent to xAI only if
+  // you set it here. The agent's own configuration in the xAI console decides
+  // how it thinks, when it takes its turn and how fast it speaks; this service
+  // must not quietly override any of that. Leaving a value blank is not a
+  // missing default — it is the point. Set one only to deliberately override
+  // the console for this deployment.
+  //
+  // XAI_REASONING_EFFORT: 'none' skips the thinking step before replying.
+  // Measured over 8 sessions it made no difference to time-to-first-audio
+  // (medians 644 ms for 'none' against 536 ms for 'high', overlapping ranges),
+  // so it is not a speed fix.
+  xaiReasoningEffort: env.XAI_REASONING_EFFORT || null,
+  // VAD_SILENCE_MS: how long the caller must be silent before the agent takes
+  // its turn. This is a fixed wait on every single turn, so it is the one knob
+  // that reliably changes how quickly replies come back. 400-600 ms is the
+  // usable band on a phone line; below that the agent cuts people off.
+  vadSilenceMs: num(env.VAD_SILENCE_MS),
+  // VAD_THRESHOLD: raise on a noisy line if the agent talks over background
+  // sound.
+  vadThreshold: num(env.VAD_THRESHOLD),
+  // AGENT_SPEED: playback rate, 0.7-1.5. Changes how brisk the agent sounds,
+  // not how quickly it starts.
+  agentSpeed: num(env.AGENT_SPEED),
+  // Offers the agent save_call_details, end_call and transfer_to_human as
+  // functions it may call. It decides whether and when to use them; the
+  // descriptions state only what each one does. Turn off if the agent defines
+  // its own tools in the xAI console, since sending a tools list may replace
+  // what is configured there.
   agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, true),
   // 'facts' passes the dialled number and lead fields to the agent as data;
   // 'off' passes nothing at all. Either way no instructions are sent — how the
@@ -189,5 +209,21 @@ export function configWarnings() {
     warnings.push('PUBLIC_BASE_URL must be https:// — Plivo refuses to stream audio to an insecure origin.');
   }
   if (!config.dashboardPassword) warnings.push('DASHBOARD_PASSWORD is not set — anyone who finds this URL can place calls.');
+
+  // An override set here beats the xAI console for every call, and the console
+  // still displays its own value, so the two disagree with nothing to say why.
+  // Anyone debugging "the agent ignores my settings" needs to see this.
+  for (const [name, value] of [
+    ['VAD_SILENCE_MS', config.vadSilenceMs],
+    ['VAD_THRESHOLD', config.vadThreshold],
+    ['AGENT_SPEED', config.agentSpeed],
+    ['XAI_REASONING_EFFORT', config.xaiReasoningEffort],
+  ]) {
+    if (value !== null) {
+      warnings.push(
+        `${name} is set to ${value}, which overrides the xAI console for every call. Clear it to let the agent's own configuration decide.`,
+      );
+    }
+  }
   return warnings;
 }
