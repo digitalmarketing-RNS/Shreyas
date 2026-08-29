@@ -15,7 +15,22 @@ services:
     buildCommand: npm install --omit=dev
     startCommand: node app.js
     healthCheckPath: /healthz
+
+    # Without this the container's filesystem is rebuilt on every deploy, and
+    # on the free plan on every wake from sleep, taking campaigns, leads, call
+    # history and the opt-out list with it. Nothing errors — the dashboard
+    # simply comes back empty. A disk needs a paid instance type; until then
+    # treat anything in the dashboard as losable, and keep your opt-out list
+    # somewhere you can re-import it from.
+    # disk:
+    #   name: rns-voice-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+
     envVars:
+      # Uncomment together with the disk above.
+      # - key: DATA_DIR
+      #   value: /var/data
       - key: XAI_AGENT_ID
         value: agent_CvgfdQIkeaZ1IGqg
       - key: PLIVO_PHONE_NUMBER

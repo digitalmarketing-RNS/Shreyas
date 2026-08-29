@@ -217,6 +217,18 @@ export function configWarnings() {
   }
   if (!config.dashboardPassword) warnings.push('DASHBOARD_PASSWORD is not set — anyone who finds this URL can place calls.');
 
+  // Storage inside the app folder is wiped whenever the host rebuilds the
+  // container — every deploy, and on free tiers every wake from sleep. It
+  // fails silently and looks like the app forgot: campaigns, leads, call
+  // history and the opt-out list all come back empty with nothing in the logs
+  // to explain it. The opt-out list is the serious one, because losing it
+  // means calling people who asked not to be called.
+  if (config.dataDir.startsWith(ROOT)) {
+    warnings.push(
+      'DATA_DIR is inside the application folder, so every campaign, call record and opt-out is erased whenever this host redeploys or restarts. Point DATA_DIR at a persistent disk.',
+    );
+  }
+
   // An override set here beats the xAI console for every call, and the console
   // still displays its own value, so the two disagree with nothing to say why.
   // Anyone debugging "the agent ignores my settings" needs to see this.

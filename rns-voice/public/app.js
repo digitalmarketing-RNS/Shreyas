@@ -603,14 +603,18 @@ $('leadRows').addEventListener('click', async (e) => {
 function renderCallRows(list, target, compact) {
   const rows = list.map((c) => compact
     ? `<tr><td class="mono">${esc(c.toNumber)}</td><td>${c.durationSeconds ?? '—'}</td>
-         <td><span class="badge ${c.disposition ?? c.status}">${esc(c.disposition ?? c.status)}</span></td></tr>`
+         <td><span class="badge ${c.disposition ?? c.status}"${c.error ? ` title="${esc(c.error)}"` : ''}>${esc(c.disposition ?? c.status)}</span></td></tr>`
     : `<tr>
          <td class="mono">${esc(c.toNumber)}</td>
          <td class="sub">${new Date(c.startedAt).toLocaleString()}</td>
          <td>${c.durationSeconds ?? '—'}</td>
          <td><span class="badge ${c.status}">${esc(c.status)}</span></td>
          <td><span class="badge ${c.disposition ?? ''}">${esc(c.disposition ?? '—')}</span>
-             ${c.details?.outcome ? `<div class="sub">${esc(c.details.outcome)}</div>` : ''}</td>
+             ${c.details?.outcome ? `<div class="sub">${esc(c.details.outcome)}</div>` : ''}
+             ${/* A bare "failed" badge tells the operator nothing they can act
+                  on. The reason the carrier gave is already on the record —
+                  show it, or the only way to find it is the server log. */''}
+             ${c.error ? `<div class="sub err-reason">${esc(c.error)}</div>` : ''}</td>
          <td style="white-space:nowrap">
            ${c.transcript?.length ? `<button class="btn sm" data-transcript="${c.id}">Transcript</button>` : ''}
            ${!c.endedAt ? `<button class="btn sm danger" data-hangup="${c.id}">End</button>` : ''}

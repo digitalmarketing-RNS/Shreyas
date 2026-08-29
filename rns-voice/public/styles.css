@@ -237,6 +237,9 @@ tr:last-child td { border-bottom: 0; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
 .muted { color: var(--muted); }
 .sub { font-size: 12px; color: var(--faint); }
+/* Wraps rather than truncating: a carrier's rejection reason is the whole
+   point of the row and is often a full sentence. */
+.err-reason { color: var(--bad); max-width: 380px; white-space: normal; }
 
 .badge {
   display: inline-block; padding: 3px 9px; border-radius: 999px;
