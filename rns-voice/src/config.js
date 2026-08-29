@@ -90,17 +90,20 @@ export const config = {
   // the agent already defines its own tools in the xAI console, since sending
   // a tools list may replace what is configured there.
   agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, true),
-  // The briefing sent before each call is written in English, which otherwise
-  // reads to the agent as the language to reply in. This adds an explicit
-  // instruction to mirror the caller instead. Turn off only if the agent
-  // should always answer in one fixed language.
-  agentMirrorLanguage: bool(env.AGENT_MIRROR_LANGUAGE, true),
+  // 'facts' passes the dialled number and lead fields to the agent as data;
+  // 'off' passes nothing at all. Either way no instructions are sent — how the
+  // agent behaves is decided entirely by its configuration in the xAI console.
+  agentBriefing: (env.AGENT_BRIEFING ?? 'facts').toLowerCase(),
   // Optional BCP-47 hint for the transcriber, e.g. hi-IN. Leave unset for
   // automatic detection, which is what a multilingual agent wants.
   xaiLanguageHint: env.XAI_LANGUAGE_HINT ?? '',
   // Opens the xAI session while the call is still being answered, so the
   // connection and configuration are not on the critical path.
   prewarmSessions: bool(env.PREWARM_SESSIONS, true),
+  // Generates the opening line while Plivo is still opening the audio stream,
+  // so it is ready to play rather than starting to be composed once the
+  // caller is already listening.
+  prewarmGreeting: bool(env.PREWARM_GREETING, true),
   // Lets the agent hang up when the conversation is done, rather than leaving
   // the person to hang up on a silent line.
   agentCallControl: bool(env.AGENT_CALL_CONTROL, true),

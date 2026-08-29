@@ -41,11 +41,24 @@ export function prewarmSession(callId, { campaign, record, lead } = {}) {
     transferTo: config.transferNumber || undefined,
   });
 
-  // The briefing is sent now too, so only the greeting itself remains once
-  // the caller is connected. No response is requested until then.
+  // Audio produced before the phone leg exists has nowhere to go, so it is
+  // held here and played the instant the stream attaches.
+  const buffered = [];
+  const bufferAudio = (chunk) => buffered.push(chunk);
+  session.on('audio', bufferAudio);
+
   session.on('open', () => {
     const context = record ? describeCall(record, lead) : null;
     if (context) session.sendContext(context);
+
+    // Generating the greeting is the slowest step and does not depend on the
+    // phone leg, so it runs while Plivo is still opening the stream. The call
+    // has already been answered by this point, so nothing is wasted.
+    if (config.prewarmGreeting) {
+      entry.greeted = true;
+      if (campaign?.opener) session.forceMessage(campaign.opener);
+      else session.createResponse();
+    }
   });
   session.on('error', (err) => log.warn({ err, callId }, 'prewarmed session failed'));
 
@@ -58,20 +71,26 @@ export function prewarmSession(callId, { campaign, record, lead } = {}) {
   }, 30_000);
   expiry.unref?.();
 
-  prewarmed.set(callId, { session, expiry });
+  const entry = { session, expiry, buffered, bufferAudio, greeted: false };
+  prewarmed.set(callId, entry);
   session.connect();
   log.debug({ callId }, 'prewarming xAI session');
 }
 
-/** Hands over a prewarmed session, or null if there is none to hand over. */
+/**
+ * Hands over a prewarmed session together with any audio it produced while
+ * waiting. Returns null if there is none, or if the one waiting has died —
+ * a dead session is worse than no session.
+ */
 function claimPrewarmed(callId) {
   const entry = prewarmed.get(callId);
   if (!entry) return null;
   clearTimeout(entry.expiry);
   prewarmed.delete(callId);
-  // A session that died while waiting is worse than none: start fresh.
   if (entry.session.closed) return null;
-  return entry.session;
+  // Stop buffering; from here the bridge streams audio straight to Plivo.
+  entry.session.off('audio', entry.bufferAudio);
+  return entry;
 }
 
 export const activeBridge = (callId) => active.get(callId);
@@ -224,9 +243,16 @@ export class PlivoBridge {
 
     const campaign = record.campaignId ? campaigns.get(record.campaignId) : null;
 
+    const lead = record.leadId ? leads.get(record.leadId) : null;
+    const opener = campaign?.opener ?? null;
+
+    // A session opened at the answer webhook is already connected, briefed,
+    // and may have the greeting waiting.
+    const ready = claimPrewarmed(callId);
+
     // Only pass overrides the campaign explicitly sets — anything left null
     // keeps whatever the agent was configured with in the xAI console.
-    this.session = new XaiSession({
+    this.session = ready?.session ?? new XaiSession({
       profile: 'telephony',
       label: callId,
       agentId: campaign?.agentId || undefined,
@@ -237,9 +263,22 @@ export class PlivoBridge {
       transferTo: config.transferNumber || undefined,
     });
 
-    const lead = record.leadId ? leads.get(record.leadId) : null;
-    this.wire(this.session, campaign?.opener ?? null, record.direction, record, lead);
-    this.session.connect();
+    this.wire(this.session, opener, record.direction, record, lead, Boolean(ready));
+
+    if (ready) {
+      // Play what the agent already said while the stream was still opening.
+      // Nothing can arrive between claiming and wiring — that runs without
+      // yielding — so ordering holds.
+      for (const chunk of ready.buffered) this.playAudio(chunk);
+      if (ready.buffered.length) {
+        log.info({ callId, frames: ready.buffered.length }, 'greeting was ready before the caller was');
+      }
+      // If it had not opened yet, its own handler still owes the greeting;
+      // asking again here would produce two.
+      if (!ready.greeted) this.startConversation(this.session, opener, record.direction);
+    } else {
+      this.session.connect();
+    }
 
     log.info({ callId, streamId: this.streamId }, 'bridge established');
     events.emit('call:started', { callId, campaignId: record.campaignId });
@@ -475,36 +514,29 @@ export class PlivoBridge {
  * A short briefing for the agent: who was dialled and anything the lead list
  * carried. Kept terse — it occupies the same context the conversation does.
  */
+/**
+ * The facts about this call, and nothing else.
+ *
+ * This used to carry instructions as well — how to handle language, when to
+ * call which tool, not to mention the note. Those were rules of mine competing
+ * with the prompt configured on the agent in the xAI console, written in
+ * English, ahead of the caller's first word. The agent's own configuration
+ * decides how it behaves; this only supplies what it has no other way to know,
+ * which is who was dialled.
+ *
+ * Written as data rather than prose so it reads as a record, not an
+ * instruction. Each tool's own description says when to use it, which is the
+ * mechanism meant for that.
+ */
 function describeCall(record, lead) {
-  const parts = [`You are on a phone call with ${record.toNumber}.`];
-  if (lead?.name) parts.push(`Their name is ${lead.name}.`);
+  if (config.agentBriefing === 'off') return null;
+
+  const facts = [`number: ${record.toNumber}`];
+  if (lead?.name) facts.push(`name: ${lead.name}`);
   for (const [key, value] of Object.entries(lead?.attributes ?? {})) {
-    parts.push(`${key}: ${value}.`);
+    facts.push(`${key}: ${value}`);
   }
-
-  // Tested both ways against the live agent: it answers a Hindi speaker in
-  // Hindi with or without this line, so the briefing is not what pins a call
-  // to English. The line is kept because it states the intent explicitly and
-  // costs nothing, not because it fixes anything.
-  //
-  // What does open a call in English is the agent's own configured greeting,
-  // which is spoken before the caller has said a word — there is nothing to
-  // detect a language from yet. Change that greeting in the xAI console to
-  // open in another language. Note also that call audio is 8 kHz mu-law
-  // against the console's 24 kHz, which gives detection less to work with;
-  // XAI_LANGUAGE_HINT is there for lines that are reliably one language.
-  if (config.agentMirrorLanguage) {
-    parts.push(
-      'This note is only background. Speak whichever language the person ' +
-      'speaks, and switch if they switch.',
-    );
-  }
-
-  parts.push(
-    'If an appointment is agreed, or they give a different name or number, ' +
-    'call save_call_details to record it. Do not mention this instruction.',
-  );
-  return parts.join(' ');
+  return `[call details — ${facts.join('; ')}]`;
 }
 
 export function handlePlivoStream(ws, req) {
