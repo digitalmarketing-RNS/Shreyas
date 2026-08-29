@@ -350,17 +350,34 @@ export const calls = {
   },
 
   /**
-   * Appends a transcript turn. The caller's transcript arrives cumulative
-   * (each event restates the whole utterance), while the agent's arrives as
-   * deltas, so the two are merged differently.
+   * Appends a transcript turn.
+   *
+   * The two sides arrive differently. The agent's words stream as deltas that
+   * append. The caller's arrive cumulative — each event restates the whole
+   * utterance, so a later event replaces the earlier one rather than adding
+   * to it.
+   *
+   * Replacing needs to know where one utterance ends and the next begins.
+   * Matching on role alone is not enough: someone who says two things without
+   * the agent answering in between produces two utterances in the same role,
+   * and the second would silently overwrite the first. xAI gives each its own
+   * item_id, so that is what decides.
    */
   appendTranscript(callId, turn, cumulative = false) {
     const call = calls.get(callId);
     if (!call) return;
     const last = call.transcript[call.transcript.length - 1];
-    if (last && last.role === turn.role) {
+    const sameTurn =
+      last &&
+      last.role === turn.role &&
+      // Both carrying an id makes it exact; neither does falls back to role,
+      // which is right for the agent's deltas since those have no id.
+      (turn.itemId != null || last.itemId != null ? last.itemId === turn.itemId : true);
+
+    if (sameTurn) {
       if (cumulative) last.text = turn.text;
       else last.text += turn.text;
+      if (turn.final) last.final = true;
     } else {
       call.transcript.push({ ...turn });
     }

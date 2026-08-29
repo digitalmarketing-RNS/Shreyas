@@ -331,7 +331,14 @@ export class PlivoBridge {
     session.on('transcript', (turn) => {
       calls.appendTranscript(
         callId,
-        { role: turn.role, text: turn.text, at: new Date().toISOString() },
+        {
+          role: turn.role,
+          text: turn.text,
+          at: new Date().toISOString(),
+          // Carried through so the store can tell one utterance from the next.
+          ...(turn.itemId ? { itemId: turn.itemId } : {}),
+          ...(turn.final ? { final: true } : {}),
+        },
         Boolean(turn.cumulative),
       );
       events.emit('call:transcript', { callId, role: turn.role, text: turn.text });

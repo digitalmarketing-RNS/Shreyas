@@ -104,6 +104,67 @@ export function importLeadsCsv(campaign, csv) {
   return result;
 }
 
+/**
+ * Imports a plain list of numbers — one per line, as typed or pasted into the
+ * campaign wizard.
+ *
+ * Separate from the CSV path because there are no columns to interpret: every
+ * line is a number and nothing else. It still runs each one through the same
+ * normalisation, duplicate and opt-out checks, so a number pasted here is
+ * treated exactly like one imported from a file.
+ *
+ * Commas and semicolons split as well as newlines, because a list copied out
+ * of a spreadsheet cell arrives comma-separated and rejecting it would be
+ * pedantry.
+ */
+export function importNumberList(campaign, input) {
+  const raw = Array.isArray(input) ? input : String(input ?? '').split(/[\n,;]+/);
+  const result = { imported: 0, duplicates: 0, suppressed: 0, rejected: [] };
+  const seen = new Set();
+
+  raw.forEach((entry, index) => {
+    const value = String(entry ?? '').trim();
+    if (!value || value.startsWith('#')) return;
+
+    let phone;
+    try {
+      phone = toE164(value, campaign.defaultCountryCode ?? undefined);
+    } catch (err) {
+      if (result.rejected.length < 50) {
+        result.rejected.push({
+          row: index + 1,
+          value,
+          reason: err instanceof PhoneError ? err.message : 'invalid phone number',
+        });
+      }
+      return;
+    }
+
+    if (seen.has(phone)) {
+      result.duplicates++;
+      return;
+    }
+    seen.add(phone);
+
+    const created = leads.add(campaign.id, {
+      phone,
+      name: null,
+      timezone: campaign.defaultTimezone,
+      attributes: {},
+    });
+
+    if (!created) result.duplicates++;
+    else if (created.status === 'suppressed') result.suppressed++;
+    else result.imported++;
+  });
+
+  log.info(
+    { campaignId: campaign.id, imported: result.imported, rejected: result.rejected.length },
+    'number list imported',
+  );
+  return result;
+}
+
 /** Bulk-loads an opt-out list: one number per line, '#' for comments. */
 export function importOptOutList(text, defaultCode, reason = 'bulk import') {
   const rejected = [];

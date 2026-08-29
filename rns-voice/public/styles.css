@@ -117,6 +117,13 @@ button, input, select, textarea { font: inherit; }
 .page { padding: 26px 28px 60px; max-width: 1500px; }
 .page.hidden { display: none; }
 
+/* `hidden` is applied from script to cards, notes and buttons alike, and until
+   this existed it was only honoured on the handful of elements that happened
+   to have their own rule — an empty Transcript card sat open on Call Reports
+   because .card.hidden matched nothing. !important because it has to beat
+   more specific display rules such as button.btn's inline-flex. */
+.hidden { display: none !important; }
+
 .page-tag {
   display: inline-flex; align-items: center; gap: 7px;
   font-size: 12px; font-weight: 600; color: var(--blue-700);
@@ -235,6 +242,7 @@ tr:last-child td { border-bottom: 0; }
   display: inline-block; padding: 3px 9px; border-radius: 999px;
   font-size: 11.5px; font-weight: 600; background: var(--bg); color: var(--muted);
 }
+.badge.draft     { background: var(--bg);       color: var(--muted); }
 .badge.running   { background: var(--blue-50);  color: var(--blue-700); }
 .badge.completed { background: var(--ok-bg);    color: var(--ok); }
 .badge.paused    { background: var(--warn-bg);  color: var(--warn); }
@@ -282,6 +290,95 @@ tr:last-child td { border-bottom: 0; }
 .level { height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-top: 10px; }
 .level > i { display: block; height: 100%; width: 0; background: var(--blue-500); transition: width .08s linear; }
 
+/* ----------------------------------------------------- campaign studio */
+
+.page-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 18px; flex-wrap: wrap;
+}
+.page-head .subtitle { margin-bottom: 18px; }
+button.btn.lg { padding: 10px 16px; font-size: 14px; }
+button.btn.lg svg { width: 16px; height: 16px; }
+
+.toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.search { position: relative; flex: 1; min-width: 200px; }
+.search svg {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--faint); pointer-events: none;
+}
+.search input { padding-left: 34px; }
+.filter { max-width: 190px; }
+
+/* The id is long and worth copying, but not worth the width it would take. */
+.idcell { display: inline-flex; align-items: center; gap: 6px; }
+.idcell code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px; color: var(--muted);
+}
+.copy {
+  border: 0; background: none; cursor: pointer; color: var(--faint);
+  padding: 2px; border-radius: 4px; line-height: 0;
+}
+.copy:hover { color: var(--blue-600); background: var(--blue-50); }
+.copy svg { width: 13px; height: 13px; }
+.copy.done { color: var(--ok); }
+
+/* ------------------------------------------------------------- wizard */
+
+.stepper {
+  display: flex; align-items: center; gap: 8px;
+  padding: 20px 26px 4px; justify-content: center;
+}
+.stepper .step {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 600;
+  background: var(--bg); color: var(--faint);
+  border: 1px solid var(--line); flex: none;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.stepper .step.on { background: var(--blue-500); border-color: var(--blue-500); color: #fff; }
+.stepper .step.done { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-700); }
+.stepper > i { flex: 1; max-width: 70px; height: 2px; background: var(--line); border-radius: 1px; }
+.stepper > i.on { background: var(--blue-200); }
+
+.req { color: var(--bad); }
+
+.chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 7px 15px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card);
+  font: inherit; font-weight: 600; font-size: 13.5px; color: var(--muted);
+}
+.chip:hover { border-color: var(--blue-200); color: var(--blue-700); }
+.chip.on { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-700); }
+.chips input[type="number"] { width: 80px; }
+
+.callout {
+  background: var(--blue-50); border: 1px solid var(--blue-200);
+  color: var(--blue-700); border-radius: 9px;
+  padding: 10px 13px; font-size: 13px; font-weight: 500;
+}
+.callout.warn { background: var(--warn-bg); border-color: #f3e2c0; color: var(--warn); }
+
+.advanced { margin: 4px 0 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.advanced > summary {
+  cursor: pointer; font-weight: 600; font-size: 13.5px;
+  color: var(--blue-700); padding: 4px 0; list-style: none;
+}
+.advanced > summary::-webkit-details-marker { display: none; }
+.advanced > summary::before { content: "▸ "; }
+.advanced[open] > summary::before { content: "▾ "; }
+.advanced > summary + * { margin-top: 14px; }
+
+.howto {
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: 9px; padding: 13px 15px; font-size: 13px;
+}
+.howto b { display: block; margin-bottom: 7px; }
+.howto ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.howto li { margin-bottom: 4px; }
+
 /* ------------------------------------------------------------------ modal */
 
 .gate {
@@ -294,6 +391,40 @@ tr:last-child td { border-bottom: 0; }
   width: 100%; max-width: 380px; box-shadow: 0 20px 40px rgba(16, 24, 40, .2);
 }
 .gate.hidden { display: none; }
+
+.modal {
+  position: fixed; inset: 0; z-index: 110;
+  background: rgba(16, 24, 40, .55); backdrop-filter: blur(3px);
+  display: grid; place-items: center; padding: 20px;
+}
+.modal.hidden { display: none; }
+.modal .box {
+  background: var(--card); border-radius: 14px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 20px 40px rgba(16, 24, 40, .2);
+  /* The wizard is taller than a short laptop screen once Advanced is open, so
+     the body scrolls while the header, stepper and buttons stay put. */
+  display: flex; flex-direction: column; max-height: calc(100vh - 40px);
+}
+.modal .box.wide { max-width: 620px; }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 26px 0; flex: none;
+}
+.modal-head h2 { margin: 0; }
+.modal-body { padding: 18px 26px 4px; overflow-y: auto; flex: 1; }
+.modal-foot {
+  display: flex; align-items: center; gap: 9px;
+  padding: 16px 26px 20px; flex: none;
+  border-top: 1px solid var(--line); margin-top: 12px;
+}
+.modal-foot .spacer { flex: 1; }
+.icon-btn {
+  border: 0; background: none; cursor: pointer; color: var(--faint);
+  padding: 5px; border-radius: 7px; line-height: 0;
+}
+.icon-btn:hover { background: var(--bg); color: var(--ink); }
+.icon-btn svg { width: 18px; height: 18px; }
 
 .toast {
   position: fixed; right: 20px; bottom: 20px; z-index: 200;

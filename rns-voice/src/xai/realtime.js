@@ -101,21 +101,51 @@ export class XaiSession extends EventEmitter {
         if (event.delta) this.emit('audio', event.delta);
         break;
 
-      // Both names carry the agent's own words, depending on API revision.
+      // All three carry the agent's own words, depending on API revision and
+      // whether the response is audio or text.
       case 'response.output_audio_transcript.delta':
+      case 'response.output_text.delta':
       case 'response.text.delta':
         if (event.delta) this.emit('transcript', { role: 'agent', text: event.delta });
         break;
 
-      case 'conversation.item.input_audio_transcription.updated': {
-        // Cumulative: each event restates the whole utterance so far.
+      // The caller's words. Two events carry them and only one is guaranteed:
+      //
+      //   .completed  fires once per utterance, always, with the final text.
+      //   .updated    streams the cumulative transcript while they are still
+      //               speaking, but xAI emits it ONLY when the session sets
+      //               audio.input.transcription.model to 'grok-transcribe'.
+      //
+      // Listening for .updated alone — which this did — means a session that
+      // has not asked for live captions records nothing the caller said, with
+      // no error to show for it. Handle both: .updated fills the turn in as
+      // they speak when captions are on, .completed settles it either way.
+      case 'conversation.item.input_audio_transcription.updated':
+      case 'conversation.item.input_audio_transcription.completed': {
         const text = event.transcript ?? event.text ?? '';
-        if (text) this.emit('transcript', { role: 'caller', text, cumulative: true });
+        if (text) {
+          this.emit('transcript', {
+            role: 'caller',
+            text,
+            cumulative: true,
+            // Identifies the utterance, so two things the caller says in a row
+            // become two turns instead of the second overwriting the first.
+            itemId: event.item_id ?? null,
+            final: event.type.endsWith('.completed'),
+          });
+        }
         break;
       }
 
       case 'conversation.created':
         this.conversationId = event.conversation?.id ?? null;
+        break;
+
+      // xAI's acknowledgement of session.update, echoing what it actually
+      // accepted. Logged because a field it ignored or rejected is otherwise
+      // invisible: the call simply behaves unlike the console says it should.
+      case 'session.updated':
+        log.debug({ label: this.options.label, session: event.session }, 'xAI accepted session config');
         break;
 
       case 'response.created':

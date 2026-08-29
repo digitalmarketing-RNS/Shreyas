@@ -82,6 +82,12 @@ document.querySelectorAll('.nav-item').forEach((button) => {
 
 $('menuToggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
 
+/** Switches page as if the sidebar item had been clicked, so the active
+ *  highlight and the page's own refresh both happen. */
+function showPage(target) {
+  document.querySelector(`.nav-item[data-page="${target}"]`)?.click();
+}
+
 function onPageShown(page) {
   if (page === 'calls') refreshCalls();
   else if (page === 'optout') refreshOptOut();
@@ -182,32 +188,71 @@ function progressBar(stats) {
           <div class="sub">${done}/${stats.total} done · ${pct}%</div>`;
 }
 
-async function refreshCampaigns() {
-  campaignCache = await api('/campaigns');
-  $('navCampaignCount').textContent = campaignCache.length;
+function statusLabel(status) {
+  return status === 'draft' ? 'Not started' : status[0].toUpperCase() + status.slice(1);
+}
 
-  $('campaignRows').innerHTML = campaignCache.length ? campaignCache.map((c) => `
+function whenLabel(iso) {
+  const at = new Date(iso);
+  if (Number.isNaN(at.getTime())) return '—';
+  return `${at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          <div class="sub">${at.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>`;
+}
+
+/** Applies the search box and status filter to the cached list. */
+function visibleCampaigns() {
+  const term = $('campaignSearch').value.trim().toLowerCase();
+  const status = $('campaignFilter').value;
+  return campaignCache.filter((c) => {
+    if (status && c.status !== status) return false;
+    if (!term) return true;
+    return c.name.toLowerCase().includes(term) || c.id.toLowerCase().includes(term);
+  });
+}
+
+function renderCampaignTable() {
+  const rows = visibleCampaigns();
+  const anyAtAll = campaignCache.length > 0;
+
+  $('campaignRows').innerHTML = rows.length ? rows.map((c) => `
     <tr>
-      <td><b>${esc(c.name)}</b><div class="sub mono">${c.id}</div></td>
+      <td><b>${esc(c.name)}</b></td>
+      <td>
+        <span class="idcell">
+          <code>${esc(c.id)}</code>
+          <button class="copy" data-copy="${esc(c.id)}" title="Copy campaign ID" aria-label="Copy campaign ID">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          </button>
+        </span>
+      </td>
       <td>${progressBar(c.stats)}</td>
       <td>${c.stats.total}<div class="sub">${c.stats.pending} waiting</div></td>
-      <td>${c.stats.answered}</td>
-      <td><span class="badge ${c.status}">${c.status}</span></td>
+      <td>${whenLabel(c.createdAt)}</td>
+      <td><span class="badge ${c.status}">${statusLabel(c.status)}</span></td>
       <td style="white-space:nowrap">
         ${c.status === 'running'
           ? `<button class="btn sm" data-act="pause" data-id="${c.id}">Pause</button>`
           : `<button class="btn sm primary" data-act="start" data-id="${c.id}">Start</button>`}
+        <button class="btn sm" data-act="report" data-id="${c.id}">Report</button>
         <button class="btn sm danger" data-act="delete" data-id="${c.id}">Delete</button>
       </td>
     </tr>`).join('')
-    : '<tr><td colspan="6" class="empty">No campaigns yet. Create one above.</td></tr>';
+    : `<tr><td colspan="7" class="empty">${anyAtAll
+        ? 'No campaigns match that search.'
+        : 'No campaigns yet. Press “New campaign” to make one.'}</td></tr>`;
+}
+
+async function refreshCampaigns() {
+  campaignCache = await api('/campaigns');
+  $('navCampaignCount').textContent = campaignCache.length;
+  renderCampaignTable();
 
   $('dashCampaigns').innerHTML = campaignCache.length ? campaignCache.slice(0, 6).map((c) => `
     <tr>
       <td><b>${esc(c.name)}</b></td>
       <td>${progressBar(c.stats)}</td>
       <td>${c.stats.total}</td>
-      <td><span class="badge ${c.status}">${c.status}</span></td>
+      <td><span class="badge ${c.status}">${statusLabel(c.status)}</span></td>
       <td>${c.status === 'running'
         ? `<button class="btn sm" data-act="pause" data-id="${c.id}">Pause</button>`
         : `<button class="btn sm primary" data-act="start" data-id="${c.id}">Start</button>`}</td>
@@ -222,10 +267,35 @@ async function refreshCampaigns() {
   $('consoleCampaign').innerHTML = `<option value="">Agent defaults (as configured in xAI)</option>${options}`;
 }
 
+$('campaignSearch').addEventListener('input', renderCampaignTable);
+$('campaignFilter').addEventListener('change', renderCampaignTable);
+
 async function campaignAction(event) {
+  const copyButton = event.target.closest('button[data-copy]');
+  if (copyButton) {
+    try {
+      await navigator.clipboard.writeText(copyButton.dataset.copy);
+      copyButton.classList.add('done');
+      setTimeout(() => copyButton.classList.remove('done'), 1200);
+    } catch {
+      toast('Your browser would not let the page copy that.', 'bad');
+    }
+    return;
+  }
+
   const button = event.target.closest('button[data-act]');
   if (!button) return;
   const { act, id } = button.dataset;
+
+  if (act === 'report') {
+    // Call Reports already lists every call with its transcript; scope it to
+    // this campaign rather than building a second, lesser view of the same
+    // rows. Navigating triggers the refresh, so none is issued here.
+    callsScopedTo = id;
+    showPage('calls');
+    return;
+  }
+
   button.disabled = true;
   try {
     if (act === 'delete') {
@@ -246,9 +316,170 @@ async function campaignAction(event) {
 $('campaignRows').addEventListener('click', campaignAction);
 $('dashCampaigns').addEventListener('click', campaignAction);
 
-$('createCampaign').addEventListener('click', async () => {
+// ---------------------------------------------------------------------------
+// Campaign wizard
+// ---------------------------------------------------------------------------
+
+let wizStep = 1;
+
+/** Splits the textarea the same way the server does, so counts agree. */
+function typedNumbers() {
+  return $('cNumbers').value
+    .split(/[\n,;]+/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'));
+}
+
+/**
+ * Sorts what was typed into what will dial and what will not.
+ *
+ * A preview, not a verdict — the server normalises to E.164 and has the final
+ * say. But the count shown beside the box and the count promised on the last
+ * step both come from here, so the two cannot contradict each other, and
+ * neither promises to dial something that plainly is not a phone number.
+ */
+function classifyNumbers() {
+  const seen = new Set();
+  const usable = [];
+  const unusable = [];
+  let duplicates = 0;
+
+  for (const value of typedNumbers()) {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length < 7 || digits.length > 15) {
+      unusable.push(value);
+    } else if (seen.has(digits)) {
+      duplicates++;
+    } else {
+      seen.add(digits);
+      usable.push(value);
+    }
+  }
+  return { usable, unusable, duplicates };
+}
+
+function showStep(step) {
+  wizStep = step;
+  document.querySelectorAll('.wiz-step').forEach((panel) => {
+    panel.classList.toggle('hidden', Number(panel.dataset.step) !== step);
+  });
+  document.querySelectorAll('.stepper .step').forEach((dot) => {
+    const n = Number(dot.dataset.step);
+    dot.classList.toggle('on', n === step);
+    dot.classList.toggle('done', n < step);
+  });
+  document.querySelectorAll('.stepper > i').forEach((line, index) => {
+    line.classList.toggle('on', index < step - 1);
+  });
+
+  $('wizBack').classList.toggle('hidden', step === 1);
+  $('wizNext').classList.toggle('hidden', step === 3);
+  $('wizCreate').classList.toggle('hidden', step !== 3);
+  if (step === 3) renderHowTo();
+
+  const focus = document.querySelector(`.wiz-step[data-step="${step}"] input, .wiz-step[data-step="${step}"] textarea`);
+  focus?.focus();
+}
+
+/** Says what pressing the button will actually do, using the real numbers. */
+function renderHowTo() {
+  const count = classifyNumbers().usable.length;
+  const conc = Math.max(1, Number($('cConc').value) || 1);
+  const attempts = Number($('cAttempts').value) || 1;
+  $('howtoList').innerHTML = [
+    `${count} number${count === 1 ? '' : 's'} will be loaded and the campaign starts straight away.`,
+    `${conc} call${conc === 1 ? '' : 's'} will run at a time; the rest wait in the queue.`,
+    'As each call ends, the next number is dialled automatically.',
+    `A number that does not answer is retried up to ${attempts} time${attempts === 1 ? '' : 's'}.`,
+    `Calls are only placed between ${esc($('cWinStart').value)} and ${esc($('cWinEnd').value)}, on the days you picked.`,
+    'Anyone on your opt-out list is skipped and never dialled.',
+  ].map((line) => `<li>${line}</li>`).join('');
+}
+
+function updateNumberCount() {
+  const { usable, unusable, duplicates } = classifyNumbers();
+  const box = $('numberCount');
+
+  if (!usable.length && !unusable.length) {
+    box.textContent = 'No numbers yet.';
+    box.className = 'callout';
+    return;
+  }
+
+  const asides = [
+    duplicates ? `${duplicates} duplicate${duplicates === 1 ? '' : 's'} ignored` : '',
+    unusable.length ? `${unusable.length} not a phone number (${esc(unusable.slice(0, 3).join(', '))}${unusable.length > 3 ? '…' : ''})` : '',
+  ].filter(Boolean);
+
+  box.textContent = `${usable.length} number${usable.length === 1 ? '' : 's'} will be called`
+    + (asides.length ? ` · ${asides.join(' · ')}` : '');
+  box.className = unusable.length ? 'callout warn' : 'callout';
+}
+
+function openWizard() {
+  showStep(1);
+  $('wizard').classList.remove('hidden');
+  updateNumberCount();
+  $('cNameCount').textContent = $('cName').value.length;
+  $('cName').focus();
+}
+
+function closeWizard() {
+  $('wizard').classList.add('hidden');
+}
+
+function resetWizard() {
+  for (const id of ['cName', 'cOpener', 'cNumbers', 'cInstructions']) $(id).value = '';
+  $('cNameCount').textContent = '0';
+  updateNumberCount();
+  showStep(1);
+}
+
+$('openWizard').addEventListener('click', openWizard);
+$('wizClose').addEventListener('click', closeWizard);
+$('wizCancel').addEventListener('click', closeWizard);
+$('wizBack').addEventListener('click', () => showStep(wizStep - 1));
+
+$('wizNext').addEventListener('click', () => {
+  if (wizStep === 1 && !$('cName').value.trim()) return toast('Give the campaign a name.', 'bad');
+  if (wizStep === 2 && !classifyNumbers().usable.length) {
+    return toast('Add at least one number that looks like a phone number.', 'bad');
+  }
+  showStep(wizStep + 1);
+});
+
+// Clicking the backdrop closes; clicking inside the box must not.
+$('wizard').addEventListener('click', (e) => { if (e.target === $('wizard')) closeWizard(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('wizard').classList.contains('hidden')) closeWizard();
+});
+
+$('cName').addEventListener('input', () => { $('cNameCount').textContent = $('cName').value.length; });
+$('cNumbers').addEventListener('input', updateNumberCount);
+$('cCountry').addEventListener('input', () => {
+  $('cCountryEcho').textContent = `+${$('cCountry').value.trim() || '91'}`;
+});
+
+$('concChips').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  $('cConc').value = chip.dataset.conc;
+  syncConcChips();
+  renderHowTo();
+});
+function syncConcChips() {
+  const value = String($('cConc').value);
+  document.querySelectorAll('#concChips .chip').forEach((chip) => {
+    chip.classList.toggle('on', chip.dataset.conc === value);
+  });
+}
+$('cConc').addEventListener('input', () => { syncConcChips(); renderHowTo(); });
+
+$('wizCreate').addEventListener('click', async () => {
+  const numbers = classifyNumbers().usable;
   const body = {
     name: $('cName').value.trim(),
+    numbers,
     opener: $('cOpener').value.trim() || null,
     instructions: $('cInstructions').value.trim() || null,
     windowStart: $('cWinStart').value.trim(),
@@ -262,17 +493,38 @@ $('createCampaign').addEventListener('click', async () => {
     hangupOnMachine: $('cMachine').value === 'true',
   };
   if (!body.name) return toast('Give the campaign a name.', 'bad');
+  if (!numbers.length) return toast('Add at least one phone number.', 'bad');
   if (!body.windowDays.length) return toast('Pick at least one calling day.', 'bad');
 
+  const button = $('wizCreate');
+  button.disabled = true;
   try {
-    await api('/campaigns', { method: 'POST', body: JSON.stringify(body) });
-    $('cName').value = '';
-    $('cOpener').value = '';
-    $('cInstructions').value = '';
+    const result = await api('/campaigns/launch', { method: 'POST', body: JSON.stringify(body) });
+    closeWizard();
+    resetWizard();
     await refreshCampaigns();
-    toast('Campaign created. Add leads next.', 'ok');
+
+    const { imported } = result;
+    // Say what was dropped rather than only what worked: a silently skipped
+    // number looks like a call that never happened.
+    const skipped = [
+      imported.duplicates ? `${imported.duplicates} duplicate` : '',
+      imported.suppressed ? `${imported.suppressed} opted out` : '',
+      imported.rejected.length ? `${imported.rejected.length} unreadable` : '',
+    ].filter(Boolean).join(', ');
+    const loaded = `${imported.imported} number${imported.imported === 1 ? '' : 's'} loaded`
+      + (skipped ? ` (${skipped})` : '');
+    if (result.started) {
+      toast(`${loaded} — dialling now.`, 'ok');
+    } else {
+      // Saved but not running. Say why, or the campaign looks broken rather
+      // than waiting on a setting the operator still has to fill in.
+      toast(`${loaded}. Saved but not dialling: ${result.blocked ?? 'start it when you are ready.'}`, 'bad');
+    }
   } catch (err) {
     toast(err.message, 'bad');
+  } finally {
+    button.disabled = false;
   }
 });
 
@@ -367,11 +619,33 @@ function renderCallRows(list, target, compact) {
   $(target).innerHTML = rows || `<tr><td colspan="${compact ? 3 : 6}" class="empty">No calls yet.</td></tr>`;
 }
 
+/** Set when the operator opened this page from one campaign's Report button. */
+let callsScopedTo = null;
+
 async function refreshCalls() {
-  const list = await api('/calls?limit=60');
+  const scope = callsScopedTo ? `&campaignId=${encodeURIComponent(callsScopedTo)}` : '';
+  const list = await api(`/calls?limit=60${scope}`);
   renderCallRows(list, 'callRows', false);
-  renderCallRows(list.slice(0, 8), 'dashCalls', true);
+
+  // The dashboard's recent-calls list is never scoped — it is the whole system
+  // at a glance, and quietly filtering it would misreport how much is running.
+  const unscoped = callsScopedTo ? await api('/calls?limit=8') : list.slice(0, 8);
+  renderCallRows(unscoped.slice(0, 8), 'dashCalls', true);
+
+  const note = $('callFilterNote');
+  if (callsScopedTo) {
+    const campaign = campaignCache.find((c) => c.id === callsScopedTo);
+    $('callFilterText').textContent = `Showing calls from “${campaign?.name ?? callsScopedTo}” only.`;
+    note.classList.remove('hidden');
+  } else {
+    note.classList.add('hidden');
+  }
 }
+
+$('callFilterClear').addEventListener('click', async () => {
+  callsScopedTo = null;
+  await refreshCalls();
+});
 
 $('callRows').addEventListener('click', async (e) => {
   const button = e.target.closest('button');

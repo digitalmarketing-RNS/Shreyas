@@ -114,6 +114,13 @@ export const config = {
   // 'off' passes nothing at all. Either way no instructions are sent — how the
   // agent behaves is decided entirely by its configuration in the xAI console.
   agentBriefing: (env.AGENT_BRIEFING ?? 'facts').toLowerCase(),
+  // Streams the caller's words as they speak, rather than once each sentence
+  // finishes. Sets audio.input.transcription.model, which xAI's event docs
+  // require for the live-caption event but which its published session schema
+  // does not list — so this is off until a test call confirms your account
+  // accepts it. The finished transcript of every utterance is recorded either
+  // way; this only decides whether it also arrives mid-sentence.
+  xaiLiveCaptions: bool(env.XAI_LIVE_CAPTIONS, false),
   // Optional BCP-47 hint for the transcriber, e.g. hi-IN. Leave unset for
   // automatic detection, which is what a multilingual agent wants.
   xaiLanguageHint: env.XAI_LANGUAGE_HINT ?? '',

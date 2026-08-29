@@ -67,9 +67,14 @@ export function buildSessionUpdate(options) {
 
   if (options.instructions) session.instructions = options.instructions;
   if (options.voice) session.voice = options.voice;
+  // Transcription settings describe what xAI sends back to us, not how the
+  // agent behaves, so they are ours to ask for. 'model' turns on the
+  // live-caption event; without it the caller's words still arrive, but only
+  // once each utterance is finished.
   const languageHint = options.languageHint || config.xaiLanguageHint;
-  if (languageHint || options.keyterms?.length) {
+  if (languageHint || options.keyterms?.length || config.xaiLiveCaptions) {
     audio.input.transcription = {
+      ...(config.xaiLiveCaptions ? { model: 'grok-transcribe' } : {}),
       ...(languageHint ? { language_hint: languageHint } : {}),
       ...(options.keyterms?.length ? { keyterms: options.keyterms } : {}),
     };

@@ -5,7 +5,7 @@ import { events } from '../util/events.js';
 import { toE164 } from '../util/phone.js';
 import { isValidTimeZone, parseHHMM } from '../util/windows.js';
 import { calls, campaigns, dnc, leads, totals } from '../store.js';
-import { importLeadsCsv, importOptOutList } from '../campaign/import.js';
+import { importLeadsCsv, importNumberList, importOptOutList } from '../campaign/import.js';
 import { reconcile, tick } from '../campaign/dialer.js';
 import { activeBridge, activeBridgeCount } from '../plivo/bridge.js';
 import { accountInfo, listNumbers, placeCall, hangupCall } from '../plivo/client.js';
@@ -126,6 +126,68 @@ apiRouter.post('/campaigns', (req, res) => {
   const problem = validateCampaign(req.body ?? {});
   if (problem) return fail(res, problem);
   res.status(201).json(campaigns.create(req.body));
+});
+
+/**
+ * Creates a campaign, loads its numbers and starts dialling — in one request.
+ *
+ * The wizard collects all three at once, and doing them as three requests
+ * meant a failure partway left a half-built campaign behind: named, maybe
+ * with numbers, not running, and looking to the operator like it had worked.
+ * Here nothing is stored until the numbers parse, and a campaign that cannot
+ * start is removed again rather than left as debris.
+ */
+apiRouter.post('/campaigns/launch', (req, res) => {
+  const body = req.body ?? {};
+  const problem = validateCampaign(body);
+  if (problem) return fail(res, problem);
+
+  const hasNumbers = Array.isArray(body.numbers)
+    ? body.numbers.length > 0
+    : String(body.numbers ?? '').trim().length > 0;
+  if (!hasNumbers) return fail(res, 'Add at least one phone number.');
+
+  // A deployment that cannot dial yet still gets its campaign built and its
+  // numbers loaded — it is saved rather than started, and told why. Refusing
+  // outright would mean nobody could prepare a campaign before finishing
+  // setup, which is the order most people actually work in.
+  const blocked = !plivoReady
+    ? 'Plivo is not configured, so no calls can be placed yet.'
+    : !xaiReady
+      ? 'The xAI API key is not set, so the agent cannot answer yet.'
+      : null;
+  const start = body.start !== false && !blocked;
+
+  const campaign = campaigns.create(body);
+  const imported = importNumberList(campaign, body.numbers);
+
+  if (imported.imported === 0) {
+    campaigns.remove(campaign.id);
+    const reason = imported.rejected[0]?.reason;
+    return fail(
+      res,
+      imported.suppressed || imported.duplicates
+        ? 'Every number in that list is already opted out or already in another campaign.'
+        : `None of those numbers could be read${reason ? ` — ${reason}` : ''}.`,
+    );
+  }
+
+  let started = false;
+  if (start) {
+    campaigns.update(campaign.id, { status: 'running' });
+    started = true;
+    log.info({ campaignId: campaign.id, leads: imported.imported }, 'campaign launched');
+  }
+
+  res.status(201).json({
+    campaign: { ...campaigns.get(campaign.id), stats: campaigns.stats(campaign.id) },
+    imported,
+    started,
+    blocked,
+  });
+
+  // After responding: the operator does not wait on the first dial.
+  if (started) void tick();
 });
 
 apiRouter.get('/campaigns/:id', (req, res) => {

@@ -23,6 +23,111 @@
   </div>
 </div>
 
+<!-- Campaign wizard ----------------------------------------------------- -->
+<div class="modal hidden" id="wizard">
+  <div class="box wide">
+    <div class="modal-head">
+      <h2>Create campaign</h2>
+      <button class="icon-btn" id="wizClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="stepper">
+      <span class="step on" data-step="1">1</span><i></i>
+      <span class="step" data-step="2">2</span><i></i>
+      <span class="step" data-step="3">3</span>
+    </div>
+
+    <div class="modal-body">
+      <!-- Step 1 -------------------------------------------------------- -->
+      <div class="wiz-step" data-step="1">
+        <div class="field">
+          <label for="cName">Campaign name <span class="req">*</span></label>
+          <input type="text" id="cName" maxlength="60" placeholder="e.g. Kalpataru Elaara — site visit follow-up" />
+          <div class="hint"><span id="cNameCount">0</span>/60</div>
+        </div>
+        <div class="field">
+          <label for="cOpener">Opening line <span class="muted" style="font-weight:400">(optional)</span></label>
+          <textarea id="cOpener" rows="3" placeholder="Hi, am I speaking with {name}? I'm calling from RNS about…"></textarea>
+          <div class="hint">Spoken word for word at the start of every call, with no model delay. Leave blank and your agent opens in its own words.</div>
+        </div>
+      </div>
+
+      <!-- Step 2 -------------------------------------------------------- -->
+      <div class="wiz-step hidden" data-step="2">
+        <div class="field">
+          <label for="cNumbers">Phone numbers <span class="req">*</span> <span class="muted" style="font-weight:400">(one per line)</span></label>
+          <textarea id="cNumbers" rows="9" class="mono" placeholder="9876543210&#10;9123456789"></textarea>
+          <div class="hint">
+            10-digit numbers are fine — <span id="cCountryEcho">+91</span> is added automatically.
+            Paste a whole column from a spreadsheet and it will be split for you.
+          </div>
+        </div>
+        <div class="callout" id="numberCount">No numbers yet.</div>
+      </div>
+
+      <!-- Step 3 -------------------------------------------------------- -->
+      <div class="wiz-step hidden" data-step="3">
+        <div class="field">
+          <label for="cConc">How many calls at the same time?</label>
+          <div class="chips" id="concChips">
+            <button type="button" class="chip" data-conc="1">1</button>
+            <button type="button" class="chip on" data-conc="2">2</button>
+            <button type="button" class="chip" data-conc="5">5</button>
+            <button type="button" class="chip" data-conc="10">10</button>
+            <input type="number" id="cConc" value="2" min="1" max="50" aria-label="Calls at once" />
+          </div>
+          <div class="hint">Each one is a separate live call. Start low, listen to a few, then raise it.</div>
+        </div>
+
+        <details class="advanced">
+          <summary>Advanced settings</summary>
+          <div class="grid3">
+            <div class="field"><label for="cWinStart">Calling window opens</label><input type="text" id="cWinStart" value="10:00" /></div>
+            <div class="field"><label for="cWinEnd">Calling window closes</label><input type="text" id="cWinEnd" value="19:00" /></div>
+            <div class="field"><label for="cTz">Lead timezone</label><input type="text" id="cTz" value="Asia/Kolkata" /></div>
+          </div>
+          <div class="field">
+            <label>Calling days</label>
+            <div class="days" id="cDays"></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label for="cAttempts">Attempts per lead</label><input type="number" id="cAttempts" value="3" min="1" max="10" /></div>
+            <div class="field"><label for="cRetry">Wait before retry (min)</label><input type="number" id="cRetry" value="60" min="1" /></div>
+            <div class="field"><label for="cCountry">Default country code</label><input type="text" id="cCountry" value="91" /></div>
+          </div>
+          <div class="field">
+            <label for="cMachine">If voicemail answers</label>
+            <select id="cMachine">
+              <option value="true">Hang up straight away</option>
+              <option value="false">Let the agent talk</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cInstructions">Extra instructions <span class="muted" style="font-weight:400">(optional)</span></label>
+            <textarea id="cInstructions" rows="3" placeholder="Leave blank to use the prompt already configured on your xAI agent."></textarea>
+            <div class="hint">Only fill this in if this campaign should behave differently from your agent's own xAI configuration. Blank keeps the agent exactly as you built it.</div>
+          </div>
+        </details>
+
+        <div class="howto">
+          <b>What happens when you press start</b>
+          <ul id="howtoList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="wizCancel">Cancel</button>
+      <div class="spacer"></div>
+      <button class="btn hidden" id="wizBack">Back</button>
+      <button class="btn primary" id="wizNext">Next</button>
+      <button class="btn primary hidden" id="wizCreate">Create &amp; start campaign</button>
+    </div>
+  </div>
+</div>
+
 <!-- Sidebar ------------------------------------------------------------- -->
 <aside class="sidebar" id="sidebar">
   <div class="brand"><span class="mark">RNS</span> Voice Agent</div>
@@ -153,81 +258,47 @@
 
   <!-- Campaigns ------------------------------------------------------- -->
   <section class="page hidden" id="page-campaigns">
-    <div class="page-tag"><i></i> Campaign orchestration</div>
-    <h1>AI Campaign Studio</h1>
-    <p class="subtitle">Create an outbound calling campaign and let the agent work the list.</p>
-
-    <div class="card">
-      <div class="section-head"><span class="dot"></span><h2>New campaign</h2></div>
-
-      <div class="field">
-        <label for="cName">Campaign name</label>
-        <input type="text" id="cName" placeholder="e.g. Kalpataru Elaara — site visit follow-up" />
+    <div class="page-head">
+      <div>
+        <div class="page-tag"><i></i> Campaign orchestration</div>
+        <h1>AI Campaign Studio</h1>
+        <p class="subtitle">Create and manage AI call campaigns.</p>
       </div>
-
-      <div class="field">
-        <label for="cOpener">Opening line <span class="muted" style="font-weight:400">(optional)</span></label>
-        <textarea id="cOpener" placeholder="Hi, am I speaking with {name}? I'm calling from RNS about…"></textarea>
-        <div class="hint">Spoken word for word at the start of every call, with no model delay. Leave blank and the agent opens in its own words.</div>
-      </div>
-
-      <div class="field">
-        <label for="cInstructions">Extra instructions <span class="muted" style="font-weight:400">(optional)</span></label>
-        <textarea id="cInstructions" placeholder="Leave blank to use the prompt already configured on your xAI agent."></textarea>
-        <div class="hint">Only fill this in if this campaign should behave differently from your agent's own xAI configuration. Blank keeps the agent exactly as you built it.</div>
-      </div>
-
-      <div class="grid3">
-        <div class="field"><label for="cWinStart">Calling window opens</label><input type="text" id="cWinStart" value="10:00" /></div>
-        <div class="field"><label for="cWinEnd">Calling window closes</label><input type="text" id="cWinEnd" value="19:00" /></div>
-        <div class="field"><label for="cTz">Lead timezone</label><input type="text" id="cTz" value="Asia/Kolkata" /></div>
-      </div>
-
-      <div class="field">
-        <label>Calling days</label>
-        <div class="days" id="cDays"></div>
-      </div>
-
-      <div class="grid3">
-        <div class="field">
-          <label for="cAttempts">Attempts per lead</label>
-          <input type="number" id="cAttempts" value="3" min="1" max="10" />
-        </div>
-        <div class="field">
-          <label for="cRetry">Wait before retry (minutes)</label>
-          <input type="number" id="cRetry" value="60" min="1" />
-        </div>
-        <div class="field">
-          <label for="cConc">Calls at once</label>
-          <input type="number" id="cConc" value="2" min="1" max="50" />
-          <div class="hint">Start at 2 and raise it once you've heard a few calls.</div>
-        </div>
-      </div>
-
-      <div class="grid2">
-        <div class="field">
-          <label for="cCountry">Default country code</label>
-          <input type="text" id="cCountry" value="91" />
-          <div class="hint">Applied to numbers in your list that have no country code.</div>
-        </div>
-        <div class="field">
-          <label for="cMachine">If voicemail answers</label>
-          <select id="cMachine">
-            <option value="true">Hang up straight away</option>
-            <option value="false">Let the agent talk</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="actions"><button class="btn primary" id="createCampaign">Create campaign</button></div>
+      <button class="btn primary lg" id="openWizard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New campaign
+      </button>
     </div>
 
     <div class="card">
-      <div class="section-head"><span class="dot"></span><h2>All campaigns</h2></div>
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="campaignSearch" placeholder="Search campaigns…" />
+        </div>
+        <select id="campaignFilter" class="filter">
+          <option value="">All status</option>
+          <option value="running">Running</option>
+          <option value="paused">Paused</option>
+          <option value="draft">Draft</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Campaign</th><th>Progress</th><th>Leads</th><th>Answered</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="campaignRows"><tr><td colspan="6" class="empty">No campaigns yet.</td></tr></tbody>
+          <thead>
+            <tr>
+              <th>Campaign name</th>
+              <th>Campaign ID</th>
+              <th>Activity</th>
+              <th>Total calls</th>
+              <th>Date &amp; time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="campaignRows"><tr><td colspan="7" class="empty">No campaigns yet.</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -366,6 +437,10 @@
     <p class="subtitle">Every call, with what was said on it.</p>
 
     <div class="card">
+      <div class="callout hidden" id="callFilterNote" style="margin-bottom:14px">
+        <span id="callFilterText"></span>
+        <button class="btn sm" id="callFilterClear" style="margin-left:10px">Show all calls</button>
+      </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Number</th><th>Started</th><th>Secs</th><th>Status</th><th>Outcome</th><th></th></tr></thead>
