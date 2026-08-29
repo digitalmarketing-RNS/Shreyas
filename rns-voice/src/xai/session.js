@@ -79,6 +79,8 @@ export function buildSessionUpdate(options) {
   }
   const tools = [...(options.tools ?? [])];
   if (options.detailsTool) tools.push(CALL_DETAILS_TOOL);
+  if (options.callControl) tools.push(END_CALL_TOOL);
+  if (options.transferTo) tools.push(TRANSFER_CALL_TOOL);
   if (tools.length) session.tools = tools;
 
   return { type: 'session.update', session };
@@ -125,6 +127,55 @@ export const CALL_DETAILS_TOOL = {
       contact_name: { type: 'string', description: 'The name they gave, if it differs from the list.' },
       callback_number: { type: 'string', description: 'A different number to reach them on.' },
       notes: { type: 'string', description: 'Anything else worth keeping.' },
+    },
+  },
+};
+
+/**
+ * Lets the agent end the call itself.
+ *
+ * Without this the line stays open after the conversation is finished, and
+ * the person has to hang up on a silent agent. The bridge does not cut the
+ * audio the moment this is called: it waits for the goodbye to finish playing
+ * out first, so the last thing heard is a sentence rather than a click.
+ */
+export const END_CALL_TOOL = {
+  type: 'function',
+  name: 'end_call',
+  description:
+    'Hang up. Say goodbye first, in the same turn, then call this. Use it once ' +
+    'the conversation has finished: the booking is made, they are not ' +
+    'interested, it is the wrong number, or they ask you to stop calling. ' +
+    'Do not use it while they are still asking things.',
+  parameters: {
+    type: 'object',
+    properties: {
+      reason: {
+        type: 'string',
+        enum: ['completed', 'not_interested', 'wrong_number', 'do_not_call', 'voicemail', 'other'],
+        description: 'Why the call is ending.',
+      },
+    },
+    required: ['reason'],
+  },
+};
+
+/**
+ * Hands the call to a person. The destination is fixed by configuration
+ * rather than chosen by the agent, so a call can only ever be sent to a
+ * number the operator nominated.
+ */
+export const TRANSFER_CALL_TOOL = {
+  type: 'function',
+  name: 'transfer_to_human',
+  description:
+    'Transfer this call to a human colleague. Tell the person you are ' +
+    'putting them through, then call this. Use it when they ask for a human, ' +
+    'or when the question is beyond what you can answer.',
+  parameters: {
+    type: 'object',
+    properties: {
+      reason: { type: 'string', description: 'Why a human is needed.' },
     },
   },
 };

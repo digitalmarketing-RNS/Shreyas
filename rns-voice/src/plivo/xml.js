@@ -48,3 +48,17 @@ export function hangupXml(message) {
   <Hangup/>
 </Response>`;
 }
+
+/**
+ * Dials the configured colleague. `callerId` is kept as our own number so the
+ * person receiving the transfer sees a number they recognise rather than the
+ * lead's.
+ */
+export function transferXml() {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Dial callerId="${escapeXml(config.plivoNumber)}" timeout="30">
+    <Number>${escapeXml(config.transferNumber)}</Number>
+  </Dial>
+</Response>`;
+}

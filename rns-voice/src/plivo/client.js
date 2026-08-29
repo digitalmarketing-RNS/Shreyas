@@ -91,6 +91,21 @@ export async function hangupCall(callUuid) {
   }
 }
 
+/**
+ * Hands the call to the configured number.
+ *
+ * Plivo transfers by re-pointing the leg at fresh XML rather than by taking a
+ * destination directly, so this sends it to our own endpoint, which answers
+ * with a Dial to TRANSFER_NUMBER. The destination therefore comes from this
+ * server's configuration and never from the call.
+ */
+export async function transferCall(callUuid, callId) {
+  const base = config.publicBaseUrl;
+  const token = signCallToken(callId);
+  const url = `${base}/plivo/transfer?callId=${encodeURIComponent(callId)}&token=${encodeURIComponent(token)}`;
+  return request('POST', `/Call/${callUuid}/`, { legs: 'aleg', aleg_url: url, aleg_method: 'POST' });
+}
+
 export async function getCall(callUuid) {
   return request('GET', `/Call/${callUuid}/`);
 }

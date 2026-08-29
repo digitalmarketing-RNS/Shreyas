@@ -7,7 +7,7 @@ import { calls, campaigns, dnc, leads } from '../store.js';
 import { onCallFinished } from '../campaign/dialer.js';
 import { activeBridge, prewarmSession } from './bridge.js';
 import { validatePlivoSignature, verifyCallToken } from './client.js';
-import { hangupXml, streamXml } from './xml.js';
+import { hangupXml, streamXml, transferXml } from './xml.js';
 
 export const plivoRouter = Router();
 
@@ -156,6 +156,23 @@ plivoRouter.post('/hangup', (req, res) => {
   events.emit('call:ended', { callId: record.id, disposition, durationSeconds: duration });
 
   onCallFinished(record.id, disposition);
+});
+
+// ---------------------------------------------------------------------------
+// Transfer — the agent handed the call to a person
+// ---------------------------------------------------------------------------
+
+plivoRouter.post('/transfer', (req, res) => {
+  const callId = authenticateCallWebhook(req);
+  if (!callId) return reject(res, 'invalid or missing call token');
+
+  if (!config.transferNumber) {
+    log.warn({ callId }, 'transfer requested but no TRANSFER_NUMBER is set');
+    return res.type('text/xml').send(hangupXml('Sorry, I cannot transfer you right now. Goodbye.'));
+  }
+
+  log.info({ callId, to: config.transferNumberDisplay }, 'transferring call to a person');
+  res.type('text/xml').send(transferXml());
 });
 
 // ---------------------------------------------------------------------------

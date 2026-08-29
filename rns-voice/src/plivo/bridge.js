@@ -2,8 +2,8 @@ import { log } from '../logger.js';
 import { events } from '../util/events.js';
 import { config } from '../config.js';
 import { XaiSession } from '../xai/realtime.js';
-import { calls, campaigns, leads } from '../store.js';
-import { verifyCallToken } from './client.js';
+import { calls, campaigns, dnc, leads } from '../store.js';
+import { hangupCall, transferCall, verifyCallToken } from './client.js';
 
 /** Live bridges keyed by our call id, so the dashboard can end one. */
 const active = new Map();
@@ -18,6 +18,9 @@ const active = new Map();
  * time off the critical path, so the agent can speak as soon as audio flows.
  */
 const prewarmed = new Map();
+
+/** Name of the checkpoint queued behind the agent's closing words. */
+const HANGUP_CHECKPOINT = 'rns-goodbye';
 
 /**
  * Opens the xAI session for a call that is about to connect. Safe to call more
@@ -34,6 +37,8 @@ export function prewarmSession(callId, { campaign, record, lead } = {}) {
     instructions: campaign?.instructions || undefined,
     voice: campaign?.voice || undefined,
     detailsTool: config.agentDetailsTool,
+    callControl: config.agentCallControl,
+    transferTo: config.transferNumber || undefined,
   });
 
   // The briefing is sent now too, so only the greeting itself remains once
@@ -109,6 +114,8 @@ export class PlivoBridge {
     this.closed = false;
     this.framesIn = 0;
     this.framesOut = 0;
+    /** Set once the agent has asked to hang up; cleared when it happens. */
+    this.pendingHangup = null;
 
     ws.on('message', (raw) => this.onMessage(raw));
     ws.on('close', () => this.teardown('plivo stream closed'));
@@ -146,6 +153,14 @@ export class PlivoBridge {
         if (digit) events.emit('call:dtmf', { callId: this.callId, digit });
         break;
       }
+
+      // Plivo's answer to a checkpoint we queued: everything before it has
+      // now been heard. It is the only honest signal that the goodbye is out.
+      case 'playedStream':
+        if (this.pendingHangup && message.name === HANGUP_CHECKPOINT) {
+          this.completeHangup('agent finished speaking');
+        }
+        break;
 
       case 'stop':
         this.teardown('plivo sent stop');
@@ -218,6 +233,8 @@ export class PlivoBridge {
       instructions: campaign?.instructions || undefined,
       voice: campaign?.voice || undefined,
       detailsTool: config.agentDetailsTool,
+      callControl: config.agentCallControl,
+      transferTo: config.transferNumber || undefined,
     });
 
     const lead = record.leadId ? leads.get(record.leadId) : null;
@@ -260,6 +277,12 @@ export class PlivoBridge {
       this.clearAudio();
     });
 
+    // The agent has finished the turn it was speaking, so anything queued for
+    // playback is now complete and the checkpoint can go behind it.
+    session.on('response_done', () => {
+      if (this.pendingHangup) this.armHangupCheckpoint();
+    });
+
     session.on('transcript', (turn) => {
       calls.appendTranscript(
         callId,
@@ -287,6 +310,26 @@ export class PlivoBridge {
         return;
       }
 
+      if (name === 'end_call') {
+        // Answer the tool first, so the agent can finish its sentence; the
+        // hangup is scheduled behind whatever it is still saying.
+        session.submitFunctionResult(toolCallId, { ending: true });
+        this.requestHangup(args.reason ?? 'completed');
+        return;
+      }
+
+      if (name === 'transfer_to_human') {
+        if (!config.transferNumber) {
+          session.submitFunctionResult(toolCallId, {
+            error: 'No transfer number is configured, so this call cannot be transferred.',
+          });
+          return;
+        }
+        session.submitFunctionResult(toolCallId, { transferring: true });
+        this.requestTransfer(args.reason ?? 'caller asked for a person');
+        return;
+      }
+
       log.warn({ name, callId }, 'agent called a tool this server does not provide');
       session.submitFunctionResult(toolCallId, {
         error: `No tool named ${name} is available on this call.`,
@@ -299,8 +342,20 @@ export class PlivoBridge {
       events.emit('call:error', { callId, message: err.message });
     });
 
-    // xAI dropped the session; end the phone leg rather than leave dead air.
-    session.on('close', () => this.teardown('xAI session closed'));
+    session.on('close', () => {
+      // When the agent has asked to hang up it often closes its own socket
+      // straight after, and tearing down here would cut the phone leg before
+      // the goodbye has finished playing out of Plivo's buffer. In that case
+      // the hangup sequence owns the ending: it is already waiting on the
+      // checkpoint, with a timer behind it, so nothing can hang.
+      if (this.pendingHangup && !this.pendingHangup.done) {
+        this.armHangupCheckpoint();
+        return;
+      }
+      // Otherwise xAI dropped out unexpectedly; end the leg rather than
+      // leave the caller listening to dead air.
+      this.teardown('xAI session closed');
+    });
   }
 
   playAudio(payloadBase64) {
@@ -317,6 +372,78 @@ export class PlivoBridge {
   clearAudio() {
     if (this.closed || this.ws.readyState !== this.ws.OPEN) return;
     this.ws.send(JSON.stringify({ event: 'clearAudio' }));
+  }
+
+  /**
+   * Begins ending the call at the agent's request.
+   *
+   * Hanging up here would cut the goodbye off mid-word, so nothing happens
+   * until the agent has finished the turn it is in. Once it has, a checkpoint
+   * is queued behind that audio and Plivo tells us when it has played.
+   */
+  requestHangup(reason) {
+    if (this.pendingHangup) return;
+    this.pendingHangup = { reason, action: 'hangup' };
+    log.info({ callId: this.callId, reason }, 'agent asked to end the call');
+    calls.saveDetails(this.callId, { endedByAgent: true, endReason: reason });
+
+    // A caller who asks not to be called again should not be called again,
+    // and that has to hold whatever the campaign says.
+    if (reason === 'do_not_call') {
+      const record = calls.get(this.callId);
+      if (record?.toNumber) {
+        dnc.add(record.toNumber, 'asked the agent not to be called again');
+        log.info({ callId: this.callId }, 'number added to the opt-out list at the caller request');
+      }
+    }
+  }
+
+  requestTransfer(reason) {
+    if (this.pendingHangup) return;
+    this.pendingHangup = { reason, action: 'transfer' };
+    log.info({ callId: this.callId, reason }, 'agent asked to transfer the call');
+    calls.saveDetails(this.callId, { transferRequested: true, transferReason: reason });
+  }
+
+  /** Queues a marker behind the agent's last words and waits for it to play. */
+  armHangupCheckpoint() {
+    if (!this.pendingHangup || this.pendingHangup.armed) return;
+    this.pendingHangup.armed = true;
+
+    if (this.ws.readyState === this.ws.OPEN) {
+      this.ws.send(JSON.stringify({ event: 'checkpoint', name: HANGUP_CHECKPOINT }));
+    }
+
+    // Plivo may never send the confirmation — a dropped socket, an older
+    // protocol revision. Waiting forever would leave the line open and
+    // billing, so fall back to a timer.
+    this.pendingHangup.timer = setTimeout(
+      () => this.completeHangup('checkpoint not confirmed; ending anyway'),
+      config.hangupGraceMs,
+    );
+    this.pendingHangup.timer.unref?.();
+  }
+
+  completeHangup(why) {
+    const pending = this.pendingHangup;
+    if (!pending || pending.done) return;
+    pending.done = true;
+    clearTimeout(pending.timer);
+
+    const record = calls.get(this.callId);
+    if (pending.action === 'transfer' && record?.callUuid) {
+      log.info({ callId: this.callId, why }, 'transferring to a person');
+      void transferCall(record.callUuid, this.callId).catch((err) =>
+        log.error({ err, callId: this.callId }, 'transfer failed'),
+      );
+      // Plivo takes the call over from here; release our side of the audio.
+      this.teardown('transferred');
+      return;
+    }
+
+    log.info({ callId: this.callId, why }, 'ending the call at the agent request');
+    if (record?.callUuid) void hangupCall(record.callUuid);
+    this.teardown(`agent ended the call (${pending.reason})`);
   }
 
   hangup() {

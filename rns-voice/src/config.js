@@ -101,6 +101,18 @@ export const config = {
   // Opens the xAI session while the call is still being answered, so the
   // connection and configuration are not on the critical path.
   prewarmSessions: bool(env.PREWARM_SESSIONS, true),
+  // Lets the agent hang up when the conversation is done, rather than leaving
+  // the person to hang up on a silent line.
+  agentCallControl: bool(env.AGENT_CALL_CONTROL, true),
+  // A number to hand callers to when they ask for a person. The agent cannot
+  // choose the destination — only whether to transfer — so a call can never be
+  // sent anywhere but here. Unset means no transfer tool is offered.
+  transferNumber: digitsOnly(env.TRANSFER_NUMBER),
+  transferNumberDisplay: env.TRANSFER_NUMBER ?? '',
+  // How long to wait for Plivo to confirm the goodbye finished playing before
+  // hanging up regardless. Long enough for a closing sentence, short enough
+  // that a lost confirmation does not hold the line open.
+  hangupGraceMs: int(env.HANGUP_GRACE_MS, 8000),
 
   // ---- Plivo -------------------------------------------------------------
   plivoAuthId: env.PLIVO_AUTH_ID ?? '',
