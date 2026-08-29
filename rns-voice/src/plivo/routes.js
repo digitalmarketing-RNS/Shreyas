@@ -143,19 +143,44 @@ plivoRouter.post('/hangup', (req, res) => {
   // duration means nobody actually spoke to the agent.
   if (disposition === 'answered' && (duration ?? 0) === 0) disposition = 'no_answer';
 
+  // Plivo names the reason a call never connected, and this route was the only
+  // place that reason ever existed — it was read once to pick a disposition and
+  // then dropped. Without it a call that the carrier refused outright is
+  // indistinguishable from one the agent failed to speak on, which sends you
+  // hunting through the audio path for a fault that was never there.
+  const cause = body.HangupCauseName ?? body.HangupCause ?? null;
+  const causeCode = body.HangupCauseCode ?? null;
+  const causeText = cause
+    ? `Plivo ended the call: ${cause}${causeCode ? ` (code ${causeCode})` : ''}` +
+      `${body.HangupSource ? `, reported by ${body.HangupSource}` : ''}.`
+    : null;
+
   calls.update(record.id, {
     status: disposition === 'answered' ? 'completed' : 'failed',
     disposition,
     endedAt: new Date().toISOString(),
     durationSeconds: duration,
     callUuid: body.CallUUID ?? record.callUuid,
+    // Never overwrite a more specific failure already recorded on the call.
+    ...(causeText && disposition !== 'answered' && !record.error ? { error: causeText } : {}),
   });
 
   // Close the media bridge if it is somehow still open.
   activeBridge(record.id)?.hangup();
 
   log.info(
-    { callId: record.id, callStatus: body.CallStatus, disposition, duration },
+    {
+      callId: record.id,
+      callStatus: body.CallStatus,
+      disposition,
+      duration,
+      hangupCause: cause,
+      hangupCauseCode: causeCode,
+      hangupSource: body.HangupSource ?? null,
+      // On a call that never connected, whatever else Plivo sent is worth
+      // seeing in full — it is the only account of why.
+      ...(disposition !== 'answered' ? { plivo: body } : {}),
+    },
     'call finished',
   );
   events.emit('call:ended', { callId: record.id, disposition, durationSeconds: duration });
