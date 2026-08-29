@@ -131,7 +131,9 @@ export const campaigns = {
       // voice, agentId — were exactly that reshaping.
       maxAttempts: input.maxAttempts ?? 3,
       retryDelayMinutes: input.retryDelayMinutes ?? 60,
-      concurrency: input.concurrency ?? 2,
+      // One live call at a time. The wizard no longer offers a choice, and a
+      // campaign created through the API gets the same default.
+      concurrency: input.concurrency ?? 1,
       windowStart: input.windowStart ?? '10:00',
       windowEnd: input.windowEnd ?? '19:00',
       windowDays: input.windowDays ?? [1, 2, 3, 4, 5, 6],

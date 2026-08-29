@@ -56,15 +56,26 @@ export function prewarmSession(callId, { record, lead } = {}) {
       session.createResponse();
     }
   });
-  session.on('error', (err) => log.warn({ err, callId }, 'prewarmed session failed'));
+  // A prewarmed session that dies is recoverable — claimPrewarmed refuses a
+  // dead one and the bridge builds a fresh session — but the reason still
+  // belongs on the call. If the fresh one fails the same way, this is the
+  // first place the failure was visible.
+  session.on('error', (err) => {
+    log.warn({ err, callId }, 'prewarmed session failed');
+    calls.update(callId, { error: `Agent session failed before the call connected: ${err.message}` });
+  });
 
+  // Long enough to cover a full ring plus the answer handshake, since a
+  // session opened at dial time has to survive until somebody picks up. A
+  // session that expires early is worse than none: the call answers to
+  // silence while a fresh session is built from scratch.
   const expiry = setTimeout(() => {
     if (prewarmed.get(callId)?.session === session) {
       prewarmed.delete(callId);
       session.close();
       log.debug({ callId }, 'prewarmed session expired unclaimed');
     }
-  }, 30_000);
+  }, (config.ringTimeoutSeconds + 20) * 1000);
   expiry.unref?.();
 
   const entry = { session, expiry, buffered, bufferAudio, greeted: false };
@@ -508,7 +519,30 @@ export class PlivoBridge {
       { callId: this.callId, reason, framesIn: this.framesIn, framesOut: this.framesOut },
       'bridge torn down',
     );
-    if (this.callId) events.emit('call:bridge-ended', { callId: this.callId, reason });
+
+    // "The call connected and there was no voice" is the hardest thing to
+    // diagnose from the outside, because every part reports success: the call
+    // was placed, the webhook answered, the stream opened. What separates the
+    // cases is which direction audio actually moved, and that is known only
+    // here. Record it on the call so the dashboard can say which leg was
+    // silent instead of leaving the operator to guess.
+    if (this.callId) {
+      // Only describe the silence when nothing better is already recorded. An
+      // error from xAI names the actual cause — a rejected key, a closed
+      // session — and "the agent never spoke" is the symptom of it. Replacing
+      // the cause with the symptom would throw away the useful half.
+      const recorded = calls.get(this.callId)?.error;
+      const diagnosis = !recorded && this.framesOut === 0
+        ? (this.framesIn === 0
+            ? 'No audio moved in either direction — the media stream opened but carried nothing.'
+            : 'The caller was heard but the agent never sent any audio back.')
+        : null;
+      calls.update(this.callId, {
+        media: { framesIn: this.framesIn, framesOut: this.framesOut, reason },
+        ...(diagnosis ? { error: diagnosis } : {}),
+      });
+      events.emit('call:bridge-ended', { callId: this.callId, reason });
+    }
   }
 }
 

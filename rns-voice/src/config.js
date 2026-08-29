@@ -96,6 +96,17 @@ export const config = {
   // so it is ready to play rather than starting to be composed once the
   // caller is already listening.
   prewarmGreeting: bool(env.PREWARM_GREETING, true),
+  // Starts that work when the number is dialled rather than when it is
+  // answered, so it happens during the ring instead of while somebody is
+  // holding the phone to their ear. Measured against the live agent, opening
+  // the socket takes ~490 ms and composing the greeting ~750 ms; doing both
+  // before the answer takes all of it off the critical path, leaving only the
+  // time Plivo needs to open the audio stream.
+  //
+  // The cost is a session for every number dialled, answered or not. With one
+  // call at a time that is at most one unanswered session in flight, and it is
+  // closed as soon as the ring times out.
+  prewarmOnDial: bool(env.PREWARM_ON_DIAL, true),
   // Lets the agent hang up when the conversation is done, rather than leaving
   // the person to hang up on a silent line.
   agentCallControl: bool(env.AGENT_CALL_CONTROL, true),

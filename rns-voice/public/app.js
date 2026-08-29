@@ -389,11 +389,10 @@ function showStep(step) {
 /** Says what pressing the button will actually do, using the real numbers. */
 function renderHowTo() {
   const count = classifyNumbers().usable.length;
-  const conc = Math.max(1, Number($('cConc').value) || 1);
   const attempts = Number($('cAttempts').value) || 1;
   $('howtoList').innerHTML = [
     `${count} number${count === 1 ? '' : 's'} will be loaded and the campaign starts straight away.`,
-    `${conc} call${conc === 1 ? '' : 's'} will run at a time; the rest wait in the queue.`,
+    'One call runs at a time; the rest wait in the queue.',
     'As each call ends, the next number is dialled automatically.',
     `A number that does not answer is retried up to ${attempts} time${attempts === 1 ? '' : 's'}.`,
     `Calls are only placed between ${esc($('cWinStart').value)} and ${esc($('cWinEnd').value)}, on the days you picked.`,
@@ -465,21 +464,6 @@ $('cCountry').addEventListener('input', () => {
   $('cCountryEcho').textContent = `+${$('cCountry').value.trim() || '91'}`;
 });
 
-$('concChips').addEventListener('click', (e) => {
-  const chip = e.target.closest('.chip');
-  if (!chip) return;
-  $('cConc').value = chip.dataset.conc;
-  syncConcChips();
-  renderHowTo();
-});
-function syncConcChips() {
-  const value = String($('cConc').value);
-  document.querySelectorAll('#concChips .chip').forEach((chip) => {
-    chip.classList.toggle('on', chip.dataset.conc === value);
-  });
-}
-$('cConc').addEventListener('input', () => { syncConcChips(); renderHowTo(); });
-
 $('wizCreate').addEventListener('click', async () => {
   const numbers = classifyNumbers().usable;
   const body = {
@@ -492,7 +476,10 @@ $('wizCreate').addEventListener('click', async () => {
     defaultCountryCode: $('cCountry').value.trim() || null,
     maxAttempts: Number($('cAttempts').value),
     retryDelayMinutes: Number($('cRetry').value),
-    concurrency: Number($('cConc').value),
+    // One call at a time, always. Dialling several at once means several live
+    // conversations nobody is listening to, and the operator cannot follow
+    // what the agent is doing on any of them.
+    concurrency: 1,
     hangupOnMachine: $('cMachine').value === 'true',
   };
   if (!body.name) return toast('Give the campaign a name.', 'bad');

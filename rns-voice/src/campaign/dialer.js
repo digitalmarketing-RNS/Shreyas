@@ -4,6 +4,7 @@ import { events } from '../util/events.js';
 import { maskPhone } from '../util/phone.js';
 import { isWithinWindow, nextWindowOpening, windowFor } from '../util/windows.js';
 import { placeCall } from '../plivo/client.js';
+import { prewarmSession } from '../plivo/bridge.js';
 import { calls, campaigns, dnc, leads } from '../store.js';
 
 /** Dispositions that close a lead out. Everything else earns another attempt. */
@@ -135,6 +136,14 @@ async function dial(campaign, lead) {
       detectMachine: campaign.hangupOnMachine,
     });
     calls.update(record.id, { requestUuid, status: 'ringing' });
+
+    // The phone is now ringing, which buys several seconds of nothing. Use it
+    // to open the xAI session and let the agent compose its opening line, so
+    // the moment the person says hello the reply is already waiting rather
+    // than only then being started. Answering finds this session ready and
+    // does not build a second one.
+    if (config.prewarmOnDial) prewarmSession(record.id, { record, lead });
+
     log.info({ callId: record.id, to: maskPhone(lead.phone), campaign: campaign.id }, 'dialling');
     events.emit('call:dialing', {
       callId: record.id,
