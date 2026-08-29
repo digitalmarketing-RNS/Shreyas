@@ -19,6 +19,16 @@ const active = new Map();
  */
 const prewarmed = new Map();
 
+/** A path segment that is not valid percent-encoding must not crash the bridge. */
+function safeDecode(value) {
+  if (!value) return null;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 /** Name of the checkpoint queued behind the agent's closing words. */
 const HANGUP_CHECKPOINT = 'rns-goodbye';
 
@@ -133,13 +143,25 @@ export class PlivoBridge {
     ws._socket?.setNoDelay?.(true);
     // Identity from the handshake URL. This is the reliable channel: we chose
     // the URL, so Plivo connects with it verbatim.
-    this.urlParams = (() => {
+    // Identity arrives in the handshake URL. Path segments are the primary
+    // form; the query string is still read so a call already ringing when a
+    // new build deploys is not dropped mid-flight.
+    const { params, path } = (() => {
       try {
-        return new URL(req?.url ?? '', 'http://localhost').searchParams;
+        const parsed = new URL(req?.url ?? '', 'http://localhost');
+        const segments = parsed.pathname.split('/').filter(Boolean);
+        // /plivo/stream/<callId>/<token>
+        const after = segments.slice(segments.indexOf('stream') + 1);
+        return {
+          params: parsed.searchParams,
+          path: { callId: safeDecode(after[0]), token: safeDecode(after[1]) },
+        };
       } catch {
-        return new URLSearchParams();
+        return { params: new URLSearchParams(), path: {} };
       }
     })();
+    this.urlParams = params;
+    this.urlPath = path;
     this.streamId = null;
     this.callId = null;
     this.session = null;
@@ -222,15 +244,20 @@ export class PlivoBridge {
       message.extraHeaders ?? message.extra_headers,
     );
 
-    const callId = this.urlParams.get('callId') || headers.callId;
-    const token = this.urlParams.get('token') || headers.token;
+    const callId = this.urlPath.callId || this.urlParams.get('callId') || headers.callId;
+    const token = this.urlPath.token || this.urlParams.get('token') || headers.token;
 
     if (!callId || !verifyCallToken(callId, token)) {
       log.warn(
         {
           callUuid: start.callId,
-          fromUrl: Boolean(this.urlParams.get('callId')),
+          // Which source produced an id, and whether a token came with it.
+          // A call id present with no token is the signature of a URL whose
+          // query string did not survive being written into XML.
+          fromPath: Boolean(this.urlPath.callId),
+          fromQuery: Boolean(this.urlParams.get('callId')),
           fromHeaders: Boolean(headers.callId),
+          hadToken: Boolean(token),
         },
         'stream rejected: could not identify the call',
       );

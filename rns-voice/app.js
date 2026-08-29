@@ -97,12 +97,17 @@ server.on('upgrade', (req, socket, head) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
   const accept = (wss) => wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
 
+  // The stream URL carries the call id and token as path segments, so match
+  // the prefix as well as the bare path. The bare path stays accepted because
+  // a call already in flight when this deploys still has the old URL.
+  if (url.pathname === '/plivo/stream' || url.pathname.startsWith('/plivo/stream/')) {
+    // Plivo cannot set headers on the upgrade, so authorisation happens in
+    // the bridge, against the signed token in that URL.
+    accept(streamWss);
+    return;
+  }
+
   switch (url.pathname) {
-    case '/plivo/stream':
-      // Plivo cannot set headers on the upgrade, so authorisation happens in
-      // the bridge, on the `start` frame that carries the signed token.
-      accept(streamWss);
-      return;
 
     case '/ws/console':
       if (config.dashboardPassword && url.searchParams.get('token') !== config.dashboardPassword) {

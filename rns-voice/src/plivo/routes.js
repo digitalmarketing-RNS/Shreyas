@@ -91,6 +91,12 @@ plivoRouter.post('/answer', (req, res) => {
   // so nothing may be awaited ahead of it.
   res.type('text/xml').send(streamXml(callId));
 
+  // The single most useful line in the log when a call connects to silence.
+  // Its absence says Plivo never reached this server, which is a Plivo-side
+  // problem; its presence with no 'bridge established' after it says Plivo got
+  // the XML and then failed to open the audio stream, which is not.
+  log.info({ callId, from: req.body?.From, to: req.body?.To }, 'answer webhook reached, stream XML sent');
+
   // Now, while Plivo parses the XML and opens the WebSocket, get the xAI
   // session connected and briefed. By the time audio arrives it is ready, and
   // the caller is not left listening to the connection being set up.
@@ -178,9 +184,25 @@ plivoRouter.post('/transfer', (req, res) => {
 // Stream status callbacks
 // ---------------------------------------------------------------------------
 
+/**
+ * Plivo's own report on the audio stream.
+ *
+ * This is the only account of that leg from Plivo's side, and it says whether
+ * the stream ever connected and why it stopped. It was logged at debug, which
+ * the default log level hides — so on the one failure it exists to explain, it
+ * said nothing.
+ */
 plivoRouter.post('/stream-status', (req, res) => {
   res.status(204).end();
-  log.debug({ body: req.body }, 'stream status callback');
+  log.info(
+    {
+      status: req.body?.StreamStatus ?? req.body?.Status,
+      streamId: req.body?.StreamId,
+      error: req.body?.ErrorMessage ?? req.body?.Error,
+      body: req.body,
+    },
+    'Plivo reported on the audio stream',
+  );
 });
 
 // ---------------------------------------------------------------------------

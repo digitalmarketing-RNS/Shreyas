@@ -25,10 +25,21 @@ function escapeXml(value) {
  */
 export function streamXml(callId) {
   const token = signCallToken(callId);
-  const query = `callId=${encodeURIComponent(callId)}&token=${encodeURIComponent(token)}`;
-  const url = `${wsOrigin()}/plivo/stream?${query}`;
-  const extra = `callId=${callId};token=${token}`;
 
+  // Path segments, not a query string. Two values joined by `&` have to be
+  // written `&amp;` inside XML, and the whole call then rests on Plivo's
+  // parser turning that back into `&` before it dials the socket. If it does
+  // not, the token arrives as part of a parameter named "amp;token", the
+  // bridge cannot authenticate the stream and closes it — and the caller
+  // hears a call that connects and then says nothing. A path carries no
+  // ampersand and nothing to decode, so that failure cannot happen. The token
+  // is base64url, which is already path-safe.
+  const url = `${wsOrigin()}/plivo/stream/${encodeURIComponent(callId)}/${encodeURIComponent(token)}`;
+
+  // extraHeaders is deliberately absent. It duplicated an identity the URL
+  // already carries, and Plivo documents the attribute as alphanumeric while
+  // a base64url token contains '-' and '_' — a needless way for the element
+  // to be rejected, for no information gained.
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Stream bidirectional="true"
@@ -36,8 +47,7 @@ export function streamXml(callId) {
           contentType="audio/x-mulaw;rate=8000"
           audioTrack="inbound"
           statusCallbackUrl="${escapeXml(`${config.publicBaseUrl}/plivo/stream-status`)}"
-          statusCallbackMethod="POST"
-          extraHeaders="${escapeXml(extra)}">${escapeXml(url)}</Stream>
+          statusCallbackMethod="POST">${escapeXml(url)}</Stream>
 </Response>`;
 }
 
