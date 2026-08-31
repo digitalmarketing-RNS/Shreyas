@@ -48,11 +48,37 @@ export function prewarmSession(callId, { record, lead } = {}) {
     transferTo: config.transferNumber || undefined,
   });
 
-  // Audio produced before the phone leg exists has nowhere to go, so it is
-  // held here and played the instant the stream attaches.
+  // The session is opened while the phone is still ringing, so the handshake
+  // and the agent composing its opening line — measured at 480 ms and 571 ms
+  // against the live agent — both finish before anyone picks up.
+  //
+  // The agent does not know it is talking to a ringing phone, though. It says
+  // its opening line, gets no reply, and after a while tries again: "are you
+  // still there?". Buffering that too would play the whole pile-up at once
+  // the moment somebody says hello.
+  //
+  // The opening line is buffered and played the instant the stream attaches.
+  //
+  // If the agent goes further than that, this session is thrown away. It will
+  // have asked something — "do you have any tile requirements?" — into a phone
+  // that was still ringing, and xAI refuses conversation.item.delete on those
+  // items ("Item not found"), so it cannot be taken back. Playing it would
+  // dump two utterances at once; dropping it silently is worse still, because
+  // the agent then waits on an answer to a question the caller never heard.
+  // Measured: after a ring long enough for that, the caller's "hello?" got no
+  // reply at all.
+  //
+  // So a session that has said more than its opening line is not used, and the
+  // call gets a fresh one at answer — no faster than before, but never
+  // confused. A ring short enough to beat it keeps the full saving.
   const buffered = [];
-  const bufferAudio = (chunk) => buffered.push(chunk);
+  let responses = 0;
+
+  const bufferAudio = (chunk) => { if (responses === 0) buffered.push(chunk); };
+  const countResponse = () => { responses += 1; };
+
   session.on('audio', bufferAudio);
+  session.on('response_done', countResponse);
 
   // The only thing sent on open, and only facts: which number was dialled and
   // whatever the lead list carried. No greeting and no response.create — the
@@ -86,7 +112,7 @@ export function prewarmSession(callId, { record, lead } = {}) {
   }, (config.ringTimeoutSeconds + 20) * 1000);
   expiry.unref?.();
 
-  const entry = { session, expiry, buffered, bufferAudio };
+  const entry = { session, expiry, buffered, bufferAudio, countResponse, spoke: () => responses };
   prewarmed.set(callId, entry);
   session.connect();
   log.debug({ callId }, 'prewarming xAI session');
@@ -103,8 +129,20 @@ function claimPrewarmed(callId) {
   clearTimeout(entry.expiry);
   prewarmed.delete(callId);
   if (entry.session.closed) return null;
-  // Stop buffering; from here the bridge streams audio straight to Plivo.
+
+  // Said more than its opening line, so its idea of the conversation and the
+  // caller's no longer match. A fresh session costs about a second; a
+  // mismatched one costs the call.
+  if (entry.spoke() > 1) {
+    log.info({ callId, utterances: entry.spoke() }, 'discarding a prewarmed session that spoke past its opening line');
+    entry.session.close();
+    return null;
+  }
+  // From here there is a person on the line: audio goes straight to Plivo, and
+  // what the agent says is a real turn rather than something said to a ringing
+  // phone, so none of it is pruned.
   entry.session.off('audio', entry.bufferAudio);
+  entry.session.off('response_done', entry.countResponse);
   return entry;
 }
 
@@ -382,9 +420,20 @@ export class PlivoBridge {
       }
 
       if (name === 'end_call') {
-        // Answer the tool first, so the agent can finish its sentence; the
-        // hangup is scheduled behind whatever it is still saying.
-        session.submitFunctionResult(toolCallId, { ending: true });
+        // The agent has decided the call is over. It reaches here whether it
+        // used a tool of ours or, as it does by default, its own end_call
+        // from the xAI console — and either way the phone leg is ours to
+        // release.
+        //
+        // Waiting for xAI to close the socket instead costs the caller a long
+        // silence: measured on a live booking, the agent called end_call at
+        // 31.4 s and the socket did not close until 38.8 s. Seven seconds of
+        // open line after the goodbye is what "the call doesn't cut" is.
+        //
+        // The result is submitted only for a tool we offered. Answering the
+        // agent's own would be replying on xAI's behalf, which is what breaks
+        // its connectors.
+        if (config.agentCallControl) session.submitFunctionResult(toolCallId, { ending: true });
         this.requestHangup(args.reason ?? 'completed');
         return;
       }

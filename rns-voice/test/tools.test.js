@@ -33,6 +33,21 @@ describe('leaving room for the agent’s own tools', () => {
     }
   });
 
+  it('releases the phone leg on the agent\'s own end_call', () => {
+    // The agent ends calls with its own end_call, not one of ours, and xAI
+    // then takes its time closing the socket — measured on a live booking, the
+    // tool fired at 31.4s and the socket closed at 38.8s. Waiting for the
+    // close leaves seven seconds of open line after the goodbye, which is what
+    // "the call doesn't cut" is. The hangup runs on the tool call itself.
+    const bridge = readFileSync(new URL('../src/plivo/bridge.js', import.meta.url), 'utf8');
+    const branch = bridge.slice(bridge.indexOf("if (name === 'end_call')"), bridge.indexOf("if (name === 'transfer_to_human')"));
+    assert.ok(branch.includes('this.requestHangup('), 'end_call must release the phone leg');
+    // A result is owed only for a tool we offered. Answering the agent's own
+    // is replying on xAI's behalf, which is what breaks its connectors.
+    assert.match(branch, /config\.agentCallControl\)\s*session\.submitFunctionResult/,
+      'the result must be conditional on us having offered the tool');
+  });
+
   it('still offers the tools that do work only this server can do', () => {
     // end_call drains the audio Plivo has buffered before releasing the line,
     // which the agent cannot do for itself.

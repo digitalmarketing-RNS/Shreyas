@@ -104,16 +104,19 @@ export const config = {
   // Opens the xAI session while the call is still being answered, so the
   // connection and configuration are not on the critical path.
   prewarmSessions: bool(env.PREWARM_SESSIONS, true),
-  // Opens the session when the number is dialled rather than when it is
-  // answered.
+  // Opens the session while the phone is still ringing, so the handshake and
+  // the agent composing its opening line — 480 ms and 571 ms measured against
+  // the live agent — are done before anyone picks up. What the caller waits
+  // for is then only Plivo opening the audio stream.
   //
-  // Off, and it has to be. The agent greets as soon as the session exists and
-  // keeps talking to the silence after that — "are you still there?" — so a
-  // session opened at dial time spends the whole ring filling the buffer, and
-  // all of it plays at once the moment somebody says hello. Opening at the
-  // answer webhook still gets the greeting composed while Plivo opens the
-  // audio stream, which is where the saving actually came from.
-  prewarmOnDial: bool(env.PREWARM_ON_DIAL, false),
+  // This was off for a while because the agent, hearing no reply from a phone
+  // that is still ringing, tries again — and the whole pile-up played at once
+  // on answer. The bridge now keeps the opening line and deletes everything
+  // said after it, so that no longer happens.
+  //
+  // The cost is a session per number dialled, answered or not. With one call
+  // at a time that is at most one in flight, closed when the ring times out.
+  prewarmOnDial: bool(env.PREWARM_ON_DIAL, true),
   // Offers the agent an end_call function of ours.
   //
   // Off by default, and the reason is the whole tools mechanism: sending a

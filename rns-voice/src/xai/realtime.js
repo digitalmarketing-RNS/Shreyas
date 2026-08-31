@@ -152,6 +152,12 @@ export class XaiSession extends EventEmitter {
         this.emit('response_created');
         break;
 
+      // Carries the id of each thing the agent said, which is what makes it
+      // removable again.
+      case 'response.output_item.done':
+        if (event.item?.id) this.emit('output_item', { id: event.item.id, role: event.item.role ?? null });
+        break;
+
       case 'response.done':
         this.emit('response_done');
         break;
