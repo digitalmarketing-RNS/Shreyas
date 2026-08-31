@@ -409,10 +409,17 @@ export class PlivoBridge {
         return;
       }
 
-      log.warn({ name, callId }, 'agent called a tool this server does not provide');
-      session.submitFunctionResult(toolCallId, {
-        error: `No tool named ${name} is available on this call.`,
-      });
+      // Anything else belongs to the agent, not to us — the connectors
+      // configured in the xAI console surface here as `search_connected_tools`
+      // and `call_connected_tool`, and xAI answers them itself.
+      //
+      // Replying at all breaks them. Answering `search_connected_tools` with
+      // "no tool named that is available" ends the chain at its first step:
+      // the agent never reaches `call_connected_tool`, says something like
+      // "let me get that set up right away", and books nothing. Left alone,
+      // the same request runs through to the connector and completes. So say
+      // nothing, and let the tools the operator configured do their work.
+      log.debug({ name, callId }, "agent used one of its own tools; leaving it to xAI");
     });
 
     session.on('error', (err) => {
@@ -431,8 +438,21 @@ export class PlivoBridge {
         this.armHangupCheckpoint();
         return;
       }
-      // Otherwise xAI dropped out unexpectedly; end the leg rather than
-      // leave the caller listening to dead air.
+      // Otherwise the session ended without us asking. That is what happens
+      // when the agent hangs up using its own end_call: xAI runs the tool and
+      // closes the socket about a second later, with the closing words still
+      // in Plivo's buffer. Cutting the leg here truncates them, so drain the
+      // same way our own hangup does — the checkpoint has a timer behind it,
+      // so a lost confirmation cannot hold the line open.
+      //
+      // Nothing to drain means xAI dropped out before speaking, and there is
+      // no reason to keep the caller listening to silence.
+      if (this.framesOut > 0 && this.ws.readyState === this.ws.OPEN) {
+        this.pendingHangup = { reason: 'completed', action: 'hangup' };
+        calls.saveDetails(this.callId, { endedByAgent: true, endReason: 'completed' });
+        this.armHangupCheckpoint();
+        return;
+      }
       this.teardown('xAI session closed');
     });
   }

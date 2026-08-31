@@ -69,12 +69,19 @@ export const config = {
   // and no model fallback: this id, or the call does not go out.
   xaiAgentId: env.XAI_AGENT_ID ?? '',
 
-  // Offers the agent save_call_details, end_call and transfer_to_human as
-  // functions it may call. It decides whether and when to use them; the
-  // descriptions state only what each one does. Turn off if the agent defines
-  // its own tools in the xAI console, since sending a tools list may replace
-  // what is configured there.
-  agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, true),
+  // Offers the agent a save_call_details function that writes structured
+  // fields onto the call record.
+  //
+  // Off by default, because it competes with the agent's own connectors. An
+  // agent with a calendar connected will, asked to book an appointment, look
+  // for a connector and create the event. Offer it this tool as well and it
+  // takes this one instead — the booking lands in the dashboard and never
+  // reaches the calendar, with nothing anywhere reporting a problem. Measured
+  // against the live agent, not assumed.
+  //
+  // The transcript, duration, number and disposition are recorded either way;
+  // this only adds the structured fields, and only when nothing better exists.
+  agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, false),
   // 'facts' passes the dialled number and lead fields to the agent as data;
   // 'off' passes nothing at all. Either way no instructions are sent — how the
   // agent behaves is decided entirely by its configuration in the xAI console.
@@ -107,9 +114,18 @@ export const config = {
   // call at a time that is at most one unanswered session in flight, and it is
   // closed as soon as the ring times out.
   prewarmOnDial: bool(env.PREWARM_ON_DIAL, true),
-  // Lets the agent hang up when the conversation is done, rather than leaving
-  // the person to hang up on a silent line.
-  agentCallControl: bool(env.AGENT_CALL_CONTROL, true),
+  // Offers the agent an end_call function of ours.
+  //
+  // Off by default, and the reason is the whole tools mechanism: sending a
+  // tools list on session.update REPLACES the agent's own. Measured against
+  // the live agent, asked to book an appointment — with no tools sent it
+  // reached its calendar connector on 3 of 3 runs; sending only this one tool
+  // it invoked nothing at all, connector included, and booked nothing.
+  //
+  // It does not need ours. It has its own end_call, and when it uses it xAI
+  // closes the session, which this bridge already treats as the end of the
+  // call. Turn this on only for an agent with no end_call of its own.
+  agentCallControl: bool(env.AGENT_CALL_CONTROL, false),
   // A number to hand callers to when they ask for a person. The agent cannot
   // choose the destination — only whether to transfer — so a call can never be
   // sent anywhere but here. Unset means no transfer tool is offered.
