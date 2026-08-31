@@ -104,19 +104,25 @@ export const config = {
   // Opens the xAI session while the call is still being answered, so the
   // connection and configuration are not on the critical path.
   prewarmSessions: bool(env.PREWARM_SESSIONS, true),
-  // Opens the session while the phone is still ringing, so the handshake and
-  // the agent composing its opening line — 480 ms and 571 ms measured against
-  // the live agent — are done before anyone picks up. What the caller waits
-  // for is then only Plivo opening the audio stream.
+  // Opens the session while the phone is still ringing, rather than when it is
+  // answered.
   //
-  // This was off for a while because the agent, hearing no reply from a phone
-  // that is still ringing, tries again — and the whole pile-up played at once
-  // on answer. The bridge now keeps the opening line and deletes everything
-  // said after it, so that no longer happens.
+  // Off, and not a tuning choice — the agent's own configuration rules it out.
+  // Its session.updated echo carries:
   //
-  // The cost is a session per number dialled, answered or not. With one call
-  // at a time that is at most one in flight, closed when the ring times out.
-  prewarmOnDial: bool(env.PREWARM_ON_DIAL, true),
+  //   turn_detection: { idle_timeout_ms: 5000,
+  //                     end_call_after_idle_reminder_count: 1 }
+  //
+  // Five seconds of silence gets a reminder; a second five seconds ends the
+  // call. A ringing phone is silence, so a session opened at dial spends the
+  // ring using up both, and the agent hangs up on a caller who has not picked
+  // up yet. What that looks like from the outside is a call that connects and
+  // cuts immediately.
+  //
+  // Raising those two numbers in the xAI console is what would make this safe,
+  // and that is the operator's call to make there, not ours to work around
+  // here. Opening at the answer webhook costs about a second and always works.
+  prewarmOnDial: bool(env.PREWARM_ON_DIAL, false),
   // Offers the agent an end_call function of ours.
   //
   // Off by default, and the reason is the whole tools mechanism: sending a
