@@ -25,10 +25,10 @@ export function handleConsoleSocket(ws) {
     // anything an operator is about to run.
     session = new XaiSession({ profile: 'browser', label: 'console' });
 
-    session.on('open', () => {
-      send({ type: 'ready' });
-      session.createResponse();
-    });
+    // Nothing sent on open, exactly as on a call: the agent opens the
+    // conversation itself. Triggering a turn here would make this test differ
+    // from the thing it is meant to be a test of.
+    session.on('open', () => send({ type: 'ready' }));
     session.on('audio', (audio) => send({ type: 'audio', audio }));
     session.on('speech_started', () => send({ type: 'speech_started' }));
     session.on('transcript', (turn) => send({ type: 'transcript', ...turn }));

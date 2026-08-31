@@ -82,10 +82,6 @@ export const config = {
   // The transcript, duration, number and disposition are recorded either way;
   // this only adds the structured fields, and only when nothing better exists.
   agentDetailsTool: bool(env.AGENT_DETAILS_TOOL, false),
-  // 'facts' passes the dialled number and lead fields to the agent as data;
-  // 'off' passes nothing at all. Either way no instructions are sent — how the
-  // agent behaves is decided entirely by its configuration in the xAI console.
-  agentBriefing: (env.AGENT_BRIEFING ?? 'facts').toLowerCase(),
   // Streams the caller's words as they speak, rather than once each sentence
   // finishes. Sets audio.input.transcription.model, which xAI's event docs
   // require for the live-caption event but which its published session schema
@@ -99,21 +95,16 @@ export const config = {
   // Opens the xAI session while the call is still being answered, so the
   // connection and configuration are not on the critical path.
   prewarmSessions: bool(env.PREWARM_SESSIONS, true),
-  // Generates the opening line while Plivo is still opening the audio stream,
-  // so it is ready to play rather than starting to be composed once the
-  // caller is already listening.
-  prewarmGreeting: bool(env.PREWARM_GREETING, true),
-  // Starts that work when the number is dialled rather than when it is
-  // answered, so it happens during the ring instead of while somebody is
-  // holding the phone to their ear. Measured against the live agent, opening
-  // the socket takes ~490 ms and composing the greeting ~750 ms; doing both
-  // before the answer takes all of it off the critical path, leaving only the
-  // time Plivo needs to open the audio stream.
+  // Opens the session when the number is dialled rather than when it is
+  // answered.
   //
-  // The cost is a session for every number dialled, answered or not. With one
-  // call at a time that is at most one unanswered session in flight, and it is
-  // closed as soon as the ring times out.
-  prewarmOnDial: bool(env.PREWARM_ON_DIAL, true),
+  // Off, and it has to be. The agent greets as soon as the session exists and
+  // keeps talking to the silence after that — "are you still there?" — so a
+  // session opened at dial time spends the whole ring filling the buffer, and
+  // all of it plays at once the moment somebody says hello. Opening at the
+  // answer webhook still gets the greeting composed while Plivo opens the
+  // audio stream, which is where the saving actually came from.
+  prewarmOnDial: bool(env.PREWARM_ON_DIAL, false),
   // Offers the agent an end_call function of ours.
   //
   // Off by default, and the reason is the whole tools mechanism: sending a

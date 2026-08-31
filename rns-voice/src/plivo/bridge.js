@@ -2,7 +2,7 @@ import { log } from '../logger.js';
 import { events } from '../util/events.js';
 import { config } from '../config.js';
 import { XaiSession } from '../xai/realtime.js';
-import { calls, dnc, leads } from '../store.js';
+import { calls, dnc } from '../store.js';
 import { hangupCall, transferCall, verifyCallToken } from './client.js';
 
 /** Live bridges keyed by our call id, so the dashboard can end one. */
@@ -37,7 +37,7 @@ const HANGUP_CHECKPOINT = 'rns-goodbye';
  * than once; a session nobody claims is closed after 30 seconds so a call that
  * never connects cannot leak one.
  */
-export function prewarmSession(callId, { record, lead } = {}) {
+export function prewarmSession(callId, { record } = {}) {
   if (!config.prewarmSessions || prewarmed.has(callId) || active.has(callId)) return;
 
   const session = new XaiSession({
@@ -54,18 +54,10 @@ export function prewarmSession(callId, { record, lead } = {}) {
   const bufferAudio = (chunk) => buffered.push(chunk);
   session.on('audio', bufferAudio);
 
-  session.on('open', () => {
-    const context = record ? describeCall(record, lead) : null;
-    if (context) session.sendContext(context);
-
-    // Generating the greeting is the slowest step and does not depend on the
-    // phone leg, so it runs while Plivo is still opening the stream. The call
-    // has already been answered by this point, so nothing is wasted.
-    if (config.prewarmGreeting) {
-      entry.greeted = true;
-      session.createResponse();
-    }
-  });
+  // Nothing is sent on open. The agent opens the conversation by itself the
+  // moment the session exists — measured at about 1.6 seconds — so the
+  // greeting is composed while Plivo is still opening the audio stream and is
+  // waiting in this buffer by the time anyone can hear it.
   // A prewarmed session that dies is recoverable — claimPrewarmed refuses a
   // dead one and the bridge builds a fresh session — but the reason still
   // belongs on the call. If the fresh one fails the same way, this is the
@@ -88,7 +80,7 @@ export function prewarmSession(callId, { record, lead } = {}) {
   }, (config.ringTimeoutSeconds + 20) * 1000);
   expiry.unref?.();
 
-  const entry = { session, expiry, buffered, bufferAudio, greeted: false };
+  const entry = { session, expiry, buffered, bufferAudio };
   prewarmed.set(callId, entry);
   session.connect();
   log.debug({ callId }, 'prewarming xAI session');
@@ -281,8 +273,6 @@ export class PlivoBridge {
       callUuid: record.callUuid ?? start.callId ?? null,
     });
 
-    const lead = record.leadId ? leads.get(record.leadId) : null;
-
     // A session opened at the answer webhook is already connected, briefed,
     // and may have the greeting waiting.
     const ready = claimPrewarmed(callId);
@@ -295,7 +285,7 @@ export class PlivoBridge {
       transferTo: config.transferNumber || undefined,
     });
 
-    this.wire(this.session, record.direction, record, lead, Boolean(ready));
+    this.wire(this.session, record);
 
     if (ready) {
       // Play what the agent already said while the stream was still opening.
@@ -305,9 +295,6 @@ export class PlivoBridge {
       if (ready.buffered.length) {
         log.info({ callId, frames: ready.buffered.length }, 'greeting was ready before the caller was');
       }
-      // If it had not opened yet, its own handler still owes the greeting;
-      // asking again here would produce two.
-      if (!ready.greeted) this.startConversation(this.session, record.direction);
     } else {
       this.session.connect();
     }
@@ -317,29 +304,18 @@ export class PlivoBridge {
   }
 
   /**
-   * Hands the agent the first turn, since we are the ones who dialled.
+   * Wires a session to the phone leg. Audio, and nothing else.
    *
-   * This used to be able to speak a campaign's scripted opening line verbatim
-   * instead. That put words in the agent's mouth from outside the agent —
-   * the app talking, not the thing the operator built in the xAI console —
-   * so it is gone. How to open a call is the agent's to decide.
+   * Two things used to happen here and no longer do. A briefing — the dialled
+   * number and the lead's fields, injected as a conversation turn — and a
+   * response.create to make the agent take the first turn. Both were this
+   * service putting something into a conversation it is only supposed to
+   * carry, and both changed how the agent opened the call. Neither is needed:
+   * the agent starts speaking on its own about 1.6 seconds after the session
+   * opens. A call is now the same session a console test is.
    */
-  startConversation(session, direction) {
-    if (direction === 'outbound') session.createResponse();
-  }
-
-  wire(session, direction, record, lead, alreadyBriefed) {
+  wire(session, record) {
     const callId = this.callId;
-
-    if (!alreadyBriefed) {
-      session.on('open', () => {
-        // The agent cannot see the dialler, so it does not know who it
-        // reached unless told. Sent before the first turn.
-        const context = describeCall(record, lead);
-        if (context) session.sendContext(context);
-        this.startConversation(session, direction);
-      });
-    }
 
     session.on('audio', (payload) => this.playAudio(payload));
 
@@ -591,31 +567,6 @@ export class PlivoBridge {
       events.emit('call:bridge-ended', { callId: this.callId, reason });
     }
   }
-}
-
-/**
- * The facts about this call, and nothing else.
- *
- * This used to carry instructions as well — how to handle language, when to
- * call which tool, not to mention the note. Those were rules of ours competing
- * with the prompt configured on the agent in the xAI console, written in
- * English, ahead of the caller's first word. The agent's own configuration
- * decides how it behaves; this supplies only what it has no other way to know,
- * which is who was dialled.
- *
- * Written as data rather than prose so it reads as a record and not as an
- * instruction. Keep it that way: anything resembling "you should" belongs in
- * the xAI console, not here.
- */
-function describeCall(record, lead) {
-  if (config.agentBriefing === 'off') return null;
-
-  const facts = [`number: ${record.toNumber}`];
-  if (lead?.name) facts.push(`name: ${lead.name}`);
-  for (const [key, value] of Object.entries(lead?.attributes ?? {})) {
-    facts.push(`${key}: ${value}`);
-  }
-  return `[call details — ${facts.join('; ')}]`;
 }
 
 export function handlePlivoStream(ws, req) {
