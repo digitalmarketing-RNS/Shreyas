@@ -197,17 +197,21 @@ export class XaiSession extends EventEmitter {
   }
 
   /**
-   * Puts information into the conversation without asking for a reply.
+   * Gives the agent facts about the call it has no other way to know — which
+   * number was dialled, and whatever the lead list carried.
    *
-   * Deliberately not sent as `instructions`: those would replace the prompt
-   * configured on the agent in the xAI console, which is where the actual
-   * behaviour lives. This adds a turn the agent can read instead, so the
-   * console configuration stays authoritative.
+   * Sent with the `system` role, which xAI documents as system-level context.
+   * That matters: as a `user` item it reads as somebody speaking, and the
+   * agent answers it. As system context it is data the agent simply has.
+   *
+   * Not `instructions`, which would replace the console prompt outright, and
+   * never phrased as one. Facts only — the agent decides what to do with
+   * them, exactly as it decides everything else.
    */
-  sendContext(text) {
+  sendCallFacts(text) {
     this.send({
       type: 'conversation.item.create',
-      item: { type: 'message', role: 'user', content: [{ type: 'input_text', text }] },
+      item: { type: 'message', role: 'system', content: [{ type: 'input_text', text }] },
     });
   }
 

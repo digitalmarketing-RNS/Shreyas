@@ -69,6 +69,15 @@ export const config = {
   // and no model fallback: this id, or the call does not go out.
   xaiAgentId: env.XAI_AGENT_ID ?? '',
 
+  // Tells the agent which number was dialled, and any name or fields the lead
+  // list carried, as system-level context on the call.
+  //
+  // Facts, not instruction. The agent cannot see the dialler, so without this
+  // it has to ask the person for a number this service already knows — and a
+  // caller being asked to read out the number they were just called on is the
+  // system looking broken. Nothing here says what to do with it.
+  agentCallFacts: bool(env.AGENT_CALL_FACTS, true),
+
   // Offers the agent a save_call_details function that writes structured
   // fields onto the call record.
   //

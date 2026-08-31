@@ -2,7 +2,7 @@ import { log } from '../logger.js';
 import { events } from '../util/events.js';
 import { config } from '../config.js';
 import { XaiSession } from '../xai/realtime.js';
-import { calls, dnc } from '../store.js';
+import { calls, dnc, leads } from '../store.js';
 import { hangupCall, transferCall, verifyCallToken } from './client.js';
 
 /** Live bridges keyed by our call id, so the dashboard can end one. */
@@ -37,7 +37,7 @@ const HANGUP_CHECKPOINT = 'rns-goodbye';
  * than once; a session nobody claims is closed after 30 seconds so a call that
  * never connects cannot leak one.
  */
-export function prewarmSession(callId, { record } = {}) {
+export function prewarmSession(callId, { record, lead } = {}) {
   if (!config.prewarmSessions || prewarmed.has(callId) || active.has(callId)) return;
 
   const session = new XaiSession({
@@ -54,10 +54,16 @@ export function prewarmSession(callId, { record } = {}) {
   const bufferAudio = (chunk) => buffered.push(chunk);
   session.on('audio', bufferAudio);
 
-  // Nothing is sent on open. The agent opens the conversation by itself the
-  // moment the session exists — measured at about 1.6 seconds — so the
-  // greeting is composed while Plivo is still opening the audio stream and is
-  // waiting in this buffer by the time anyone can hear it.
+  // The only thing sent on open, and only facts: which number was dialled and
+  // whatever the lead list carried. No greeting and no response.create — the
+  // agent opens the conversation by itself about 1.6 seconds after the
+  // session exists, so its first words are composed while Plivo is still
+  // opening the audio stream and are waiting in this buffer by the time
+  // anyone can hear them.
+  session.on('open', () => {
+    const facts = callFacts(record, lead);
+    if (facts) session.sendCallFacts(facts);
+  });
   // A prewarmed session that dies is recoverable — claimPrewarmed refuses a
   // dead one and the bridge builds a fresh session — but the reason still
   // belongs on the call. If the fresh one fails the same way, this is the
@@ -285,7 +291,8 @@ export class PlivoBridge {
       transferTo: config.transferNumber || undefined,
     });
 
-    this.wire(this.session, record);
+    const lead = record.leadId ? leads.get(record.leadId) : null;
+    this.wire(this.session, record, lead);
 
     if (ready) {
       // Play what the agent already said while the stream was still opening.
@@ -314,8 +321,17 @@ export class PlivoBridge {
    * the agent starts speaking on its own about 1.6 seconds after the session
    * opens. A call is now the same session a console test is.
    */
-  wire(session, record) {
+  wire(session, record, lead) {
     const callId = this.callId;
+
+    // A session built here rather than claimed from the prewarm cache has not
+    // been given the call facts yet.
+    if (!session.ready) {
+      session.on('open', () => {
+        const facts = callFacts(record, lead);
+        if (facts) session.sendCallFacts(facts);
+      });
+    }
 
     session.on('audio', (payload) => this.playAudio(payload));
 
@@ -567,6 +583,31 @@ export class PlivoBridge {
       events.emit('call:bridge-ended', { callId: this.callId, reason });
     }
   }
+}
+
+/**
+ * What this call is, as data.
+ *
+ * Written as labelled values rather than a sentence, so there is no room for
+ * it to read as an instruction. It carries only what the agent cannot
+ * otherwise know: it has no view of the dialler, so without the number it has
+ * to ask the person to read out the number it just rang them on.
+ *
+ * Anything the lead list carried comes along for the same reason — a name in
+ * the CSV is a fact about who was called, not a rule about how to speak.
+ */
+function callFacts(record, lead) {
+  if (!config.agentCallFacts || !record) return null;
+
+  const facts = [
+    `direction: ${record.direction ?? 'outbound'}`,
+    `phone number dialled: ${record.toNumber}`,
+  ];
+  if (lead?.name) facts.push(`name on the list: ${lead.name}`);
+  for (const [key, value] of Object.entries(lead?.attributes ?? {})) {
+    facts.push(`${key}: ${value}`);
+  }
+  return `Call metadata. ${facts.join('. ')}.`;
 }
 
 export function handlePlivoStream(ws, req) {

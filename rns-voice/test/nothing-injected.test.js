@@ -31,6 +31,13 @@ describe('nothing is put into the conversation', () => {
       }
     });
 
+    it(`${name} sends no prompt, voice or behaviour setting`, () => {
+      const src = code(source);
+      for (const field of ['instructions:', 'voice:', 'turn_detection', 'reasoning.effort']) {
+        assert.ok(!src.includes(field), `${name} must not send ${field}`);
+      }
+    });
+
     it(`${name} never takes the agent's turn for it`, () => {
       // response.create makes the agent speak on our schedule rather than its
       // own, which is the difference between a call and a console test.
@@ -46,11 +53,30 @@ describe('nothing is put into the conversation', () => {
     assert.ok(code(consoleApi).includes('sendText('), 'the console must still relay what a person types');
   });
 
-  it('sends the agent no facts about the call', () => {
-    // The dialled number and the lead's fields used to be injected as a
-    // conversation turn. The agent asks for what it needs.
+  it('gives the agent the call facts, and only as system context', () => {
+    // The one thing sent, and the reason it is not a contradiction: the agent
+    // has no view of the dialler, so without the dialled number it asks the
+    // person to read out the number it just rang them on.
+    //
+    // It goes as the `system` role, which xAI documents as system-level
+    // context. As a `user` item it reads as somebody speaking and the agent
+    // answers it; as system context it is data the agent simply has.
     const src = code(bridge);
-    assert.ok(!src.includes('describeCall'), 'the call briefing must be gone');
-    assert.ok(!/leads\./.test(src), 'lead data must not reach the agent path');
+    assert.ok(src.includes('sendCallFacts('), 'the call facts must be sent');
+    const client = readFileSync(new URL('../src/xai/realtime.js', import.meta.url), 'utf8');
+    const fn = client.slice(client.indexOf('sendCallFacts('), client.indexOf('sendText('));
+    assert.match(fn, /role: 'system'/, 'call facts must use the system role, never user');
+  });
+
+  it('states facts and never tells the agent what to do with them', () => {
+    // The guard that keeps this from drifting back into a briefing. Every
+    // instruction this service ever sent arrived as a sentence like these.
+    const builder = code(bridge);
+    const body = builder.slice(builder.indexOf('function callFacts'), builder.indexOf('export function handlePlivoStream'));
+    const imperative = /\b(you should|you must|do not|don't|make sure|remember to|be sure|always|never|please|your job|your task|if the caller|when the caller)\b/i;
+    const strings = [...body.matchAll(/[`'"]([^`'"]{8,})[`'"]/g)].map((m) => m[1]);
+    for (const text of strings) {
+      assert.ok(!imperative.test(text), `call facts must not instruct: ${text}`);
+    }
   });
 });
