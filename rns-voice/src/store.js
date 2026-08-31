@@ -139,7 +139,21 @@ export const campaigns = {
       windowDays: input.windowDays ?? [1, 2, 3, 4, 5, 6],
       defaultTimezone: input.defaultTimezone ?? config.defaultTimezone,
       defaultCountryCode: input.defaultCountryCode ?? config.defaultCountryCode,
-      hangupOnMachine: input.hangupOnMachine !== false,
+      // Off unless explicitly asked for. Plivo's answering-machine detection
+      // listens to the answered call for five seconds and hangs up if it
+      // decides a machine picked up — and against a live agent it decides
+      // wrong. A real call died six seconds after the person answered, with
+      // "Machine Detected" and HangupSource "API Request": Plivo did it,
+      // because we asked it to.
+      //
+      // The heuristic looks for a long unbroken greeting, which is exactly
+      // what this call sounds like: the agent starts speaking about a second
+      // and a half in and keeps going. Nothing distinguishes that from
+      // voicemail, so a person who answers normally gets cut off.
+      //
+      // Voicemail is the agent's to recognise. It hears the greeting like
+      // anyone would, and it can end the call itself.
+      hangupOnMachine: input.hangupOnMachine === true,
       createdAt: now(),
       updatedAt: now(),
     };

@@ -88,9 +88,10 @@
           <div class="field">
             <label for="cMachine">If voicemail answers</label>
             <select id="cMachine">
-              <option value="true">Hang up straight away</option>
-              <option value="false">Let the agent talk</option>
+              <option value="false">Let the agent decide</option>
+              <option value="true">Hang up straight away (Plivo detection)</option>
             </select>
+            <div class="hint">Plivo's detection listens for five seconds and hangs up if it thinks a machine answered. Against a live agent it gets this wrong and cuts off real people, so leave it on the agent.</div>
           </div>
         </details>
 
