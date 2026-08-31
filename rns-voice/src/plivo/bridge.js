@@ -586,8 +586,20 @@ export class PlivoBridge {
     this.teardown(`agent ended the call (${pending.reason})`);
   }
 
+  /**
+   * Closes our side after Plivo has reported the call over.
+   *
+   * Only the hangup webhook calls this, and that webhook fires because the
+   * call has already ended — the person hung up, or the carrier dropped it.
+   * Nothing is being decided here; the leg is gone and this releases the
+   * resources still pointed at it.
+   *
+   * It used to record itself as "ended from the dashboard", which read on the
+   * call record as though this service had chosen to end a call somebody else
+   * had already put down.
+   */
   hangup() {
-    this.teardown('ended from the dashboard');
+    this.teardown('call already ended; releasing the bridge');
   }
 
   teardown(reason) {
