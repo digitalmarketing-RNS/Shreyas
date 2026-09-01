@@ -38,18 +38,25 @@ const PROFILES = {
  * effort, turn-taking and speech rate all belong to the agent's configuration
  * in the xAI console. Not defaults left unset: no fields at all. This service
  * connects the call; it does not configure the agent.
+ *
+ * Sending even this much is not free, though: xAI replaces the whole `audio`
+ * object rather than merging it, so the format alone deletes the agent's own
+ * settings beside it. restoreAgentAudio below puts them back.
  */
-export function buildSessionUpdate(options) {
+function buildAudio(options) {
   // JSON round-trip rather than structuredClone: the profiles are plain data,
   // and structuredClone does not exist before Node 17, which some shared hosts
   // still run.
-  const audio = JSON.parse(JSON.stringify(PROFILES[options.profile]));
-  const session = { audio };
+  const audio = JSON.parse(JSON.stringify(PROFILES[options.profile] ?? {}));
 
   // Transcription settings describe what xAI sends back to us, not how the
   // agent behaves, so they are ours to ask for. 'model' turns on the
   // live-caption event; without it the caller's words still arrive, but only
   // once each utterance is finished.
+  //
+  // All three are unset by default, and should stay that way for an agent that
+  // has its own: the agent's transcriber is tuned to the languages it actually
+  // takes calls in, and this cannot improve on it without knowing them.
   const languageHint = options.languageHint || config.xaiLanguageHint;
   if (languageHint || options.keyterms?.length || config.xaiLiveCaptions) {
     audio.input.transcription = {
@@ -58,6 +65,13 @@ export function buildSessionUpdate(options) {
       ...(options.keyterms?.length ? { keyterms: options.keyterms } : {}),
     };
   }
+  return audio;
+}
+
+export function buildSessionUpdate(options) {
+  const audio = buildAudio(options);
+  const session = { audio };
+
   const tools = [...(options.tools ?? [])];
   if (options.detailsTool) tools.push(CALL_DETAILS_TOOL);
   if (options.callControl) tools.push(END_CALL_TOOL);
@@ -76,6 +90,63 @@ export function buildSessionUpdate(options) {
  * built, with none of its prompt or settings, and nothing anywhere saying so.
  * A missing agent id is a configuration error and now reads as one.
  */
+/**
+ * Hands the agent back the audio settings our format update just erased.
+ *
+ * xAI replaces `audio.input` and `audio.output` wholesale rather than merging
+ * them key by key. Sending a format therefore deletes every sibling field the
+ * agent carries from the xAI console — measured against the live agent, whose
+ * `audio.input.transcription.keyterms` of ["Kannada"] and `audio.output.speed`
+ * of 1.3 both vanished the instant we sent a format and nothing else. Same
+ * shape of bug as sending a tools array and wiping the agent's connectors.
+ *
+ * The keyterms are not cosmetic. They bias the transcriber towards a language,
+ * and stripped of them Kannada comes back as Telugu or Hindi — near enough
+ * phonetically to fool a general model, and once the transcript says Telugu
+ * the agent answers in Telugu and the call is lost. The agent had it right in
+ * its own configuration; we were quietly deleting it on every call.
+ *
+ * So this waits until xAI echoes the agent's own audio block back, then hands
+ * those exact values straight back with only the two format fields — the ones
+ * that describe the phone line rather than the agent — set to ours. Nothing is
+ * chosen here: every field except the format is the agent's own, copied
+ * verbatim, whatever it happens to be. Fields we have never heard of are
+ * carried across too, which is the point.
+ *
+ * Returns null when the echo holds nothing of the agent's, so a session that
+ * has nothing to restore sends no extra message at all.
+ */
+export function restoreAgentAudio(agentAudio, options) {
+  if (!PROFILES[options?.profile] || !agentAudio || typeof agentAudio !== 'object') return null;
+  const audio = buildAudio(options);
+
+  let restored = false;
+  for (const side of ['input', 'output']) {
+    const theirs = agentAudio[side];
+    if (!theirs || typeof theirs !== 'object') continue;
+    for (const [key, value] of Object.entries(theirs)) {
+      // The format and transport describe the phone line, so those stay ours.
+      // Every other field on this side is the agent's.
+      if (key === 'format' || key === 'transport') continue;
+      if (key === 'transcription' && audio[side].transcription) {
+        // An operator who set a language hint here meant it, so it survives —
+        // but it is added to the agent's transcriber settings rather than
+        // swapped in for them, because dropping its keyterms is the whole bug
+        // this exists to fix.
+        audio[side].transcription = { ...value, ...audio[side].transcription };
+      } else {
+        audio[side][key] = value;
+      }
+      restored = true;
+    }
+  }
+  // Nothing of the agent's to give back — say so, rather than sending a second
+  // update that repeats the first.
+  if (!restored) return null;
+
+  return { type: 'session.update', session: { audio } };
+}
+
 export function realtimeUrl({ conversationId } = {}) {
   if (!config.xaiAgentId) {
     throw new Error('XAI_AGENT_ID is not set — there is no agent to connect the call to.');

@@ -98,8 +98,15 @@ export const config = {
   // accepts it. The finished transcript of every utterance is recorded either
   // way; this only decides whether it also arrives mid-sentence.
   xaiLiveCaptions: bool(env.XAI_LIVE_CAPTIONS, false),
-  // Optional BCP-47 hint for the transcriber, e.g. hi-IN. Leave unset for
-  // automatic detection, which is what a multilingual agent wants.
+  // Optional BCP-47 hint for the transcriber, e.g. hi-IN. Leave unset, which is
+  // what an agent that takes calls in more than one language wants: a hint
+  // pins the transcriber to one language, and a caller who switches is then
+  // transcribed into the pinned one regardless.
+  //
+  // Setting this does not discard the agent's own transcriber settings — its
+  // keyterms are kept and this is added to them — but the agent's console is
+  // the better place to say anything about language, because that is where the
+  // agent reads it from as well.
   xaiLanguageHint: env.XAI_LANGUAGE_HINT ?? '',
   // Opens the xAI session while the call is still being answered, so the
   // connection and configuration are not on the critical path.

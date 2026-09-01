@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import WebSocket from 'ws';
 import { config } from '../config.js';
 import { log } from '../logger.js';
-import { buildSessionUpdate, realtimeUrl } from './session.js';
+import { buildSessionUpdate, realtimeUrl, restoreAgentAudio } from './session.js';
 
 /** Barge-in signals. Deployments emit one name or the other; both mean "stop talking". */
 const SPEECH_STARTED = new Set([
@@ -34,6 +34,8 @@ export class XaiSession extends EventEmitter {
     this.conversationId = null;
     /** Audio appended before the socket opens, so nothing is lost on a slow handshake. */
     this.pending = [];
+    /** Whether the agent's own audio settings have been handed back yet. */
+    this.audioRestored = false;
   }
 
   connect() {
@@ -144,9 +146,27 @@ export class XaiSession extends EventEmitter {
       // xAI's acknowledgement of session.update, echoing what it actually
       // accepted. Logged because a field it ignored or rejected is otherwise
       // invisible: the call simply behaves unlike the console says it should.
-      case 'session.updated':
+      case 'session.updated': {
         log.debug({ label: this.options.label, session: event.session }, 'xAI accepted session config');
+        // This echo is also the only place the agent's own audio settings are
+        // ever visible, and the format we have to send for the phone line
+        // replaces them. Hand them straight back the first time we see them.
+        //
+        // First time only: the acknowledgement of that very message carries
+        // them too, so restoring from every echo would never stop.
+        if (!this.audioRestored) {
+          const restore = restoreAgentAudio(event.session?.audio, this.options);
+          if (restore) {
+            this.audioRestored = true;
+            this.send(restore);
+            log.info(
+              { label: this.options.label, audio: restore.session.audio },
+              "kept the agent's own audio settings",
+            );
+          }
+        }
         break;
+      }
 
       case 'response.created':
         this.emit('response_created');
