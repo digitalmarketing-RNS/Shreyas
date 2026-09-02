@@ -24,6 +24,46 @@ const SPEECH_STARTED = new Set([
  *   error(Error)
  *   close({code, reason})
  */
+/**
+ * Turns a refused handshake into an error that says what was refused and why.
+ *
+ * 'ws' reports a rejection as "Unexpected server response: 403" and discards
+ * the body, which is the only part that distinguishes an expired key from an
+ * account with no credit left from a genuine outage. On a phone call all three
+ * present identically — the call connects and nobody speaks — so the body is
+ * worth reading.
+ */
+export function readRejection(res) {
+  return new Promise((resolve) => {
+    // A rejection is a short JSON object. Cap what is kept, and cap it on the
+    // way in rather than before appending — a single chunk larger than the
+    // limit would otherwise pass the check and be added whole.
+    const LIMIT = 2048;
+    let body = '';
+    res.on('data', (chunk) => {
+      if (body.length >= LIMIT) return;
+      body += chunk.toString().slice(0, LIMIT - body.length);
+    });
+    res.on('end', () => {
+      let detail = body.trim();
+      try {
+        const parsed = JSON.parse(body);
+        detail = parsed.error ?? parsed.message ?? detail;
+      } catch {
+        // Not JSON. The raw text is still better than nothing.
+      }
+      const err = new Error(
+        `xAI refused the connection (HTTP ${res.statusCode})` + (detail ? `: ${detail}` : ''),
+      );
+      err.status = res.statusCode;
+      resolve(err);
+    });
+    res.on('error', () => resolve(
+      Object.assign(new Error(`xAI refused the connection (HTTP ${res.statusCode})`), { status: res.statusCode }),
+    ));
+  });
+}
+
 export class XaiSession extends EventEmitter {
   constructor(options = {}) {
     super();
@@ -57,6 +97,24 @@ export class XaiSession extends EventEmitter {
     // small packets back waiting for company.
     ws.on('upgrade', () => ws._socket?.setNoDelay?.(true));
     this.ws = ws;
+
+    // A refused handshake is where the useful detail lives, and 'ws' throws it
+    // away: whatever xAI said arrives as "Unexpected server response: 403" and
+    // nothing else. That is the same thing on screen as a network fault, an
+    // expired key, or an account with no credit left — and the caller's
+    // experience of all three is a call that connects to silence, which is the
+    // hardest failure here to tell apart from a bug in this service.
+    //
+    // So read the body xAI sent and say what it said.
+    ws.on('unexpected-response', (_req, res) => {
+      readRejection(res).then((err) => {
+        log.error(
+          { status: err.status, label: this.options.label },
+          'xAI refused the realtime connection',
+        );
+        this.emit('error', err);
+      });
+    });
 
     ws.on('open', () => {
       // Configure before anything else: audio sent ahead of session.update is

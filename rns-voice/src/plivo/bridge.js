@@ -460,6 +460,30 @@ export class PlivoBridge {
       // "let me get that set up right away", and books nothing. Left alone,
       // the same request runs through to the connector and completes. So say
       // nothing, and let the tools the operator configured do their work.
+      // Say nothing — but do write down what happened. A booking made through
+      // a connector is otherwise invisible from this side: the agent tells the
+      // caller "your appointment is confirmed" whether the connector created
+      // the event or not, and xAI sends us no result either way, so "is it in
+      // the calendar?" has had no answer anywhere but the calendar itself.
+      // Recording the attempt does not make it succeed, but it does mean a
+      // booking that never arrives can be traced to whether the agent asked
+      // for it at all.
+      if (name === 'call_connected_tool' || name === 'search_connected_tools') {
+        const record = calls.get(callId);
+        const attempts = [...(record?.details?.connectorCalls ?? [])];
+        attempts.push({
+          tool: name === 'call_connected_tool' ? args.tool_name ?? 'unknown' : 'search',
+          arguments: name === 'call_connected_tool' ? args.arguments ?? null : args.query ?? null,
+          at: new Date().toISOString(),
+        });
+        calls.saveDetails(callId, { connectorCalls: attempts });
+        log.info(
+          { callId, tool: attempts[attempts.length - 1].tool, arguments: attempts[attempts.length - 1].arguments },
+          'agent used one of its connectors',
+        );
+        return;
+      }
+
       log.debug({ name, callId }, "agent used one of its own tools; leaving it to xAI");
     });
 
