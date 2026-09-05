@@ -679,9 +679,27 @@ $('callRows').addEventListener('click', async (e) => {
     // The line the tile-requirement column was read from is marked here, so
     // the column can be checked against the transcript rather than believed.
     const answeredAt = call.tileInterest?.index ?? -1;
+
+    // How long the agent took to answer, per reply and overall. A caller who
+    // waits too long assumes the line is dead and speaks again, so this is the
+    // number to watch after changing anything in the xAI console. It is
+    // measured from the caller's transcript arriving, which is already after
+    // they stopped talking — so the real silence was longer, never shorter.
+    const gapBefore = new Map((call.replyGaps ?? []).map((g) => [g.index, g.ms]));
+    const pace = call.replyPace;
+    $('callPace').innerHTML = pace
+      ? `<div>Agent replied in <b>${(pace.medianMs / 1000).toFixed(1)}s</b> typically, slowest `
+        + `<b>${(pace.slowestMs / 1000).toFixed(1)}s</b>, over ${pace.samples} `
+        + `${pace.samples === 1 ? 'reply' : 'replies'}.<br>`
+        + `<span class="muted">Measured from the caller's words reaching us, so the pause `
+        + `they heard was a little longer.</span></div>`
+      : '';
+    $('callPace').classList.toggle('hidden', !pace);
     $('transcriptFeed').innerHTML = call.transcript.map((t, i) =>
       `<div class="line${i === answeredAt ? ' answer' : ''}"><span class="at">${new Date(t.at).toLocaleTimeString()}</span>
        <span class="${t.role}">${t.role === 'agent' ? 'Agent' : 'Person'}: ${esc(t.text)}</span>${
+         gapBefore.has(i) ? `<span class="tag gap${gapBefore.get(i) >= 3000 ? ' slow' : ''}">waited ${(gapBefore.get(i) / 1000).toFixed(1)}s</span>` : ''
+       }${
          i === answeredAt ? `<span class="tag">tile requirement: ${call.tileInterest.answer}</span>` : ''
        }</div>`).join('')
       || '<div class="line muted">Nothing was transcribed on this call.</div>';

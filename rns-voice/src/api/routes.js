@@ -11,6 +11,7 @@ import { activeBridge, activeBridgeCount } from '../plivo/bridge.js';
 import { accountInfo, listNumbers, placeCall, hangupCall } from '../plivo/client.js';
 import { probeXai } from '../xai/realtime.js';
 import { tileInterest } from '../report/interest.js';
+import { replyGaps, replyPace } from '../report/pace.js';
 
 export const apiRouter = Router();
 
@@ -295,7 +296,12 @@ apiRouter.delete('/leads/:id', (req, res) => res.json({ deleted: leads.remove(re
  * never needs old records rewritten. The stored record is not touched.
  */
 function withInterest(record) {
-  return { ...record, tileInterest: tileInterest(record.transcript) };
+  return {
+    ...record,
+    tileInterest: tileInterest(record.transcript),
+    replyPace: replyPace(record.transcript),
+    replyGaps: replyGaps(record.transcript),
+  };
 }
 
 apiRouter.get('/calls', (req, res) => {
