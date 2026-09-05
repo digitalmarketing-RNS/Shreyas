@@ -688,7 +688,10 @@ $('callRows').addEventListener('click', async (e) => {
     const gapBefore = new Map((call.replyGaps ?? []).map((g) => [g.index, g.ms]));
     const pace = call.replyPace;
     $('callPace').innerHTML = pace
-      ? `<div>Agent replied in <b>${(pace.medianMs / 1000).toFixed(1)}s</b> typically, slowest `
+      ? `<div>${call.timeToFirstWord != null
+             ? `Caller heard silence for <b>${(call.timeToFirstWord / 1000).toFixed(1)}s</b> after picking up, then `
+             : ''}`
+        + `agent replied in <b>${(pace.medianMs / 1000).toFixed(1)}s</b> typically, slowest `
         + `<b>${(pace.slowestMs / 1000).toFixed(1)}s</b>, over ${pace.samples} `
         + `${pace.samples === 1 ? 'reply' : 'replies'}.<br>`
         + `<span class="muted">Measured from the caller's words reaching us, so the pause `

@@ -80,3 +80,32 @@ describe('summarising a call', () => {
     assert.equal(pace.medianMs, 2000);
   });
 });
+
+describe('dead air after pickup', () => {
+  const answered = new Date(Date.UTC(2026, 8, 5, 6, 0, 0)).toISOString();
+
+  it('measures from the answer to the agent speaking', async () => {
+    const { timeToFirstWord } = await import('../src/report/pace.js');
+    assert.equal(timeToFirstWord(answered, [agent(2)]), 2000);
+  });
+
+  it('ignores the caller speaking first', async () => {
+    const { timeToFirstWord } = await import('../src/report/pace.js');
+    // A machine answering with its own recording does not stop the clock —
+    // the caller really did wait that long for the agent.
+    assert.equal(timeToFirstWord(answered, [caller(1), agent(13)]), 13000);
+  });
+
+  it('reports nothing when there is nothing to measure', async () => {
+    const { timeToFirstWord } = await import('../src/report/pace.js');
+    assert.equal(timeToFirstWord(null, [agent(2)]), null, 'call never answered');
+    assert.equal(timeToFirstWord(answered, [caller(2)]), null, 'agent never spoke');
+    assert.equal(timeToFirstWord(answered, []), null);
+    assert.equal(timeToFirstWord(answered, [{ role: 'agent', text: 'x' }]), null, 'no timestamp');
+  });
+
+  it('does not report a negative wait when the clocks disagree', async () => {
+    const { timeToFirstWord } = await import('../src/report/pace.js');
+    assert.equal(timeToFirstWord(answered, [agent(-5)]), null);
+  });
+});

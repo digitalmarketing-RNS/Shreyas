@@ -45,6 +45,27 @@ export function replyGaps(transcript) {
 }
 
 /**
+ * Dead air: how long the caller held a silent line before the agent spoke.
+ *
+ * The part of the delay a caller feels most sharply — they say hello into
+ * nothing. Measured from Plivo telling us the call was answered to the agent's
+ * first words reaching us.
+ *
+ * Returns null when the call was never answered, or when the agent never
+ * spoke. A machine that answers with a recorded greeting inflates this
+ * honestly: the agent really did wait through it before speaking.
+ */
+export function timeToFirstWord(answeredAt, transcript) {
+  const turns = Array.isArray(transcript) ? transcript : [];
+  const answered = Date.parse(answeredAt);
+  if (!Number.isFinite(answered)) return null;
+  const first = turns.find((t) => !isCaller(t) && Number.isFinite(Date.parse(t.at)));
+  if (!first) return null;
+  const ms = Date.parse(first.at) - answered;
+  return ms >= 0 ? ms : null;
+}
+
+/**
  * Summary of one call's pace: { medianMs, slowestMs, samples }, or null when
  * the call had no reply to measure.
  *
