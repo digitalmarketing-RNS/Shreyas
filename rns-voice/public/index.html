@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RNS Voice Agent</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232f6bed'/><text y='68' x='50' text-anchor='middle' font-size='46' font-family='sans-serif' font-weight='bold' fill='white'>R</text></svg>" />
+</head>
+<body>
+
+<!-- Password gate ------------------------------------------------------- -->
+<div class="gate hidden" id="gate">
+  <div class="box">
+    <div class="brand" style="padding:0 0 16px"><span class="mark">RNS</span> Voice Agent</div>
+    <div class="field">
+      <label for="gatePassword">Dashboard password</label>
+      <input type="password" id="gatePassword" placeholder="Set in DASHBOARD_PASSWORD" autocomplete="current-password" />
+      <div class="hint">Whatever you set as <code>DASHBOARD_PASSWORD</code> in your environment variables.</div>
+    </div>
+    <button class="btn primary" id="gateSubmit" style="width:100%;justify-content:center">Unlock</button>
+    <div id="gateError" class="hint" style="color:var(--bad);margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- Campaign wizard ----------------------------------------------------- -->
+<div class="modal hidden" id="wizard">
+  <div class="box wide">
+    <div class="modal-head">
+      <h2>Create campaign</h2>
+      <button class="icon-btn" id="wizClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="stepper">
+      <span class="step on" data-step="1">1</span><i></i>
+      <span class="step" data-step="2">2</span><i></i>
+      <span class="step" data-step="3">3</span>
+    </div>
+
+    <div class="modal-body">
+      <!-- Step 1 -------------------------------------------------------- -->
+      <div class="wiz-step" data-step="1">
+        <div class="field">
+          <label for="cName">Campaign name <span class="req">*</span></label>
+          <input type="text" id="cName" maxlength="60" placeholder="e.g. Kalpataru Elaara — site visit follow-up" />
+          <div class="hint"><span id="cNameCount">0</span>/60</div>
+        </div>
+        <div class="callout">
+          Every call in this campaign is handled by your xAI agent
+          <b id="wizAgentId">as configured</b>. What it says, how it opens and
+          when it ends the call are all set there, not here.
+        </div>
+      </div>
+
+      <!-- Step 2 -------------------------------------------------------- -->
+      <div class="wiz-step hidden" data-step="2">
+        <div class="field">
+          <label for="cNumbers">Phone numbers <span class="req">*</span> <span class="muted" style="font-weight:400">(one per line)</span></label>
+          <textarea id="cNumbers" rows="9" class="mono" placeholder="9876543210&#10;9123456789"></textarea>
+          <div class="hint">
+            10-digit numbers are fine — <span id="cCountryEcho">+91</span> is added automatically.
+            Paste a whole column from a spreadsheet and it will be split for you.
+          </div>
+        </div>
+        <div class="callout" id="numberCount">No numbers yet.</div>
+      </div>
+
+      <!-- Step 3 -------------------------------------------------------- -->
+      <div class="wiz-step hidden" data-step="3">
+        <details class="advanced">
+          <summary>Advanced settings</summary>
+          <div class="grid3">
+            <div class="field"><label for="cWinStart">Calling window opens</label><input type="text" id="cWinStart" value="10:00" /></div>
+            <div class="field"><label for="cWinEnd">Calling window closes</label><input type="text" id="cWinEnd" value="19:00" /></div>
+            <div class="field"><label for="cTz">Lead timezone</label><input type="text" id="cTz" value="Asia/Kolkata" /></div>
+          </div>
+          <div class="field">
+            <label>Calling days</label>
+            <div class="days" id="cDays"></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label for="cAttempts">Attempts per lead</label><input type="number" id="cAttempts" value="3" min="1" max="10" /></div>
+            <div class="field"><label for="cRetry">Wait before retry (min)</label><input type="number" id="cRetry" value="60" min="1" /></div>
+            <div class="field"><label for="cCountry">Default country code</label><input type="text" id="cCountry" value="91" /></div>
+          </div>
+          <div class="field">
+            <label for="cMachine">If voicemail answers</label>
+            <select id="cMachine">
+              <option value="false">Let the agent decide</option>
+              <option value="true">Hang up straight away (Plivo detection)</option>
+            </select>
+            <div class="hint">Plivo's detection listens for five seconds and hangs up if it thinks a machine answered. Against a live agent it gets this wrong and cuts off real people, so leave it on the agent.</div>
+          </div>
+        </details>
+
+        <div class="howto">
+          <b>What happens when you press start</b>
+          <ul id="howtoList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="wizCancel">Cancel</button>
+      <div class="spacer"></div>
+      <button class="btn hidden" id="wizBack">Back</button>
+      <button class="btn primary" id="wizNext">Next</button>
+      <button class="btn primary hidden" id="wizCreate">Create &amp; start campaign</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar ------------------------------------------------------------- -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="mark">RNS</span> Voice Agent</div>
+
+  <div class="nav-group">
+    <div class="nav-label">Main</div>
+    <button class="nav-item active" data-page="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-page="campaigns">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg>
+      Campaigns <span class="count" id="navCampaignCount">0</span>
+    </button>
+    <button class="nav-item" data-page="leads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      Leads
+    </button>
+    <button class="nav-item" data-page="test">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
+      Test Agent
+    </button>
+    <button class="nav-item" data-page="optout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m2 2 20 20"/><path d="M17.5 17.5A15 15 0 0 1 6.5 6.5"/><path d="M8.5 3.5A2 2 0 0 1 11 5l.5 2a2 2 0 0 1-.5 2l-1 1"/></svg>
+      Opt-out List <span class="count" id="navOptOutCount">0</span>
+    </button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Insights</div>
+    <button class="nav-item" data-page="calls">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v14H4z"/><path d="M8 13h8M8 17h5"/></svg>
+      Call Reports
+    </button>
+    <button class="nav-item" data-page="activity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Activity Log
+    </button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">System</div>
+    <button class="nav-item" data-page="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 2.6 7a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V1a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 17 2.6a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H23a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      Settings &amp; Health
+    </button>
+  </div>
+</aside>
+
+<!-- Main ---------------------------------------------------------------- -->
+<div class="shell">
+  <div class="topbar">
+    <button class="btn sm menu-toggle" id="menuToggle">Menu</button>
+    <span class="eyebrow">Realtime Operations</span>
+    <span style="flex:1"></span>
+    <span class="status-dot" id="agentStatus"><i></i> Checking…</span>
+    <span class="status-dot" id="lineStatus"><i></i> Line</span>
+  </div>
+
+  <!-- Dashboard ------------------------------------------------------- -->
+  <section class="page" id="page-dashboard">
+    <div class="page-tag"><i></i> Live voice AI operations</div>
+    <h1>Realtime Overview</h1>
+    <p class="subtitle">Monitor calls, campaigns and system health in one place.</p>
+
+    <div id="warnings"></div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div><div class="label">System</div><div class="value" id="statSystem">—</div></div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="m9 11 3 3L22 4"/></svg></div>
+      </div>
+      <div class="stat">
+        <div><div class="label">Total Leads</div><div class="value" id="statLeads">0</div></div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      </div>
+      <div class="stat">
+        <div><div class="label">Total Calls</div><div class="value" id="statCalls">0</div></div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.4 1.8.6 2.8.8a2 2 0 0 1 1.7 2z"/></svg></div>
+      </div>
+      <div class="stat">
+        <div><div class="label">Campaigns</div><div class="value" id="statCampaigns">0</div></div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+      </div>
+      <div class="stat">
+        <div><div class="label">Live Now</div><div class="value" id="statLive">0</div></div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      </div>
+      <div class="stat">
+        <div><div class="label">Plivo Balance</div><div class="value" id="statBalance">—</div></div>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div>
+        <div class="card">
+          <div class="section-head"><span class="dot"></span><h2>Weekly Call Volume</h2></div>
+          <svg class="chart" id="volumeChart" viewBox="0 0 640 190" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="card">
+          <div class="section-head"><span class="dot"></span><h2>Recent Campaigns</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campaign</th><th>Progress</th><th>Calls</th><th>Status</th><th></th></tr></thead>
+              <tbody id="dashCampaigns"><tr><td colspan="5" class="empty">No campaigns yet.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="section-head"><span class="dot"></span><h2>Recent Calls</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Number</th><th>Secs</th><th>Status</th></tr></thead>
+              <tbody id="dashCalls"><tr><td colspan="3" class="empty">No calls yet.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-head"><span class="dot"></span><h2>Live Activity</h2></div>
+          <div class="feed" id="dashFeed"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Campaigns ------------------------------------------------------- -->
+  <section class="page hidden" id="page-campaigns">
+    <div class="page-head">
+      <div>
+        <div class="page-tag"><i></i> Campaign orchestration</div>
+        <h1>AI Campaign Studio</h1>
+        <p class="subtitle">Create and manage AI call campaigns.</p>
+      </div>
+      <button class="btn primary lg" id="openWizard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New campaign
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="campaignSearch" placeholder="Search campaigns…" />
+        </div>
+        <select id="campaignFilter" class="filter">
+          <option value="">All status</option>
+          <option value="running">Running</option>
+          <option value="paused">Paused</option>
+          <option value="draft">Draft</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Campaign name</th>
+              <th>Campaign ID</th>
+              <th>Activity</th>
+              <th>Total calls</th>
+              <th>Date &amp; time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="campaignRows"><tr><td colspan="7" class="empty">No campaigns yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Leads ----------------------------------------------------------- -->
+  <section class="page hidden" id="page-leads">
+    <div class="page-tag"><i></i> Lead management</div>
+    <h1>Upload Calling List</h1>
+    <p class="subtitle">Import the numbers this campaign should dial.</p>
+
+    <div class="card">
+      <div class="field">
+        <label for="leadCampaign">Add to campaign</label>
+        <select id="leadCampaign"></select>
+      </div>
+      <div class="field">
+        <label for="leadFile">CSV file</label>
+        <input type="file" id="leadFile" accept=".csv,text/csv" />
+        <div class="hint">Needs a <b>phone</b> column. <b>name</b> and <b>timezone</b> are used if present; every other column is kept against the lead.</div>
+      </div>
+      <div class="field">
+        <label for="leadCsv">…or paste rows here</label>
+        <textarea id="leadCsv" style="min-height:130px" placeholder="phone,name&#10;9876543210,Dana Reyes&#10;+919812345678,Arjun Mehta"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="uploadLeads">Import leads</button>
+        <span id="importResult" class="muted"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head"><span class="dot"></span><h2>Leads in this campaign</h2>
+        <span style="flex:1"></span>
+        <select id="leadFilter" style="width:auto">
+          <option value="">All</option><option value="pending">Waiting</option>
+          <option value="dialing">Dialling</option><option value="completed">Reached</option>
+          <option value="exhausted">Gave up</option><option value="suppressed">Opted out</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Number</th><th>Name</th><th>Status</th><th>Tries</th><th>Last outcome</th><th>Next attempt</th><th></th></tr></thead>
+          <tbody id="leadRows"><tr><td colspan="7" class="empty">Pick a campaign to see its leads.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Test agent ------------------------------------------------------ -->
+  <section class="page hidden" id="page-test">
+    <div class="page-tag"><i></i> Agent preview</div>
+    <h1>Test Your Agent</h1>
+    <p class="subtitle">Hear exactly what a lead will hear, without spending a call.</p>
+
+    <div class="split">
+      <div class="card">
+        <div class="section-head"><span class="dot"></span><h2>Talk in your browser</h2></div>
+        <div class="actions">
+          <button class="btn primary" id="micStart">Start microphone</button>
+          <button class="btn" id="micStop" disabled>Stop</button>
+        </div>
+        <div class="level"><i id="micLevel"></i></div>
+        <div class="field" style="margin-top:16px">
+          <label for="typed">Or type a message</label>
+          <input type="text" id="typed" placeholder="Type and press Enter…" />
+        </div>
+        <div class="feed" id="convoFeed" style="height:250px"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-head"><span class="dot"></span><h2>Call a real phone</h2></div>
+        <div class="field">
+          <label for="testNumber">Number to call</label>
+          <input type="text" id="testNumber" placeholder="9876543210" />
+          <div class="hint">Dials immediately, ignoring calling windows and attempt limits. Use your own phone first.</div>
+        </div>
+        <div class="actions"><button class="btn primary" id="placeCall">Place test call</button></div>
+        <div class="note info" style="margin-top:16px">
+          <div>Calls are placed from <b id="testFrom">your Plivo number</b>. The first real call is the fastest way to prove the whole chain works end to end.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Opt-out --------------------------------------------------------- -->
+  <section class="page hidden" id="page-optout">
+    <div class="page-tag"><i></i> Compliance</div>
+    <h1>Opt-out List</h1>
+    <p class="subtitle">Numbers here are never dialled, on any campaign.</p>
+
+    <div class="card">
+      <div class="grid2">
+        <div class="field">
+          <label for="optoutNumber">Add a number</label>
+          <input type="text" id="optoutNumber" placeholder="9876543210" />
+        </div>
+        <div class="field">
+          <label for="optoutReason">Reason</label>
+          <input type="text" id="optoutReason" placeholder="asked not to be called again" />
+        </div>
+      </div>
+      <div class="actions"><button class="btn danger" id="addOptOut">Add to opt-out list</button></div>
+      <div class="field" style="margin-top:18px">
+        <label for="optoutBulk">Bulk add — one number per line</label>
+        <textarea id="optoutBulk" placeholder="9876543210&#10;9812345678"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn" id="bulkOptOut">Import list</button>
+        <span id="optoutResult" class="muted"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Number</th><th>Reason</th><th>Added</th><th></th></tr></thead>
+          <tbody id="optoutRows"><tr><td colspan="4" class="empty">Nothing suppressed yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call reports ---------------------------------------------------- -->
+  <section class="page hidden" id="page-calls">
+    <div class="page-tag"><i></i> Reporting</div>
+    <h1>Call Reports</h1>
+    <p class="subtitle">Every call, with what was said on it.</p>
+
+    <div class="card">
+      <div class="callout hidden" id="callFilterNote" style="margin-bottom:14px">
+        <span id="callFilterText"></span>
+        <button class="btn sm" id="callFilterClear" style="margin-left:10px">Show all calls</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Number</th><th>Started</th><th>Secs</th><th>Status</th><th>Tile requirement</th><th>Outcome</th><th></th></tr></thead>
+          <tbody id="callRows"><tr><td colspan="6" class="empty">No calls yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card hidden" id="transcriptCard">
+      <div class="section-head"><span class="dot"></span><h2>Transcript</h2>
+        <span style="flex:1"></span>
+        <button class="btn sm" id="closeTranscript">Close</button>
+      </div>
+      <div id="callDetails"></div>
+      <div id="callPace" class="note hidden"></div>
+      <div class="feed" id="transcriptFeed"></div>
+    </div>
+  </section>
+
+  <!-- Activity -------------------------------------------------------- -->
+  <section class="page hidden" id="page-activity">
+    <div class="page-tag"><i></i> Diagnostics</div>
+    <h1>Activity Log</h1>
+    <p class="subtitle">What the server has been doing. Useful when something looks stuck.</p>
+    <div class="card">
+      <div class="actions" style="margin-bottom:12px">
+        <button class="btn" id="refreshLogs">Refresh</button>
+        <button class="btn" id="runReconcile">Clear stuck calls</button>
+      </div>
+      <div class="feed" id="logFeed" style="height:460px"></div>
+    </div>
+  </section>
+
+  <!-- Settings -------------------------------------------------------- -->
+  <section class="page hidden" id="page-settings">
+    <div class="page-tag"><i></i> System</div>
+    <h1>Settings &amp; Health</h1>
+    <p class="subtitle">Check every link in the chain before you run a campaign.</p>
+
+    <div class="card">
+      <div class="section-head"><span class="dot"></span><h2>Connection checks</h2></div>
+      <p class="muted" style="margin-top:0">Run these in order. Each one has to pass before calls will work.</p>
+
+      <div class="actions" style="margin-bottom:14px">
+        <button class="btn primary" id="runAllTests">Run all checks</button>
+      </div>
+
+      <div id="testXai"      class="note info"><div><b>1. xAI agent</b><br><span>Not checked yet.</span></div></div>
+      <div id="testPlivo"    class="note info"><div><b>2. Plivo account</b><br><span>Not checked yet.</span></div></div>
+      <div id="testSocket"   class="note info"><div><b>3. WebSocket support</b><br><span>Not checked yet.</span></div></div>
+    </div>
+
+    <div class="card">
+      <div class="section-head"><span class="dot"></span><h2>This deployment</h2></div>
+      <div class="table-wrap">
+        <table><tbody id="settingRows"></tbody></table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head"><span class="dot"></span><h2>Point Plivo at this server</h2></div>
+      <p class="muted" style="margin-top:0">In the Plivo console, open your number's application and set these URLs.</p>
+      <div class="table-wrap">
+        <table><tbody id="webhookRows"></tbody></table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<script src="app.js" type="module"></script>
+</body>
+</html>

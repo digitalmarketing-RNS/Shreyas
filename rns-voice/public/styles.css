@@ -1,0 +1,478 @@
+/* RNS Voice Agent — dashboard styling.
+   Light surface, blue accent, fixed left rail. */
+
+:root {
+  --blue-50:  #eef4ff;
+  --blue-100: #dbe7ff;
+  --blue-200: #bcd2ff;
+  --blue-500: #2f6bed;
+  --blue-600: #1f56d3;
+  --blue-700: #1846ad;
+
+  --ink:      #101828;
+  --ink-2:    #344054;
+  --muted:    #667085;
+  --faint:    #98a2b3;
+
+  --bg:       #f6f8fc;
+  --card:     #ffffff;
+  --line:     #e6eaf2;
+
+  --ok:       #12805c;
+  --ok-bg:    #e5f6ef;
+  --warn:     #b25e09;
+  --warn-bg:  #fdf3e6;
+  --bad:      #b42318;
+  --bad-bg:   #fdeceb;
+
+  --radius:   12px;
+  --shadow:   0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .04);
+  --sidebar:  252px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font: inherit; }
+
+/* ---------------------------------------------------------------- sidebar */
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar);
+  background: var(--card);
+  border-right: 1px solid var(--line);
+  padding: 18px 0;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 20px 20px;
+  font-size: 17px; font-weight: 700; letter-spacing: -.01em;
+}
+.brand .mark {
+  width: 32px; height: 32px; border-radius: 9px; flex: none;
+  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+  color: #fff; display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; letter-spacing: .02em;
+}
+
+.nav-group { padding: 14px 12px 4px; }
+.nav-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--faint); padding: 0 8px 8px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 12px; margin-bottom: 2px;
+  border-radius: 9px; cursor: pointer;
+  color: var(--ink-2); font-weight: 500;
+  border: 0; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--bg); }
+.nav-item.active { background: var(--blue-50); color: var(--blue-700); font-weight: 600; }
+.nav-item svg { width: 17px; height: 17px; flex: none; stroke-width: 1.9; }
+.nav-item .count {
+  margin-left: auto; font-size: 11px; font-weight: 600;
+  background: var(--blue-100); color: var(--blue-700);
+  padding: 1px 7px; border-radius: 999px;
+}
+
+/* ------------------------------------------------------------------ shell */
+
+.shell { margin-left: var(--sidebar); min-height: 100vh; }
+
+.topbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 28px; background: var(--card);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar .eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.status-dot {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 600;
+  padding: 4px 11px; border-radius: 999px;
+  background: var(--ok-bg); color: var(--ok);
+}
+.status-dot i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.status-dot.down { background: var(--bad-bg); color: var(--bad); }
+.status-dot.warn { background: var(--warn-bg); color: var(--warn); }
+
+.page { padding: 26px 28px 60px; max-width: 1500px; }
+.page.hidden { display: none; }
+
+/* `hidden` is applied from script to cards, notes and buttons alike, and until
+   this existed it was only honoured on the handful of elements that happened
+   to have their own rule — an empty Transcript card sat open on Call Reports
+   because .card.hidden matched nothing. !important because it has to beat
+   more specific display rules such as button.btn's inline-flex. */
+.hidden { display: none !important; }
+
+.page-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 600; color: var(--blue-700);
+  background: var(--blue-50); padding: 4px 11px; border-radius: 999px;
+  margin-bottom: 12px;
+}
+.page-tag i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
+.subtitle { color: var(--muted); margin: 0 0 24px; }
+
+h2 { font-size: 16px; margin: 0 0 2px; letter-spacing: -.01em; }
+.section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.section-head .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue-500); }
+
+/* ------------------------------------------------------------------ cards */
+
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 18px 20px; margin-bottom: 18px;
+}
+.card > h2 { margin-bottom: 14px; }
+
+.stat-grid {
+  display: grid; gap: 14px; margin-bottom: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+/* Six cards auto-fit to 5 + 1, which reads as a mistake. Three across gives 3 + 3. */
+@media (min-width: 1150px) { .stat-grid { grid-template-columns: repeat(3, 1fr); } }
+.stat {
+  background: linear-gradient(135deg, var(--blue-50), #f4f8ff);
+  border: 1px solid var(--blue-100);
+  border-radius: var(--radius); padding: 16px 18px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+}
+.stat .label {
+  font-size: 11px; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+}
+.stat .value { font-size: 25px; font-weight: 700; letter-spacing: -.02em; }
+.stat .icon { color: var(--blue-500); opacity: .85; }
+.stat .icon svg { width: 21px; height: 21px; stroke-width: 1.8; }
+
+.split { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 1150px) { .split { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------ forms */
+
+label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin: 0 0 5px; }
+.field { margin-bottom: 14px; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 5px; font-weight: 400; }
+
+input[type=text], input[type=password], input[type=number], input[type=file], select, textarea {
+  width: 100%; padding: 9px 11px;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: #fff; color: var(--ink); outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--blue-500); box-shadow: 0 0 0 3px var(--blue-50);
+}
+textarea { resize: vertical; min-height: 76px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 760px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+.days { display: flex; gap: 6px; flex-wrap: wrap; }
+.days label {
+  display: flex; align-items: center; gap: 6px; margin: 0;
+  padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px;
+  cursor: pointer; font-weight: 500; background: #fff;
+}
+.days label.on { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-700); }
+.days input { display: none; }
+
+button.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: 9px; cursor: pointer;
+  border: 1px solid var(--line); background: #fff; color: var(--ink-2);
+  font-weight: 600;
+}
+button.btn:hover:not(:disabled) { border-color: var(--blue-200); color: var(--blue-700); }
+button.btn:disabled { opacity: .5; cursor: not-allowed; }
+button.btn.primary {
+  background: var(--blue-500); border-color: var(--blue-500); color: #fff;
+}
+button.btn.primary:hover:not(:disabled) { background: var(--blue-600); border-color: var(--blue-600); color: #fff; }
+button.btn.danger { color: var(--bad); border-color: #f3d4d1; }
+button.btn.danger:hover:not(:disabled) { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+button.btn.sm { padding: 5px 11px; font-size: 12.5px; }
+
+.actions { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  padding: 10px 12px; background: var(--bg);
+  border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+th:first-child { border-radius: 8px 0 0 0; }
+th:last-child { border-radius: 0 8px 0 0; }
+td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+.empty { text-align: center; color: var(--faint); padding: 30px 12px; }
+
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+.muted { color: var(--muted); }
+.sub { font-size: 12px; color: var(--faint); }
+/* Wraps rather than truncating: a carrier's rejection reason is the whole
+   point of the row and is often a full sentence. */
+.err-reason { color: var(--bad); max-width: 380px; white-space: normal; }
+
+.badge {
+  display: inline-block; padding: 3px 9px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600; background: var(--bg); color: var(--muted);
+}
+.badge.draft     { background: var(--bg);       color: var(--muted); }
+.badge.running   { background: var(--blue-50);  color: var(--blue-700); }
+.badge.completed { background: var(--ok-bg);    color: var(--ok); }
+.badge.paused    { background: var(--warn-bg);  color: var(--warn); }
+.badge.failed,
+.badge.no_answer { background: var(--bad-bg);   color: var(--bad); }
+.badge.answered  { background: var(--ok-bg);    color: var(--ok); }
+
+/* The tile-requirement answer. Yes and No are read the same way and carry the
+   same confidence, so they are weighted alike — only the colour differs. */
+.badge.want-yes  { background: var(--ok-bg);    color: var(--ok); }
+.badge.want-no   { background: var(--bad-bg);   color: var(--bad); }
+
+/* The caller's own words under the answer. Kept small and quiet: it is there
+   to be checked, not read. */
+.quote {
+  max-width: 26ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.bar { height: 6px; background: var(--blue-50); border-radius: 3px; overflow: hidden; min-width: 110px; }
+.bar > i { display: block; height: 100%; background: var(--blue-500); border-radius: 3px; }
+
+/* ------------------------------------------------------------------- feed */
+
+.feed {
+  height: 300px; overflow-y: auto;
+  background: #fbfcfe; border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+}
+.feed .line { padding: 3px 4px; border-bottom: 1px solid #eef1f6; display: flex; gap: 9px; }
+/* The turn the tile-requirement column was read from. */
+.feed .line.answer { background: var(--blue-50); border-radius: 4px; }
+/* How long the caller waited for this reply. Three seconds is about where a
+   person stops believing anyone is there and says "hello?" again, so past that
+   it is called out rather than just reported. */
+.feed .line .tag.gap { color: var(--muted); }
+.feed .line .tag.gap.slow { color: var(--bad); font-weight: 600; }
+.feed .line .tag {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--blue-700);
+  white-space: nowrap;
+}
+.feed .line:last-child { border-bottom: 0; }
+.feed .at { color: var(--faint); flex: none; }
+.feed .agent  { color: var(--blue-600); }
+.feed .caller { color: var(--ok); }
+.feed .err    { color: var(--bad); }
+
+/* ------------------------------------------------------------------ chart */
+
+.chart { width: 100%; height: 190px; }
+.chart .grid-line { stroke: var(--line); stroke-width: 1; }
+.chart .axis { fill: var(--faint); font-size: 10px; }
+.chart .bar-rect { fill: var(--blue-500); rx: 4; }
+
+/* ------------------------------------------------------------------ notes */
+
+.note {
+  display: flex; gap: 11px; padding: 12px 14px;
+  border-radius: 10px; font-size: 13px; margin-bottom: 12px;
+  border: 1px solid; align-items: flex-start;
+}
+.note.warn { background: var(--warn-bg); border-color: #f5dcb8; color: #7a4406; }
+.note.bad  { background: var(--bad-bg);  border-color: #f3d4d1; color: #8c1d16; }
+.note.ok   { background: var(--ok-bg);   border-color: #c5e8d9; color: #0a5c42; }
+.note.info { background: var(--blue-50); border-color: var(--blue-100); color: var(--blue-700); }
+.note b { font-weight: 700; }
+
+.level { height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.level > i { display: block; height: 100%; width: 0; background: var(--blue-500); transition: width .08s linear; }
+
+/* ----------------------------------------------------- campaign studio */
+
+.page-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 18px; flex-wrap: wrap;
+}
+.page-head .subtitle { margin-bottom: 18px; }
+button.btn.lg { padding: 10px 16px; font-size: 14px; }
+button.btn.lg svg { width: 16px; height: 16px; }
+
+.toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.search { position: relative; flex: 1; min-width: 200px; }
+.search svg {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--faint); pointer-events: none;
+}
+.search input { padding-left: 34px; }
+.filter { max-width: 190px; }
+
+/* The id is long and worth copying, but not worth the width it would take. */
+.idcell { display: inline-flex; align-items: center; gap: 6px; }
+.idcell code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px; color: var(--muted);
+}
+.copy {
+  border: 0; background: none; cursor: pointer; color: var(--faint);
+  padding: 2px; border-radius: 4px; line-height: 0;
+}
+.copy:hover { color: var(--blue-600); background: var(--blue-50); }
+.copy svg { width: 13px; height: 13px; }
+.copy.done { color: var(--ok); }
+
+/* ------------------------------------------------------------- wizard */
+
+.stepper {
+  display: flex; align-items: center; gap: 8px;
+  padding: 20px 26px 4px; justify-content: center;
+}
+.stepper .step {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 600;
+  background: var(--bg); color: var(--faint);
+  border: 1px solid var(--line); flex: none;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.stepper .step.on { background: var(--blue-500); border-color: var(--blue-500); color: #fff; }
+.stepper .step.done { background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-700); }
+.stepper > i { flex: 1; max-width: 70px; height: 2px; background: var(--line); border-radius: 1px; }
+.stepper > i.on { background: var(--blue-200); }
+
+.req { color: var(--bad); }
+
+.chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 7px 15px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card);
+  font: inherit; font-weight: 600; font-size: 13.5px; color: var(--muted);
+}
+.chip:hover { border-color: var(--blue-200); color: var(--blue-700); }
+.chip.on { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-700); }
+.chips input[type="number"] { width: 80px; }
+
+.callout {
+  background: var(--blue-50); border: 1px solid var(--blue-200);
+  color: var(--blue-700); border-radius: 9px;
+  padding: 10px 13px; font-size: 13px; font-weight: 500;
+}
+.callout.warn { background: var(--warn-bg); border-color: #f3e2c0; color: var(--warn); }
+
+.advanced { margin: 4px 0 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.advanced > summary {
+  cursor: pointer; font-weight: 600; font-size: 13.5px;
+  color: var(--blue-700); padding: 4px 0; list-style: none;
+}
+.advanced > summary::-webkit-details-marker { display: none; }
+.advanced > summary::before { content: "▸ "; }
+.advanced[open] > summary::before { content: "▾ "; }
+.advanced > summary + * { margin-top: 14px; }
+
+.howto {
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: 9px; padding: 13px 15px; font-size: 13px;
+}
+.howto b { display: block; margin-bottom: 7px; }
+.howto ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.howto li { margin-bottom: 4px; }
+
+/* ------------------------------------------------------------------ modal */
+
+.gate {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(16, 24, 40, .55); backdrop-filter: blur(3px);
+  display: grid; place-items: center; padding: 20px;
+}
+.gate .box {
+  background: var(--card); border-radius: 14px; padding: 26px;
+  width: 100%; max-width: 380px; box-shadow: 0 20px 40px rgba(16, 24, 40, .2);
+}
+.gate.hidden { display: none; }
+
+.modal {
+  position: fixed; inset: 0; z-index: 110;
+  background: rgba(16, 24, 40, .55); backdrop-filter: blur(3px);
+  display: grid; place-items: center; padding: 20px;
+}
+.modal.hidden { display: none; }
+.modal .box {
+  background: var(--card); border-radius: 14px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 20px 40px rgba(16, 24, 40, .2);
+  /* The wizard is taller than a short laptop screen once Advanced is open, so
+     the body scrolls while the header, stepper and buttons stay put. */
+  display: flex; flex-direction: column; max-height: calc(100vh - 40px);
+}
+.modal .box.wide { max-width: 620px; }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 26px 0; flex: none;
+}
+.modal-head h2 { margin: 0; }
+.modal-body { padding: 18px 26px 4px; overflow-y: auto; flex: 1; }
+.modal-foot {
+  display: flex; align-items: center; gap: 9px;
+  padding: 16px 26px 20px; flex: none;
+  border-top: 1px solid var(--line); margin-top: 12px;
+}
+.modal-foot .spacer { flex: 1; }
+.icon-btn {
+  border: 0; background: none; cursor: pointer; color: var(--faint);
+  padding: 5px; border-radius: 7px; line-height: 0;
+}
+.icon-btn:hover { background: var(--bg); color: var(--ink); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+.toast {
+  position: fixed; right: 20px; bottom: 20px; z-index: 200;
+  background: var(--ink); color: #fff; padding: 12px 17px;
+  border-radius: 10px; box-shadow: 0 10px 24px rgba(16, 24, 40, .25);
+  max-width: 380px; font-size: 13px;
+}
+.toast.hidden { display: none; }
+.toast.bad { background: var(--bad); }
+.toast.ok  { background: var(--ok); }
+
+@media (max-width: 860px) {
+  .sidebar { transform: translateX(-100%); transition: transform .2s; }
+  .sidebar.open { transform: none; }
+  .shell { margin-left: 0; }
+  .page { padding: 18px 16px 50px; }
+}
+/* Matches button.btn's specificity so the toggle stays hidden on desktop. */
+button.menu-toggle { display: none; }
+@media (max-width: 860px) { button.menu-toggle { display: inline-flex; } }
