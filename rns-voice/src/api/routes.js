@@ -10,6 +10,7 @@ import { reconcile, tick } from '../campaign/dialer.js';
 import { activeBridge, activeBridgeCount } from '../plivo/bridge.js';
 import { accountInfo, listNumbers, placeCall, hangupCall } from '../plivo/client.js';
 import { probeXai } from '../xai/realtime.js';
+import { tileInterest } from '../report/interest.js';
 
 export const apiRouter = Router();
 
@@ -286,19 +287,30 @@ apiRouter.delete('/leads/:id', (req, res) => res.json({ deleted: leads.remove(re
 // Calls
 // ---------------------------------------------------------------------------
 
+/**
+ * Adds the tile-requirement answer read back out of the transcript.
+ *
+ * Derived on the way out rather than stored on the call, so it covers calls
+ * that were made before this existed and so improving how the answer is read
+ * never needs old records rewritten. The stored record is not touched.
+ */
+function withInterest(record) {
+  return { ...record, tileInterest: tileInterest(record.transcript) };
+}
+
 apiRouter.get('/calls', (req, res) => {
   res.json(
     calls.list({
       campaignId: req.query.campaignId ? String(req.query.campaignId) : undefined,
       limit: req.query.limit ? Number(req.query.limit) : undefined,
-    }),
+    }).map(withInterest),
   );
 });
 
 apiRouter.get('/calls/:id', (req, res) => {
   const record = calls.get(req.params.id);
   if (!record) return res.status(404).json({ error: 'No such call.' });
-  res.json(record);
+  res.json(withInterest(record));
 });
 
 /** Places one call immediately — the quickest end-to-end check of a deployment. */

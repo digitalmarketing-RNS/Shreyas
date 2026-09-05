@@ -599,6 +599,15 @@ function renderCallRows(list, target, compact) {
          <td class="sub">${new Date(c.startedAt).toLocaleString()}</td>
          <td>${c.durationSeconds ?? '—'}</td>
          <td><span class="badge ${c.status}">${esc(c.status)}</span></td>
+         ${/* What the person said when asked whether they have a tile
+              requirement, read back out of their own transcript. The sentence
+              it was read from is on the cell, so a Yes or No can be checked
+              without opening the call; a call that never gave a clear answer
+              shows a dash rather than a guess. */''}
+         <td>${c.tileInterest?.answer
+             ? `<span class="badge want-${c.tileInterest.answer}" title="Caller said: ${esc(c.tileInterest.quote)}">${c.tileInterest.answer === 'yes' ? 'Yes' : 'No'}</span>
+                <div class="sub quote">“${esc(c.tileInterest.quote)}”</div>`
+             : '<span class="muted">—</span>'}</td>
          <td><span class="badge ${c.disposition ?? ''}">${esc(c.disposition ?? '—')}</span>
              ${c.details?.outcome ? `<div class="sub">${esc(c.details.outcome)}</div>` : ''}
              ${/* A bare "failed" badge tells the operator nothing they can act
@@ -610,7 +619,7 @@ function renderCallRows(list, target, compact) {
            ${!c.endedAt ? `<button class="btn sm danger" data-hangup="${c.id}">End</button>` : ''}
          </td>
        </tr>`).join('');
-  $(target).innerHTML = rows || `<tr><td colspan="${compact ? 3 : 6}" class="empty">No calls yet.</td></tr>`;
+  $(target).innerHTML = rows || `<tr><td colspan="${compact ? 3 : 7}" class="empty">No calls yet.</td></tr>`;
 }
 
 /** Set when the operator opened this page from one campaign's Report button. */
@@ -667,9 +676,14 @@ $('callRows').addEventListener('click', async (e) => {
         }</div></div>`
       : '<p class="muted">The agent did not record any structured details on this call.</p>';
 
-    $('transcriptFeed').innerHTML = call.transcript.map((t) =>
-      `<div class="line"><span class="at">${new Date(t.at).toLocaleTimeString()}</span>
-       <span class="${t.role}">${t.role === 'agent' ? 'Agent' : 'Person'}: ${esc(t.text)}</span></div>`).join('')
+    // The line the tile-requirement column was read from is marked here, so
+    // the column can be checked against the transcript rather than believed.
+    const answeredAt = call.tileInterest?.index ?? -1;
+    $('transcriptFeed').innerHTML = call.transcript.map((t, i) =>
+      `<div class="line${i === answeredAt ? ' answer' : ''}"><span class="at">${new Date(t.at).toLocaleTimeString()}</span>
+       <span class="${t.role}">${t.role === 'agent' ? 'Agent' : 'Person'}: ${esc(t.text)}</span>${
+         i === answeredAt ? `<span class="tag">tile requirement: ${call.tileInterest.answer}</span>` : ''
+       }</div>`).join('')
       || '<div class="line muted">Nothing was transcribed on this call.</div>';
     $('transcriptCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }

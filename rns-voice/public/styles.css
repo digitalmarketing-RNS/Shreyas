@@ -253,6 +253,21 @@ tr:last-child td { border-bottom: 0; }
 .badge.no_answer { background: var(--bad-bg);   color: var(--bad); }
 .badge.answered  { background: var(--ok-bg);    color: var(--ok); }
 
+/* The tile-requirement answer. Yes and No are read the same way and carry the
+   same confidence, so they are weighted alike — only the colour differs. */
+.badge.want-yes  { background: var(--ok-bg);    color: var(--ok); }
+.badge.want-no   { background: var(--bad-bg);   color: var(--bad); }
+
+/* The caller's own words under the answer. Kept small and quiet: it is there
+   to be checked, not read. */
+.quote {
+  max-width: 26ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: italic;
+}
+
 .bar { height: 6px; background: var(--blue-50); border-radius: 3px; overflow: hidden; min-width: 110px; }
 .bar > i { display: block; height: 100%; background: var(--blue-500); border-radius: 3px; }
 
@@ -264,6 +279,14 @@ tr:last-child td { border-bottom: 0; }
   padding: 10px; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
 }
 .feed .line { padding: 3px 4px; border-bottom: 1px solid #eef1f6; display: flex; gap: 9px; }
+/* The turn the tile-requirement column was read from. */
+.feed .line.answer { background: var(--blue-50); border-radius: 4px; }
+.feed .line .tag {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--blue-700);
+  white-space: nowrap;
+}
 .feed .line:last-child { border-bottom: 0; }
 .feed .at { color: var(--faint); flex: none; }
 .feed .agent  { color: var(--blue-600); }
