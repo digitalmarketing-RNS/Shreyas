@@ -362,9 +362,15 @@ export class PlivoBridge {
   wire(session, record, lead) {
     const callId = this.callId;
 
-    // A session built here rather than claimed from the prewarm cache has not
-    // been given the call facts yet.
-    if (!session.ready) {
+    // Give the agent the call facts. sendCallFacts sends them once per session,
+    // so a session already briefed while it was prewarming is not briefed
+    // again — the old test here was whether the socket had finished opening,
+    // which is not the same question and got it wrong for a session claimed
+    // mid-handshake: briefed by the prewarm, then briefed a second time here.
+    if (session.ready) {
+      const facts = callFacts(record, lead);
+      if (facts) session.sendCallFacts(facts);
+    } else {
       session.on('open', () => {
         const facts = callFacts(record, lead);
         if (facts) session.sendCallFacts(facts);

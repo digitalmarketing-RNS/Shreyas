@@ -76,6 +76,8 @@ export class XaiSession extends EventEmitter {
     this.pending = [];
     /** Whether the agent's own audio settings have been handed back yet. */
     this.audioRestored = false;
+    /** Whether this call's facts have been given to the agent. */
+    this.factsSent = false;
   }
 
   connect() {
@@ -292,7 +294,18 @@ export class XaiSession extends EventEmitter {
    * never phrased as one. Facts only — the agent decides what to do with
    * them, exactly as it decides everything else.
    */
+  /**
+   * Gives the agent the facts about this call, once.
+   *
+   * Once is the point. A session can be briefed by whoever opened it and then
+   * briefed again by whoever picked it up, and the same metadata arriving twice
+   * makes the number look like something worth remarking on rather than
+   * something already known. The flag lives on the session because that is what
+   * both callers share.
+   */
   sendCallFacts(text) {
+    if (this.factsSent) return;
+    this.factsSent = true;
     this.send({
       type: 'conversation.item.create',
       item: { type: 'message', role: 'system', content: [{ type: 'input_text', text }] },
