@@ -663,15 +663,29 @@ async function refreshCalls() {
   }
 }
 
-/** Draws the pager, and hides it when every call already fits on one page. */
+/**
+ * Draws the pager.
+ *
+ * The count is always shown, even when there is only one page. Hiding it was a
+ * mistake: the question this answers is "am I seeing all of them?", and a table
+ * with no count cannot answer it either way — you cannot tell twelve calls from
+ * the first twelve of two hundred. Only the buttons go away when there is
+ * nowhere to page to.
+ */
 function renderCallPager({ total, limit, offset }) {
-  const pager = $('callPager');
-  pager.classList.toggle('hidden', total <= limit);
-  if (total <= limit) return;
+  // Nothing recorded at all: the empty table already says so.
+  $('callPager').classList.toggle('hidden', total === 0);
+  if (total === 0) return;
 
   const first = offset + 1;
   const last = Math.min(offset + limit, total);
-  $('callRange').textContent = `Showing ${first}–${last} of ${total} calls`;
+  $('callRange').textContent = total <= limit
+    ? `${total} ${total === 1 ? 'call' : 'calls'}, all shown`
+    : `Showing ${first}–${last} of ${total} calls`;
+
+  const onePage = total <= limit;
+  $('callPrev').hidden = onePage;
+  $('callNext').hidden = onePage;
   $('callPrev').disabled = offset === 0;
   $('callNext').disabled = last >= total;
 }
