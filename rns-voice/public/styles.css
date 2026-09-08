@@ -476,3 +476,14 @@ button.btn.lg svg { width: 16px; height: 16px; }
 /* Matches button.btn's specificity so the toggle stays hidden on desktop. */
 button.menu-toggle { display: none; }
 @media (max-width: 860px) { button.menu-toggle { display: inline-flex; } }
+
+/* Paging under the call table. Hidden entirely when everything already fits —
+   a pager with nothing to page is just noise. */
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px 2px;
+}
+.pager .sub { flex: 1; text-align: center; }
+.pager button[disabled] { opacity: .45; cursor: default; }

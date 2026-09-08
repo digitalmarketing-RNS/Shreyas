@@ -305,13 +305,21 @@ function withInterest(record) {
   };
 }
 
+/** Keeps a hand-typed limit from asking for the whole history in one request. */
+const MAX_PAGE = 200;
+
 apiRouter.get('/calls', (req, res) => {
-  res.json(
-    calls.list({
-      campaignId: req.query.campaignId ? String(req.query.campaignId) : undefined,
-      limit: req.query.limit ? Number(req.query.limit) : undefined,
-    }).map(withInterest),
-  );
+  const asked = Number(req.query.limit);
+  const limit = Number.isFinite(asked) ? Math.min(Math.max(1, Math.trunc(asked)), MAX_PAGE) : 50;
+  const from = Number(req.query.offset);
+  const offset = Number.isFinite(from) ? Math.max(0, Math.trunc(from)) : 0;
+
+  const { items, total } = calls.list({
+    campaignId: req.query.campaignId ? String(req.query.campaignId) : undefined,
+    limit,
+    offset,
+  });
+  res.json({ calls: items.map(withInterest), total, limit, offset });
 });
 
 apiRouter.get('/calls/:id', (req, res) => {

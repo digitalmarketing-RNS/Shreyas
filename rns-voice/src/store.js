@@ -408,11 +408,23 @@ export const calls = {
     return call.details;
   },
 
-  list({ campaignId, limit = 50 } = {}) {
-    return data.calls
+  /**
+   * One page of calls, newest first, with the total behind it.
+   *
+   * The total is what makes a page navigable: without it the dashboard can
+   * show fifty calls and no way to know whether that is all of them. It counts
+   * the calls matching the filter, not the page.
+   */
+  list({ campaignId, limit = 50, offset = 0 } = {}) {
+    const matching = data.calls
       .filter((c) => !campaignId || c.campaignId === campaignId)
-      .sort((a, b) => b.startedAt.localeCompare(a.startedAt))
-      .slice(0, limit);
+      .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+    // An offset past the end returns an empty page rather than the last one —
+    // silently showing different calls than were asked for is worse than a
+    // page that is plainly empty.
+    const from = Math.max(0, Math.trunc(offset) || 0);
+    const size = Math.max(1, Math.trunc(limit) || 1);
+    return { items: matching.slice(from, from + size), total: matching.length };
   },
 
   activeCount(campaignId) {

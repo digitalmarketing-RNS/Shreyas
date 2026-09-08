@@ -297,6 +297,8 @@ async function campaignAction(event) {
     // this campaign rather than building a second, lesser view of the same
     // rows. Navigating triggers the refresh, so none is issued here.
     callsScopedTo = id;
+    // A different set of calls is a different first page.
+    callsOffset = 0;
     showPage('calls');
     return;
   }
@@ -625,14 +627,30 @@ function renderCallRows(list, target, compact) {
 /** Set when the operator opened this page from one campaign's Report button. */
 let callsScopedTo = null;
 
+/** How many calls a page of the report holds, and where the current page starts. */
+const CALLS_PER_PAGE = 50;
+let callsOffset = 0;
+
 async function refreshCalls() {
   const scope = callsScopedTo ? `&campaignId=${encodeURIComponent(callsScopedTo)}` : '';
-  const list = await api(`/calls?limit=60${scope}`);
-  renderCallRows(list, 'callRows', false);
+  let page = await api(`/calls?limit=${CALLS_PER_PAGE}&offset=${callsOffset}${scope}`);
+
+  // Calls end and campaigns are deleted while someone is reading, so the page
+  // they are on can fall off the end. Step back to the last real page rather
+  // than showing them an empty table and no way out of it.
+  if (!page.calls.length && callsOffset > 0 && page.total > 0) {
+    callsOffset = Math.max(0, (Math.ceil(page.total / CALLS_PER_PAGE) - 1) * CALLS_PER_PAGE);
+    page = await api(`/calls?limit=${CALLS_PER_PAGE}&offset=${callsOffset}${scope}`);
+  }
+
+  renderCallRows(page.calls, 'callRows', false);
+  renderCallPager(page);
 
   // The dashboard's recent-calls list is never scoped — it is the whole system
   // at a glance, and quietly filtering it would misreport how much is running.
-  const unscoped = callsScopedTo ? await api('/calls?limit=8') : list.slice(0, 8);
+  const unscoped = callsScopedTo || callsOffset > 0
+    ? (await api('/calls?limit=8')).calls
+    : page.calls.slice(0, 8);
   renderCallRows(unscoped.slice(0, 8), 'dashCalls', true);
 
   const note = $('callFilterNote');
@@ -645,8 +663,34 @@ async function refreshCalls() {
   }
 }
 
+/** Draws the pager, and hides it when every call already fits on one page. */
+function renderCallPager({ total, limit, offset }) {
+  const pager = $('callPager');
+  pager.classList.toggle('hidden', total <= limit);
+  if (total <= limit) return;
+
+  const first = offset + 1;
+  const last = Math.min(offset + limit, total);
+  $('callRange').textContent = `Showing ${first}–${last} of ${total} calls`;
+  $('callPrev').disabled = offset === 0;
+  $('callNext').disabled = last >= total;
+}
+
+$('callPrev').addEventListener('click', async () => {
+  callsOffset = Math.max(0, callsOffset - CALLS_PER_PAGE);
+  await refreshCalls();
+  $('callRows').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+$('callNext').addEventListener('click', async () => {
+  callsOffset += CALLS_PER_PAGE;
+  await refreshCalls();
+  $('callRows').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
 $('callFilterClear').addEventListener('click', async () => {
   callsScopedTo = null;
+  callsOffset = 0;
   await refreshCalls();
 });
 
