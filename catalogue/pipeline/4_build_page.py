@@ -178,7 +178,8 @@ dialog::backdrop{background:rgba(18,18,17,.72);backdrop-filter:blur(3px)}
 .d-in{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr)}
 .d-img{background:var(--surface-2);display:flex;align-items:center;
   justify-content:center;padding:26px;border-right:1px solid var(--line)}
-.d-img img{max-width:100%;max-height:64vh;display:block;border:1px solid var(--line)}
+.d-img img{width:100%;max-width:400px;max-height:60vh;display:block;
+  border:1px solid var(--line)}
 .d-body{padding:26px 28px 24px;display:flex;flex-direction:column;gap:18px;
   max-height:78vh;overflow-y:auto}
 .d-head .kicker{font-family:"IBM Plex Mono",monospace;font-size:12px;
@@ -433,7 +434,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
     <code>DESIGNS NEW FOLDER 11.08.2026</code> on {gen}. Every design links back
     to its original files on Drive.</p>
     <dl class="figures">
-      <div class="fig"><dt>Designs</dt><dd>{len(DATA)}</dd><small>unique tile codes</small></div>
+      <div class="fig"><dt>Designs</dt><dd>{fmt(len(DATA))}</dd><small>unique tile codes</small></div>
       <div class="fig"><dt>Images</dt><dd>{fmt(faces)}</dd><small>faces &amp; renders</small></div>
       <div class="fig"><dt>Formats</dt><dd>{len(size)}</dd><small>600&#215;600 to 800&#215;1600 mm</small></div>
       <div class="fig"><dt>Series</dt><dd>{len(coll)}</dd><small>finishes &amp; collections</small></div>
@@ -475,7 +476,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
       <div class="facet"><span>Series</span>{chips('coll', coll)}</div>
     </div>
     <div class="status">
-      <span>Showing <b id="shown">{len(DATA)}</b> of <b>{len(DATA)}</b> designs</span>
+      <span>Showing <b id="shown">{fmt(len(DATA))}</b> of <b>{fmt(len(DATA))}</b> designs</span>
       <button class="clear" id="clear" hidden>Clear all filters</button>
     </div>
   </div>
@@ -491,7 +492,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
 
 <footer>
   <div class="wrap">
-    <p><strong>Naveen Tile — Master Catalogue.</strong> {len(DATA)} designs indexed from
+    <p><strong>Naveen Tile — Master Catalogue.</strong> {fmt(len(DATA))} designs indexed from
     {fmt(faces)} source images. Thumbnails are compressed previews; open any design to reach
     the full-resolution original on Google Drive.</p>
     <p>Codes, names and series are read from the source folder and filenames; where a filename
@@ -518,7 +519,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
         <div><dt>Files</dt><dd class="mono" id="d-faces"></dd></div>
       </dl>
       <div class="d-sec">
-        <h3>Source images on Drive</h3>
+        <h3>Source images on Drive — full resolution</h3>
         <ul class="files" id="d-files"></ul>
       </div>
       <div class="d-act">

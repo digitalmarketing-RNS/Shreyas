@@ -1,14 +1,18 @@
 """Step 1 — walk the shared Drive design folder and record every file in it.
 
-Writes tree.json: {"<folder path>": [{"id", "name", "mime"}, ...], ...}
+Writes tree.json: {"<folder path>": [{"id", "name"}, ...], ...}
 
-The folder is shared with "anyone with the link", and Google renders its file
-list into the folder page as a `_DRIVE_ivd` blob. We read that rather than the
-Drive API, because the API's search index does not return children for a folder
-that was only shared into the account — it reports the folder as empty.
+The folder is shared "anyone with the link", but Drive's search index reports it
+as empty for an account it was only shared into, so the API is not an option
+here. We read Drive's own `embeddedfolderview` listing instead.
+
+Do NOT go back to scraping the normal folder page's `_DRIVE_ivd` blob: that
+carries only the first page of each folder (50 items), which silently truncated
+the first build of this catalogue to about half the library. `embeddedfolderview`
+returns a folder's full contents in one response. The count check at the end of
+this script exists to catch any future cap of the same kind.
 """
 
-import codecs
 import json
 import re
 import subprocess
@@ -16,49 +20,77 @@ import sys
 import time
 
 ROOT = "1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO"   # DESIGNS NEW FOLDER 11.08.2026
-FOLDER_MIME = "application/vnd.google-apps.folder"
-IVD = re.compile(r"window\['_DRIVE_ivd'\]\s*=\s*'(.*?)';", re.S)
+
+# Each row carries the id on the wrapper div, then a link that reveals whether
+# the row is a folder (/drive/folders/) or a file (/file/d/), then the title.
+ENTRY = re.compile(
+    r'<div class="flip-entry" id="entry-(?P<id>[A-Za-z0-9_-]+)".*?'
+    r'<a href="(?P<href>[^"]+)".*?'
+    r'<div class="flip-entry-title">(?P<name>.*?)</div>',
+    re.S,
+)
+ENTITIES = (("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"), ("&quot;", '"'), ("&#39;", "'"))
 
 
-def listing(folder_id, attempts=3):
-    """Return [[id, _, name, mime, ...], ...] for one folder, or None."""
+def unescape(s):
+    for a, b in ENTITIES:
+        s = s.replace(a, b)
+    return s
+
+
+def listing(folder_id, attempts=4):
+    """Return [{id, name, folder}] for one folder, or None if it could not be read."""
     for attempt in range(attempts):
         page = subprocess.run(
-            ["curl", "-sS", "-L", "--max-time", "90",
-             f"https://drive.google.com/drive/folders/{folder_id}"],
+            ["curl", "-sS", "-L", "--max-time", "120",
+             f"https://drive.google.com/embeddedfolderview?id={folder_id}#list"],
             capture_output=True,
         ).stdout.decode("utf-8", "replace")
-        m = IVD.search(page)
-        if m:
-            try:
-                return json.loads(codecs.decode(m.group(1), "unicode_escape"))[0]
-            except (ValueError, IndexError):
-                pass
+        if "flip-entries" in page:
+            return [
+                {"id": m.group("id"),
+                 "name": unescape(m.group("name")),
+                 "folder": "/drive/folders/" in m.group("href")}
+                for m in ENTRY.finditer(page)
+            ]
         time.sleep(2 * (attempt + 1))
     return None
 
 
-def walk(folder_id, path, tree, depth=0):
+def walk(folder_id, path, tree, stats, depth=0):
     items = listing(folder_id)
     if items is None:
-        print(f"could not read {'/'.join(path) or 'root'}", file=sys.stderr)
+        stats["failed"].append("/".join(path))
+        print(f"!! could not read {'/'.join(path) or 'root'}", file=sys.stderr)
         return
-    for item in items:
-        item_id, name, mime = item[0], item[2], item[3]
-        if mime == FOLDER_MIME:
-            print("  " * depth + f"[dir] {name}", flush=True)
-            walk(item_id, path + [name], tree, depth + 1)
-        else:
-            tree.setdefault("/".join(path), []).append(
-                {"id": item_id, "name": name, "mime": mime})
+    files = [i for i in items if not i["folder"]]
+    if files:
+        tree.setdefault("/".join(path), []).extend(
+            {"id": f["id"], "name": f["name"]} for f in files)
+        print("  " * depth + f"{len(files):5d}  {'/'.join(path) or '(root)'}", flush=True)
+    for sub in (i for i in items if i["folder"]):
+        stats["folders"] += 1
+        walk(sub["id"], path + [sub["name"]], tree, stats, depth + 1)
 
 
 def main():
-    tree = {}
-    walk(ROOT, [], tree)
+    tree, stats = {}, {"folders": 0, "failed": []}
+    walk(ROOT, [], tree, stats)
     json.dump(tree, open("tree.json", "w"), indent=1)
-    files = sum(len(v) for v in tree.values())
-    print(f"\n{files} files across {len(tree)} folders -> tree.json")
+
+    total = sum(len(v) for v in tree.values())
+    print(f"\n{total} files / {len(tree)} leaf folders / {stats['folders']} subfolders")
+    if stats["failed"]:
+        print(f"FAILED to read {len(stats['failed'])} folders: {stats['failed']}",
+              file=sys.stderr)
+
+    # A folder landing on a round number is the signature of a paging cap.
+    suspect = [(k, len(v)) for k, v in tree.items() if len(v) in (50, 100, 200, 500, 1000)]
+    if suspect:
+        print("WARNING: these folders sit exactly on a round count — check for truncation:",
+              file=sys.stderr)
+        for k, n in suspect:
+            print(f"  {n}  {k}", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -22,15 +22,15 @@ import os
 import subprocess
 import sys
 
-THUMB_W = 440          # px — wide enough for the detail view, small enough to inline
-QUALITY = 72           # starting WebP quality
-MAX_BYTES = 36_000     # per-image ceiling; quality steps down until it fits
+THUMB_W = 300          # px — sized so the whole set inlines under the artifact limit
+QUALITY = 68           # starting WebP quality
+MAX_BYTES = 23_000     # per-image ceiling; quality steps down until it fits
 RAW_DIR = "raw"
 WORKERS = 16
 
 # The published page carries every thumbnail inline, so the whole set has to fit
 # inside the artifact size limit once base64 adds its ~33%.
-BUDGET_MB = 12.0
+BUDGET_MB = 13.5
 
 
 def fetch_all(designs):
@@ -52,8 +52,10 @@ def fetch_all(designs):
         '[ "$c" = 200 ] && [ -s "$2" ] && exit 0; sleep $((a*2)); done; '
         'echo "FAILED $1" >&2'
     )
+    # The trailing "sh" is the $0 placeholder, so the two words xargs feeds each
+    # invocation land as $1 (file id) and $2 (output path).
     proc = subprocess.run(
-        ["xargs", "-P", str(WORKERS), "-n", "2", "sh", "-c", script + ' _ "$0" "$1"'],
+        ["xargs", "-P", str(WORKERS), "-n", "2", "sh", "-c", script, "sh"],
         input="\n".join(f"{i} {o}" for i, o in jobs).encode(),
         stderr=subprocess.PIPE,
     )
