@@ -7,7 +7,8 @@ built so the sales team can answer "do we make 7130?" without opening Drive.
 
 Current build: **1,914 designs from 3,161 source images**, 9 September 2026.
 The two folders share no files and only 23 of their design codes overlap, so both
-are needed for the catalogue to be complete. A Library filter separates them.
+are needed for the catalogue to be complete. Each design's detail panel names
+the library it came from.
 
 | Body | Designs | Formats |
 |---|---:|---|
@@ -97,7 +98,7 @@ lands on a round count, which is what that bug looked like from the outside.
 bare trailing number) so the pattern does not visibly repeat once laid, and it can
 appear again under `RENDERS` as a room shot. Step 2 collapses all of those into
 one design keyed on code + name, keeps the faces in order, and flags renders.
-That is what turns 1,993 files into 1,329 designs.
+That is what turns 3,161 files into 1,914 designs.
 
 **Codes and names come from the filenames**, which is where the shop floor already
 keeps them (`7130 CLASSIC DYNA F3.jpg` → code `7130`, name `CLASSIC DYNA`, face 3).
