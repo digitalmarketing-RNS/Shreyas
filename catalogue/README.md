@@ -27,7 +27,41 @@ series, searches on code or name, and links every design back to its original
 full-resolution files on Drive. Each design's detail panel names the library it
 came from; the two are not filtered apart in the grid.
 
-## Regenerating after new designs are added
+## The print catalogue
+
+`Naveen-Tile-Master-Catalogue.pdf` — 86 pages, A4, 1,725 designs. Cover, contents,
+sections by body and format, and an index of every code with its page number.
+
+Draft, Renders and Punch Series are excluded: those are working files, not
+products. That is 189 designs, leaving 1,725 of the 1,914 in the web catalogue.
+
+**Every tile prints at its real proportions** — a 600×1200 as a 1:2 portrait, a
+600×600 as a square — so the format reads off the page without checking the
+caption. A page can only hold one shape, so the catalogue is sectioned by body
+and then by format, and the column count follows the shape: 7×4 for 1:2, 5×4 for
+2:3, 6×6 for square. Source photos are centre-cropped to the tile's proportions,
+which is why the print run pulls `w1600` sources rather than reusing the web
+thumbnails.
+
+Pagination is computed in Python, not left to the browser: each `.page` is
+exactly A4 and breaks after itself, so the page numbers printed in the contents
+and index are the ones that come out of the printer. `verify.js` checks that no
+page overflows its box and that nothing collides with the folio.
+
+```
+cd catalogue/pipeline
+python3 print_fetch.py                        # w1600 sources -> print_raw/
+python3 5_build_pdf.py                        # -> pdf/catalogue.html  (300dpi, ~48MB)
+node 6_render_pdf.js                          # -> Naveen-Tile-Master-Catalogue.pdf
+
+SCALE=0.72 QUALITY=76 OUT=pdf-print python3 5_build_pdf.py   # ~215dpi, ~25MB
+SCALE=0.5  QUALITY=68 OUT=pdf-light python3 5_build_pdf.py   # screen/email, ~11MB
+```
+
+Rendering needs Chromium; this repo uses the one at
+`/opt/pw-browsers/chromium-1194/chrome-linux/chrome` via Playwright.
+
+## Regenerating the web catalogue after new designs are added
 
 ```
 cd catalogue/pipeline
