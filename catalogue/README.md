@@ -1,17 +1,26 @@
 # Naveen Tile — Master Catalogue
 
-A single browsable index of every tile design in the shared Drive folder
-[`DESIGNS NEW FOLDER 11.08.2026`](https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO),
+A single browsable index of every tile design across both shared Drive libraries —
+[`DESIGNS NEW FOLDER 11.08.2026`](https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO)
+and [`ALL DESIGNS`](https://drive.google.com/drive/folders/1p836uZhZKqR8eBZ6z01xowOvDVvv7Oen) —
 built so the sales team can answer "do we make 7130?" without opening Drive.
 
-Current build: **1,329 designs from 1,993 source images**, 9 September 2026.
+Current build: **1,914 designs from 3,161 source images**, 9 September 2026.
+The two folders share no files and only 23 of their design codes overlap, so both
+are needed for the catalogue to be complete. A Library filter separates them.
 
 | Body | Designs | Formats |
 |---|---:|---|
 | PGVT — polished glazed vitrified | 724 | 600×600, 600×1200, 800×1600 mm |
 | GVT — glazed vitrified | 396 | 600×600, 600×1200 mm |
-| Parking — heavy-duty exterior | 180 | printed on each sheet |
+| Wall — ceramic wall tile | 328 | 300×300 to 800×800 mm |
+| Parking — heavy-duty exterior | 237 | printed on each sheet |
+| Full Body — through-body porcelain | 84 | 600×600, 600×1200 mm |
+| Nano — nano-polished | 33 | 300×300 mm |
+| Floor — ceramic floor tile | 32 | 300×300 mm |
+| Double Charge | 31 | not stated |
 | Carving — textured surface | 29 | 600×1200 mm |
+| Roof — roofing tile | 20 | 300×300 mm |
 
 The page filters by body, format, tone and series, searches on code or name, and
 links every design back to its original full-resolution files on Drive.
@@ -58,6 +67,11 @@ That is what turns 1,993 files into 1,329 designs.
 keeps them (`7130 CLASSIC DYNA F3.jpg` → code `7130`, name `CLASSIC DYNA`, face 3).
 Where a filename carries no code, the design is listed by name alone.
 
+**Trust the bytes, not the status code.** Drive answers some thumbnail requests
+with an HTTP 200 sign-in page — a ~900 KB HTML document, so neither the status
+code nor the file size catches it. Step 3 checks each download's magic bytes and
+retries; what survives four rounds is genuinely unavailable, not a flake.
+
 **Tone is measured from the tile surface, not the frame.** Many sources are studio
 sheets shot on a black or blown-out white backdrop; averaging that in turns every
 tile charcoal. Step 3 drops backdrop pixels before sampling, then buckets the
@@ -65,13 +79,16 @@ result into the eight tone families used by the filter.
 
 ## Known limits
 
-- Thumbnails are compressed previews (300 px WebP) so all 1,329 fit in one file
+- Thumbnails are compressed previews (250 px WebP) so all 1,914 fit in one file
   under the artifact size limit. The detail panel links to the full-resolution
   original on Drive. Step 3 prints the inlined total and warns if it exceeds
-  `BUDGET_MB`; raising `THUMB_W` past ~300 px overflows the limit at this count.
-- This folder holds only 4-digit design codes. The `1000`–`1099` and `11xxx`–`13xxx`
-  series live in a separate `ALL DESIGNS` folder, which is not part of this build:
-  the two folders share no files and only 23 of their codes overlap.
+  `BUDGET_MB`; raising `THUMB_W` past ~250 px overflows the limit at this count.
+- 22 designs have no preview. Their files answer the public thumbnail endpoint
+  with a sign-in page rather than an image, and are not resolvable through the
+  authenticated connector either, so they are almost certainly shared differently
+  from the rest of the folder. They stay in the index — searching their code still
+  finds them — and render as "no preview" with a link to Drive. Step 3 lists them
+  by code on every run; fixing the sharing on those files makes them appear.
 - Parking sheets print their own size and finish, and the folder does not state a
   format, so none is asserted for them — read it off the sheet.
 - Anyone opening the page needs access to the Drive folder for the "open original"

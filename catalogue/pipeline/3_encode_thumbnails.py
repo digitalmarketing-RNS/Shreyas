@@ -22,29 +22,59 @@ import os
 import subprocess
 import sys
 
-THUMB_W = 300          # px — sized so the whole set inlines under the artifact limit
-QUALITY = 68           # starting WebP quality
-MAX_BYTES = 23_000     # per-image ceiling; quality steps down until it fits
+THUMB_W = 250          # px — sized so the whole set inlines under the artifact limit
+QUALITY = 64           # starting WebP quality
+MAX_BYTES = 16_000     # per-image ceiling; quality steps down until it fits
 RAW_DIR = "raw"
 WORKERS = 16
 
 # The published page carries every thumbnail inline, so the whole set has to fit
 # inside the artifact size limit once base64 adds its ~33%.
-BUDGET_MB = 13.5
+BUDGET_MB = 14.0
 
 
-def fetch_all(designs):
+# Magic bytes for the formats Drive's thumbnail endpoint can return.
+MAGIC = (b"\xff\xd8", b"\x89PNG", b"RIFF", b"GIF8")
+
+
+def is_downloaded(path):
+    """True only for a real image file.
+
+    Under load Drive answers some thumbnail requests with an HTTP 200 sign-in
+    page. That is a ~900 KB HTML document, so neither the status code nor the
+    file size catches it — check what the bytes actually are.
+    """
+    try:
+        with open(path, "rb") as fh:
+            return fh.read(4)[:4].startswith(MAGIC)
+    except OSError:
+        return False
+
+
+def fetch_all(designs, rounds=4):
     """Download one hero image per design into RAW_DIR (parallel, resumable)."""
     os.makedirs(RAW_DIR, exist_ok=True)
-    jobs = []
-    for i, d in enumerate(designs):
-        out = f"{RAW_DIR}/{i:04d}.jpg"
-        if not os.path.exists(out) or os.path.getsize(out) == 0:
-            jobs.append((d["faces"][0]["id"], out))
-    if not jobs:
-        print(f"all {len(designs)} hero images already cached")
-        return
-    print(f"fetching {len(jobs)} hero images…")
+    for attempt in range(rounds):
+        jobs = []
+        for i, d in enumerate(designs):
+            out = f"{RAW_DIR}/{i:04d}.jpg"
+            if not is_downloaded(out):
+                if os.path.exists(out):
+                    os.remove(out)          # a sign-in page, not an image
+                jobs.append((d["faces"][0]["id"], out))
+        if not jobs:
+            if attempt == 0:
+                print(f"all {len(designs)} hero images already cached")
+            return
+        print(f"fetching {len(jobs)} hero images (round {attempt + 1})…")
+        _run_batch(jobs)
+    left = [i for i in range(len(designs)) if not is_downloaded(f"{RAW_DIR}/{i:04d}.jpg")]
+    if left:
+        print(f"WARNING: {len(left)} images could not be fetched: {left[:20]}",
+              file=sys.stderr)
+
+
+def _run_batch(jobs):
     script = (
         'for a in 1 2 3; do '
         'c=$(curl -sS -L --max-time 90 '
@@ -136,9 +166,24 @@ def main():
     designs = json.load(open("designs.json"))
     fetch_all(designs)
 
-    out, total = [], 0
+    out, total, skipped = [], 0, []
     for i, d in enumerate(designs):
-        im = Image.open(f"{RAW_DIR}/{i:04d}.jpg").convert("RGB")
+        path = f"{RAW_DIR}/{i:04d}.jpg"
+        if not is_downloaded(path):
+            # A handful of files answer the public thumbnail endpoint with a
+            # sign-in page, so no preview can be built. Keep the design in the
+            # index anyway — someone searching its code still needs to find it —
+            # and let the page render it as "preview unavailable".
+            skipped.append(f"{d['code']} {d['name']}".strip())
+            rec = dict(d)
+            rec.pop("folders", None)
+            rec.update(aspect=1.5, rgb=[190, 187, 182], dom="#bebbb6", lum=0.73,
+                       tone="Grey", n_faces=len(d["faces"]), img="")
+            if rec["family"] == "Parking":
+                rec["size"] = ""
+            out.append(rec)
+            continue
+        im = Image.open(path).convert("RGB")
         avg, dom, lum, tone = colour_stats(im)
         data = encode(im)
         total += len(data)
@@ -159,6 +204,9 @@ def main():
     json.dump(out, open("catalog.json", "w"))
     inline = total * 4 / 3 / 1e6
     print(f"encoded {len(out)} designs — {total/1e6:.2f} MB binary, ~{inline:.2f} MB inlined")
+    if skipped:
+        print(f"NOTE: {len(skipped)} designs have no fetchable preview and are listed "
+              f"without one: {skipped}", file=sys.stderr)
     if inline > BUDGET_MB:
         print(f"WARNING: over the {BUDGET_MB} MB budget — lower THUMB_W or QUALITY",
               file=sys.stderr)

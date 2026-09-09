@@ -6,18 +6,27 @@ fam   = collections.Counter(d['family'] for d in DATA)
 size  = collections.Counter(d['size'] for d in DATA if d['size'])
 tone  = collections.Counter(d['tone'] for d in DATA)
 coll  = collections.Counter(d['collection'] for d in DATA if d['collection'])
+src   = collections.Counter(d['source'] for d in DATA)
 faces = sum(d['n_faces'] for d in DATA)
 
 TONE_HEX = {'White':'#eae8e4','Ivory':'#ddcfbe','Beige':'#cbb196','Grey':'#a4a19e',
             'Brown':'#937a63','Black':'#443e38','Blue':'#78869d','Accent':'#8a7f5e'}
 TONE_ORDER = ['White','Ivory','Beige','Brown','Grey','Black','Blue','Accent']
-SIZE_ORDER = ['600x600','600x1200','800x1600']
-FAM_ORDER  = ['PGVT','GVT','Carving','Parking']
+SIZE_ORDER = ['300x300','300x450','300x600','600x600','600x1200','800x800','800x1600']
+FAM_ORDER  = ['PGVT','GVT','Wall','Full Body','Nano','Carving',
+              'Double Charge','Floor','Roof','Parking']
+SRC_ORDER  = ['New 11.08.2026','All Designs']
 
 FAM_NOTE = {
  'PGVT':'Polished glazed vitrified',
  'GVT':'Glazed vitrified',
+ 'Wall':'Ceramic wall tile',
+ 'Full Body':'Through-body porcelain',
+ 'Nano':'Nano-polished',
  'Carving':'Textured / carved surface',
+ 'Double Charge':'Double-charge vitrified',
+ 'Floor':'Ceramic floor tile',
+ 'Roof':'Roofing tile',
  'Parking':'Heavy-duty exterior',
 }
 
@@ -151,6 +160,12 @@ main{padding:26px 0 80px}
   position:relative;overflow:hidden;aspect-ratio:3/2;
   transition:border-color .15s, box-shadow .15s}
 .shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot.nopreview{display:flex;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(45deg,var(--surface-2) 0 8px,var(--surface) 8px 16px)}
+.noimg{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);text-align:center;line-height:1.6}
+.noimg em{display:block;font-style:normal;font-size:10px;opacity:.75;
+  letter-spacing:.06em;text-transform:none}
 .shot:hover{border-color:var(--line-2);box-shadow:var(--shadow)}
 .shot:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .badge{position:absolute;left:0;bottom:0;
@@ -166,6 +181,8 @@ main{padding:26px 0 80px}
 .nm{grid-column:2;margin:0;font-size:13.5px;font-weight:500;line-height:1.25;
   letter-spacing:-.005em;overflow-wrap:anywhere}
 .sub{grid-column:2;margin:3px 0 0;font-size:11.5px;color:var(--muted)}
+.src{grid-column:2;margin:3px 0 0;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);opacity:.75}
 
 .empty{padding:80px 0;text-align:center;color:var(--muted)}
 .empty p{margin:0 0 14px}
@@ -262,17 +279,19 @@ const shownEl = document.getElementById('shown');
 const clearBtn = document.getElementById('clear');
 const dlg = document.getElementById('detail');
 
-const state = {q:'', family:new Set(), size:new Set(), tone:new Set(), coll:new Set()};
+const state = {q:'', family:new Set(), size:new Set(), tone:new Set(),
+               coll:new Set(), src:new Set()};
 let view = [];
 
 const fmt = n => n.toLocaleString('en-IN');
-const mm = s => s ? s.replace('x','×') + ' mm' : 'Size on sheet';
+const mm = s => s ? s.replace('x','×') + ' mm' : 'Size not stated';
 
 function match(d){
   if(state.family.size && !state.family.has(d.family)) return false;
   if(state.size.size   && !state.size.has(d.size))     return false;
   if(state.tone.size   && !state.tone.has(d.tone))     return false;
   if(state.coll.size   && !state.coll.has(d.collection)) return false;
+  if(state.src.size    && !state.src.has(d.source))      return false;
   if(state.q){
     const t = state.q;
     if(!(d.code.toLowerCase().includes(t) || d.name.toLowerCase().includes(t)
@@ -281,7 +300,8 @@ function match(d){
   return true;
 }
 
-const RANK = {PGVT:0, GVT:1, Carving:2, Parking:3};
+const RANK = {PGVT:0, GVT:1, 'Wall':2, 'Full Body':3, Nano:4, Carving:5,
+              'Double Charge':6, Floor:7, Roof:8, Parking:9};
 const bycode = (a,b)=> (a.code||'zzzz').localeCompare(b.code||'zzzz','en',{numeric:true}) || a.name.localeCompare(b.name);
 const sorters = {
   cat:(a,b)=> RANK[a.family]-RANK[b.family] || bycode(a,b),
@@ -296,8 +316,10 @@ function render(){
   view = DATA.filter(match).sort(sorters[sortSel.value]);
   grid.innerHTML = view.map((d,i)=>`
     <article class="tile">
-      <button class="shot" data-i="${i}" aria-label="Open ${d.code} ${d.name}">
-        <img src="${d.img}" alt="${d.name} — ${d.family} ${mm(d.size)} tile" loading="lazy" decoding="async">
+      <button class="shot${d.img?'':' nopreview'}" data-i="${i}" aria-label="Open ${d.code} ${d.name}">
+        ${d.img
+          ? `<img src="${d.img}" alt="${d.name} — ${d.family} ${mm(d.size)} tile" loading="lazy" decoding="async">`
+          : `<span class="noimg">No preview<em>open on Drive</em></span>`}
         ${d.n_faces>1?`<span class="badge">${d.n_faces} faces</span>`:''}
       </button>
       <div class="meta">
@@ -305,11 +327,13 @@ function render(){
         <span class="code">${d.code || '—'}</span>
         <h3 class="nm">${d.name}</h3>
         <p class="sub">${d.family} · ${mm(d.size)}${d.collection?' · '+d.collection:''}</p>
+        <p class="src">${d.source}</p>
       </div>
     </article>`).join('');
   shownEl.textContent = fmt(view.length);
   empty.hidden = view.length > 0;
-  const active = state.q || state.family.size || state.size.size || state.tone.size || state.coll.size;
+  const active = state.q || state.family.size || state.size.size || state.tone.size
+                 || state.coll.size || state.src.size;
   clearBtn.hidden = !active;
 }
 
@@ -326,7 +350,7 @@ sortSel.addEventListener('change', render);
 densSel.addEventListener('change', ()=> grid.classList.toggle('lg', densSel.value==='lg'));
 clearBtn.addEventListener('click', ()=>{
   state.q=''; q.value='';
-  ['family','size','tone','coll'].forEach(k=>state[k].clear());
+  ['family','size','tone','coll','src'].forEach(k=>state[k].clear());
   document.querySelectorAll('.chip[data-k]').forEach(b=>b.setAttribute('aria-pressed','false'));
   render();
 });
@@ -342,12 +366,18 @@ function open(i){
   document.getElementById('d-kicker').textContent = d.code ? 'Design ' + d.code : d.family;
   document.getElementById('d-name').textContent = d.name;
   const img = document.getElementById('d-img');
-  img.src = d.img; img.alt = d.name + ' — ' + d.family + ' ' + mm(d.size);
-  img.style.aspectRatio = d.aspect;
+  const none = document.getElementById('d-noimg');
+  img.hidden = !d.img;
+  none.hidden = !!d.img;
+  if(d.img){
+    img.src = d.img; img.alt = d.name + ' — ' + d.family + ' ' + mm(d.size);
+    img.style.aspectRatio = d.aspect;
+  }
   document.getElementById('d-fam').textContent  = d.family;
   document.getElementById('d-famn').textContent = d.famnote;
   document.getElementById('d-size').textContent = mm(d.size);
   document.getElementById('d-coll').textContent = d.collection || '—';
+  document.getElementById('d-src').textContent  = d.source;
   document.getElementById('d-tone').textContent = d.tone;
   document.getElementById('d-swatch').style.setProperty('--c', d.dom);
   document.getElementById('d-hex').textContent  = d.dom.toUpperCase();
@@ -420,7 +450,8 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
   <div class="wrap top-in">
     <div class="mark"><b>Naveen Tile</b><span>Master Catalogue</span></div>
     <nav class="top-links">
-      <a href="https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO" target="_blank" rel="noopener">Source folder</a>
+      <a href="https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO" target="_blank" rel="noopener">New 11.08.2026</a>
+      <a href="https://drive.google.com/drive/folders/1p836uZhZKqR8eBZ6z01xowOvDVvv7Oen" target="_blank" rel="noopener">All Designs</a>
       <a href="#grid">Browse</a>
     </nav>
   </div>
@@ -429,14 +460,16 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
 <section class="hero">
   <div class="wrap">
     <h1>Every design<br>we make, <em>in one place.</em></h1>
-    <p class="lede">The complete surface library — vitrified, glazed, carved and parking
-    tile designs, indexed by code, size and tone. Built from
-    <code>DESIGNS NEW FOLDER 11.08.2026</code> on {gen}. Every design links back
-    to its original files on Drive.</p>
+    <p class="lede">The complete surface library — vitrified, glazed, carved, wall,
+    floor and parking designs, indexed by code, format and tone. Built on
+    {gen} from both design libraries — <code>DESIGNS NEW FOLDER 11.08.2026</code>
+    and <code>ALL DESIGNS</code>. Every design links back to its original files
+    on Drive.</p>
     <dl class="figures">
       <div class="fig"><dt>Designs</dt><dd>{fmt(len(DATA))}</dd><small>unique tile codes</small></div>
+      <div class="fig"><dt>Bodies</dt><dd>{len(fam)}</dd><small>PGVT to parking</small></div>
       <div class="fig"><dt>Images</dt><dd>{fmt(faces)}</dd><small>faces &amp; renders</small></div>
-      <div class="fig"><dt>Formats</dt><dd>{len(size)}</dd><small>600&#215;600 to 800&#215;1600 mm</small></div>
+      <div class="fig"><dt>Formats</dt><dd>{len(size)}</dd><small>300&#215;300 to 800&#215;1600 mm</small></div>
       <div class="fig"><dt>Series</dt><dd>{len(coll)}</dd><small>finishes &amp; collections</small></div>
     </dl>
   </div>
@@ -474,6 +507,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
       <div class="facet"><span>Format</span>{chips('size', size, SIZE_ORDER)}</div>
       <div class="facet"><span>Tone</span>{chips('tone', tone, TONE_ORDER, swatch=True)}</div>
       <div class="facet"><span>Series</span>{chips('coll', coll)}</div>
+      <div class="facet"><span>Library</span>{chips('src', src, SRC_ORDER)}</div>
     </div>
     <div class="status">
       <span>Showing <b id="shown">{fmt(len(DATA))}</b> of <b>{fmt(len(DATA))}</b> designs</span>
@@ -493,19 +527,24 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
 <footer>
   <div class="wrap">
     <p><strong>Naveen Tile — Master Catalogue.</strong> {fmt(len(DATA))} designs indexed from
-    {fmt(faces)} source images. Thumbnails are compressed previews; open any design to reach
-    the full-resolution original on Google Drive.</p>
-    <p>Codes, names and series are read from the source folder and filenames; where a filename
-    carried no code, the design is listed by name. Parking designs print their own size and
-    finish on the sheet, so no format is asserted for them here.
-    <a href="https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO" target="_blank" rel="noopener">Open the source folder</a>.</p>
+    {fmt(faces)} source images across both Drive libraries. Thumbnails are compressed
+    previews; open any design to reach the full-resolution original on Google Drive.</p>
+    <p>Codes, names, bodies and formats are read from the source folders and filenames;
+    where a filename carried no code, the design is listed by name. Where a folder states no
+    size — parking sheets and some full-body and nano lines — none is asserted here; read it
+    off the sheet. Use the Library filter to separate the two folders:
+    <a href="https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO" target="_blank" rel="noopener">New 11.08.2026</a> ·
+    <a href="https://drive.google.com/drive/folders/1p836uZhZKqR8eBZ6z01xowOvDVvv7Oen" target="_blank" rel="noopener">All Designs</a>.</p>
   </div>
 </footer>
 
 <dialog id="detail" aria-label="Design detail">
   <button class="d-close" id="d-close" aria-label="Close">&#215;</button>
   <div class="d-in">
-    <div class="d-img"><img id="d-img" src="" alt=""></div>
+    <div class="d-img">
+      <img id="d-img" src="" alt="">
+      <p id="d-noimg" class="noimg" hidden>No preview available<em>the original is still on Drive</em></p>
+    </div>
     <div class="d-body">
       <div class="d-head">
         <p class="kicker" id="d-kicker"></p>
@@ -515,6 +554,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
         <div><dt>Body</dt><dd><span id="d-fam"></span><br><span style="font-weight:400;color:var(--muted);font-size:11.5px" id="d-famn"></span></dd></div>
         <div><dt>Format</dt><dd class="mono" id="d-size"></dd></div>
         <div><dt>Series</dt><dd id="d-coll"></dd></div>
+        <div><dt>Library</dt><dd id="d-src"></dd></div>
         <div><dt>Tone</dt><dd><span class="swatch-row"><i id="d-swatch"></i><span id="d-tone"></span><span class="mono" style="color:var(--muted);font-size:11.5px" id="d-hex"></span></span></dd></div>
         <div><dt>Files</dt><dd class="mono" id="d-faces"></dd></div>
       </dl>

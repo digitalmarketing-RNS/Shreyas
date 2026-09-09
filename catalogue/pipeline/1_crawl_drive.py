@@ -1,10 +1,10 @@
-"""Step 1 — walk the shared Drive design folder and record every file in it.
+"""Step 1 — walk the shared Drive design folders and record every file in them.
 
-Writes tree.json: {"<folder path>": [{"id", "name"}, ...], ...}
+Writes tree.json: {"<source>|<folder path>": [{"id", "name"}, ...], ...}
 
-The folder is shared "anyone with the link", but Drive's search index reports it
-as empty for an account it was only shared into, so the API is not an option
-here. We read Drive's own `embeddedfolderview` listing instead.
+The folders are shared "anyone with the link", but Drive's search index reports
+them as empty for an account they were only shared into, so the API is not an
+option here. We read Drive's own `embeddedfolderview` listing instead.
 
 Do NOT go back to scraping the normal folder page's `_DRIVE_ivd` blob: that
 carries only the first page of each folder (50 items), which silently truncated
@@ -19,7 +19,12 @@ import subprocess
 import sys
 import time
 
-ROOT = "1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO"   # DESIGNS NEW FOLDER 11.08.2026
+# Both design libraries. They share no files, and only 23 of their design codes
+# overlap, so the catalogue needs both to be complete.
+SOURCES = [
+    ("New 11.08.2026", "1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO"),  # DESIGNS NEW FOLDER 11.08.2026
+    ("All Designs",    "1p836uZhZKqR8eBZ6z01xowOvDVvv7Oen"),  # ALL DESIGNS
+]
 
 # Each row carries the id on the wrapper div, then a link that reveals whether
 # the row is a folder (/drive/folders/) or a file (/file/d/), then the title.
@@ -57,29 +62,35 @@ def listing(folder_id, attempts=4):
     return None
 
 
-def walk(folder_id, path, tree, stats, depth=0):
+def walk(folder_id, source, path, tree, stats, depth=0):
     items = listing(folder_id)
     if items is None:
-        stats["failed"].append("/".join(path))
-        print(f"!! could not read {'/'.join(path) or 'root'}", file=sys.stderr)
+        stats["failed"].append(f"{source}|{'/'.join(path)}")
+        print(f"!! could not read {source}/{'/'.join(path)}", file=sys.stderr)
         return
     files = [i for i in items if not i["folder"]]
     if files:
-        tree.setdefault("/".join(path), []).extend(
+        tree.setdefault(f"{source}|{'/'.join(path)}", []).extend(
             {"id": f["id"], "name": f["name"]} for f in files)
-        print("  " * depth + f"{len(files):5d}  {'/'.join(path) or '(root)'}", flush=True)
+        print("  " * depth + f"{len(files):5d}  {source}/{'/'.join(path) or '(root)'}",
+              flush=True)
     for sub in (i for i in items if i["folder"]):
         stats["folders"] += 1
-        walk(sub["id"], path + [sub["name"]], tree, stats, depth + 1)
+        walk(sub["id"], source, path + [sub["name"]], tree, stats, depth + 1)
 
 
 def main():
     tree, stats = {}, {"folders": 0, "failed": []}
-    walk(ROOT, [], tree, stats)
+    for source, folder_id in SOURCES:
+        print(f"\n=== {source} ===", flush=True)
+        walk(folder_id, source, [], tree, stats)
     json.dump(tree, open("tree.json", "w"), indent=1)
 
     total = sum(len(v) for v in tree.values())
     print(f"\n{total} files / {len(tree)} leaf folders / {stats['folders']} subfolders")
+    for source, _ in SOURCES:
+        n = sum(len(v) for k, v in tree.items() if k.startswith(source + "|"))
+        print(f"  {n:5d}  {source}")
     if stats["failed"]:
         print(f"FAILED to read {len(stats['failed'])} folders: {stats['failed']}",
               file=sys.stderr)
