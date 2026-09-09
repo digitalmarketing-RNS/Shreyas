@@ -690,6 +690,7 @@ function renderCallPager({ total, limit, offset }) {
   $('callNext').disabled = last >= total;
 }
 
+
 $('callPrev').addEventListener('click', async () => {
   callsOffset = Math.max(0, callsOffset - CALLS_PER_PAGE);
   await refreshCalls();
