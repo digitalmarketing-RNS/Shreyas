@@ -22,8 +22,10 @@ are needed for the catalogue to be complete. A Library filter separates them.
 | Carving — textured surface | 29 | 600×1200 mm |
 | Roof — roofing tile | 20 | 300×300 mm |
 
-The page filters by body, format, tone and series, searches on code or name, and
-links every design back to its original full-resolution files on Drive.
+The page lists designs in ascending code order, filters by body, format, tone and
+series, searches on code or name, and links every design back to its original
+full-resolution files on Drive. Each design's detail panel names the library it
+came from; the two are not filtered apart in the grid.
 
 ## Regenerating after new designs are added
 

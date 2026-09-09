@@ -6,7 +6,6 @@ fam   = collections.Counter(d['family'] for d in DATA)
 size  = collections.Counter(d['size'] for d in DATA if d['size'])
 tone  = collections.Counter(d['tone'] for d in DATA)
 coll  = collections.Counter(d['collection'] for d in DATA if d['collection'])
-src   = collections.Counter(d['source'] for d in DATA)
 faces = sum(d['n_faces'] for d in DATA)
 
 TONE_HEX = {'White':'#eae8e4','Ivory':'#ddcfbe','Beige':'#cbb196','Grey':'#a4a19e',
@@ -15,7 +14,6 @@ TONE_ORDER = ['White','Ivory','Beige','Brown','Grey','Black','Blue','Accent']
 SIZE_ORDER = ['300x300','300x450','300x600','600x600','600x1200','800x800','800x1600']
 FAM_ORDER  = ['PGVT','GVT','Wall','Full Body','Nano','Carving',
               'Double Charge','Floor','Roof','Parking']
-SRC_ORDER  = ['New 11.08.2026','All Designs']
 
 FAM_NOTE = {
  'PGVT':'Polished glazed vitrified',
@@ -181,8 +179,6 @@ main{padding:26px 0 80px}
 .nm{grid-column:2;margin:0;font-size:13.5px;font-weight:500;line-height:1.25;
   letter-spacing:-.005em;overflow-wrap:anywhere}
 .sub{grid-column:2;margin:3px 0 0;font-size:11.5px;color:var(--muted)}
-.src{grid-column:2;margin:3px 0 0;font-size:10px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--muted);opacity:.75}
 
 .empty{padding:80px 0;text-align:center;color:var(--muted)}
 .empty p{margin:0 0 14px}
@@ -279,8 +275,7 @@ const shownEl = document.getElementById('shown');
 const clearBtn = document.getElementById('clear');
 const dlg = document.getElementById('detail');
 
-const state = {q:'', family:new Set(), size:new Set(), tone:new Set(),
-               coll:new Set(), src:new Set()};
+const state = {q:'', family:new Set(), size:new Set(), tone:new Set(), coll:new Set()};
 let view = [];
 
 const fmt = n => n.toLocaleString('en-IN');
@@ -291,7 +286,6 @@ function match(d){
   if(state.size.size   && !state.size.has(d.size))     return false;
   if(state.tone.size   && !state.tone.has(d.tone))     return false;
   if(state.coll.size   && !state.coll.has(d.collection)) return false;
-  if(state.src.size    && !state.src.has(d.source))      return false;
   if(state.q){
     const t = state.q;
     if(!(d.code.toLowerCase().includes(t) || d.name.toLowerCase().includes(t)
@@ -327,13 +321,12 @@ function render(){
         <span class="code">${d.code || '—'}</span>
         <h3 class="nm">${d.name}</h3>
         <p class="sub">${d.family} · ${mm(d.size)}${d.collection?' · '+d.collection:''}</p>
-        <p class="src">${d.source}</p>
       </div>
     </article>`).join('');
   shownEl.textContent = fmt(view.length);
   empty.hidden = view.length > 0;
   const active = state.q || state.family.size || state.size.size || state.tone.size
-                 || state.coll.size || state.src.size;
+                 || state.coll.size;
   clearBtn.hidden = !active;
 }
 
@@ -350,7 +343,7 @@ sortSel.addEventListener('change', render);
 densSel.addEventListener('change', ()=> grid.classList.toggle('lg', densSel.value==='lg'));
 clearBtn.addEventListener('click', ()=>{
   state.q=''; q.value='';
-  ['family','size','tone','coll','src'].forEach(k=>state[k].clear());
+  ['family','size','tone','coll'].forEach(k=>state[k].clear());
   document.querySelectorAll('.chip[data-k]').forEach(b=>b.setAttribute('aria-pressed','false'));
   render();
 });
@@ -486,8 +479,8 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
       <div class="selects">
         <label class="sel">Sort
           <select id="sort">
-            <option value="cat">Catalogue order</option>
             <option value="code">Code</option>
+            <option value="cat">By body, then code</option>
             <option value="name">Name A–Z</option>
             <option value="light">Lightest first</option>
             <option value="dark">Darkest first</option>
@@ -507,7 +500,6 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
       <div class="facet"><span>Format</span>{chips('size', size, SIZE_ORDER)}</div>
       <div class="facet"><span>Tone</span>{chips('tone', tone, TONE_ORDER, swatch=True)}</div>
       <div class="facet"><span>Series</span>{chips('coll', coll)}</div>
-      <div class="facet"><span>Library</span>{chips('src', src, SRC_ORDER)}</div>
     </div>
     <div class="status">
       <span>Showing <b id="shown">{fmt(len(DATA))}</b> of <b>{fmt(len(DATA))}</b> designs</span>
@@ -532,7 +524,7 @@ HTML = f"""<title>Naveen Tile Master Catalogue</title>
     <p>Codes, names, bodies and formats are read from the source folders and filenames;
     where a filename carried no code, the design is listed by name. Where a folder states no
     size — parking sheets and some full-body and nano lines — none is asserted here; read it
-    off the sheet. Use the Library filter to separate the two folders:
+    off the sheet. Source folders:
     <a href="https://drive.google.com/drive/folders/1H7h215GQqsb6-OoVDaV1oyPVdBhs0DyO" target="_blank" rel="noopener">New 11.08.2026</a> ·
     <a href="https://drive.google.com/drive/folders/1p836uZhZKqR8eBZ6z01xowOvDVvv7Oen" target="_blank" rel="noopener">All Designs</a>.</p>
   </div>
