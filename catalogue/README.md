@@ -55,9 +55,15 @@ python3 print_fetch.py                        # w1600 sources -> print_raw/
 python3 5_build_pdf.py                        # -> pdf/catalogue.html  (300dpi, ~48MB)
 node 6_render_pdf.js                          # -> Naveen-Tile-Master-Catalogue.pdf
 
+SCALE=0.85 QUALITY=70 OUT=pdf-hi    python3 5_build_pdf.py   # ~255dpi, ~28MB
 SCALE=0.72 QUALITY=76 OUT=pdf-print python3 5_build_pdf.py   # ~215dpi, ~25MB
 SCALE=0.5  QUALITY=68 OUT=pdf-light python3 5_build_pdf.py   # screen/email, ~11MB
 ```
+
+The 300 dpi run is ~48MB, which is past most mail and transfer limits. `SCALE=0.85
+QUALITY=70` is the best quality that still lands the whole catalogue in a single
+file under 30 MiB; drop `SCALE` further only if the recipient's limit is tighter.
+`6_render_pdf.js` accepts a `pageRanges` option if a run ever has to be split.
 
 Rendering needs Chromium; this repo uses the one at
 `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` via Playwright.
