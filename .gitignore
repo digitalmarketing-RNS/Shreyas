@@ -4,3 +4,9 @@ client_secret*.json
 oauth-token.json
 google-api.json
 .env
+
+# catalogue build artefacts
+catalogue/pipeline/raw/
+catalogue/pipeline/tree.json
+catalogue/pipeline/catalog.json
+catalogue/pipeline/*.html
