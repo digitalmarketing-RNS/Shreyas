@@ -26,9 +26,10 @@
  *
  * Marks (\p{M}) are kept alongside letters, and that is the whole trick: in
  * every Indic script the vowel signs are combining marks, so splitting on
- * letters alone tears ಹೌದು into three pieces and no Kannada word can ever
- * match. Zero-width joiners are dropped rather than split on, for the same
- * reason — they sit inside words, not between them.
+ * letters alone makes the vowel signs act as separators: ಹೌದು comes apart
+ * into ಹ and ದ, and no Kannada word can ever match. Zero-width joiners are
+ * dropped rather than split on, for the same reason — they sit inside words,
+ * not between them.
  */
 function tokenize(text) {
   return String(text ?? '')
