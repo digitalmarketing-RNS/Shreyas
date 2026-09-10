@@ -1,0 +1,22 @@
+[Unit]
+Description=RNS Voice Agent
+After=network.target
+
+[Service]
+Type=simple
+User=rns
+WorkingDirectory=/opt/rns-voice
+EnvironmentFile=/opt/rns-voice/.env
+ExecStart=/usr/bin/node app.js
+Restart=always
+RestartSec=5
+
+# The process only needs its own directory writable.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/rns-voice/data
+
+[Install]
+WantedBy=multi-user.target
