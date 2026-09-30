@@ -2,7 +2,7 @@
 
 A 78-second vertical reel (1080×1920, 30 fps). It shows the whole process at the Murudeshwar Ceramics plant, from raw material to dispatch, in 14 steps. All 71 shots show machines only; the one exception is people loading the truck at the dispatch step. The footage comes from the numbered "Naveen Tile-Factory Sept" Drive folder. Built with [Remotion](https://www.remotion.dev/) on components from [claude-code-video-toolkit](https://github.com/digitalsamba/claude-code-video-toolkit).
 
-- **Master:** `renders/NaveenTiles_ByMachine_master.mp4`
+- **Master:** `renders/NaveenTiles_ByMachine_master.mp4` (89 MB, 9 Mbps H.264, AAC 256k, −13.3 LUFS; kept under GitHub's 100 MB file limit)
 - **Cover:** `renders/NaveenTiles_ByMachine_cover.jpg`
 - **Caption and posting notes:** [`CAPTION.md`](CAPTION.md)
 
