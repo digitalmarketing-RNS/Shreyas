@@ -1,0 +1,357 @@
+{
+  "s00_124-PO": {
+    "file": "clips/s00_124-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 39
+  },
+  "s01_97_3-KL": {
+    "file": "clips/s01_97_3-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 39
+  },
+  "s02_147-PK": {
+    "file": "clips/s02_147-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 39
+  },
+  "s03_63-PR": {
+    "file": "clips/s03_63-PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 39
+  },
+  "s04_111-KL": {
+    "file": "clips/s04_111-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s05_FC": {
+    "file": "clips/s05_FC.mp4",
+    "padFrames": 11,
+    "totalFrames": 83
+  },
+  "s06_13-BM": {
+    "file": "clips/s06_13-BM.mp4",
+    "padFrames": 9,
+    "totalFrames": 51
+  },
+  "s07_5-CP": {
+    "file": "clips/s07_5-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s08_12_3-CP": {
+    "file": "clips/s08_12_3-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s09_9-CP": {
+    "file": "clips/s09_9-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s10_7-CP": {
+    "file": "clips/s10_7-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s11_12_2-CP": {
+    "file": "clips/s11_12_2-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s12_11-CP": {
+    "file": "clips/s12_11-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s13_12_1-CP": {
+    "file": "clips/s13_12_1-CP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s14_22_1-BM": {
+    "file": "clips/s14_22_1-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s15_21-BM": {
+    "file": "clips/s15_21-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s16_20-BM": {
+    "file": "clips/s16_20-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s17_22-BM": {
+    "file": "clips/s17_22-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s18_25-BM": {
+    "file": "clips/s18_25-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s19_23-BM": {
+    "file": "clips/s19_23-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s20_26_1-BM": {
+    "file": "clips/s20_26_1-BM.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s21_46-SD": {
+    "file": "clips/s21_46-SD.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s22_45-SD": {
+    "file": "clips/s22_45-SD.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s23_44-SD": {
+    "file": "clips/s23_44-SD.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s24_57-SD": {
+    "file": "clips/s24_57-SD.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s25_51_1-SD": {
+    "file": "clips/s25_51_1-SD.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s26_53-SD": {
+    "file": "clips/s26_53-SD.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s27_63-PR": {
+    "file": "clips/s27_63-PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s28_64-PR": {
+    "file": "clips/s28_64-PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s29_62_1PR": {
+    "file": "clips/s29_62_1PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s30_69-PR": {
+    "file": "clips/s30_69-PR.mp4",
+    "padFrames": 3,
+    "totalFrames": 45
+  },
+  "s31_71-PR": {
+    "file": "clips/s31_71-PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s32_66-PR": {
+    "file": "clips/s32_66-PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s33_75-PR": {
+    "file": "clips/s33_75-PR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s34_77-DR": {
+    "file": "clips/s34_77-DR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s35_79-DR": {
+    "file": "clips/s35_79-DR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s36_78-DR": {
+    "file": "clips/s36_78-DR.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s37_GP": {
+    "file": "clips/s37_GP.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s38_80-GL": {
+    "file": "clips/s38_80-GL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s39_84-GL": {
+    "file": "clips/s39_84-GL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s40_82-GL": {
+    "file": "clips/s40_82-GL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s41_86-DG": {
+    "file": "clips/s41_86-DG.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s42_87-DG": {
+    "file": "clips/s42_87-DG.mp4",
+    "padFrames": 5,
+    "totalFrames": 47
+  },
+  "s43_90-DG": {
+    "file": "clips/s43_90-DG.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s44_94-KL": {
+    "file": "clips/s44_94-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s45_95-KL": {
+    "file": "clips/s45_95-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s46_97_1-KL": {
+    "file": "clips/s46_97_1-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s47_95_1-KL": {
+    "file": "clips/s47_95_1-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s48_96-KL": {
+    "file": "clips/s48_96-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s49_97_2-KL": {
+    "file": "clips/s49_97_2-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s50_97_6_3-KL": {
+    "file": "clips/s50_97_6_3-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s51_106-KL": {
+    "file": "clips/s51_106-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s52_101-KL": {
+    "file": "clips/s52_101-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s53_102-KL": {
+    "file": "clips/s53_102-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s54_115_1-PO": {
+    "file": "clips/s54_115_1-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s55_119-PO": {
+    "file": "clips/s55_119-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s56_123-PO": {
+    "file": "clips/s56_123-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s57_125-PO": {
+    "file": "clips/s57_125-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s58_126-PO": {
+    "file": "clips/s58_126-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s59_132-PO": {
+    "file": "clips/s59_132-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s60_135-PK": {
+    "file": "clips/s60_135-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s61_136-PK": {
+    "file": "clips/s61_136-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s62_137-PK": {
+    "file": "clips/s62_137-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s63_145-PK": {
+    "file": "clips/s63_145-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s64_147-PK": {
+    "file": "clips/s64_147-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s65_154-PK": {
+    "file": "clips/s65_154-PK.mp4",
+    "padFrames": 5,
+    "totalFrames": 47
+  },
+  "s66_162-DS": {
+    "file": "clips/s66_162-DS.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s67_164-DS": {
+    "file": "clips/s67_164-DS.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s68_169DS": {
+    "file": "clips/s68_169DS.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s69_168-DS": {
+    "file": "clips/s69_168-DS.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s70_131-PO": {
+    "file": "clips/s70_131-PO.mp4",
+    "padFrames": 12,
+    "totalFrames": 204
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "naveen-tiles-by-machine-reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Instagram Reel (9:16): how a Naveen tile is made, start to finish, by machine. Built with claude-code-video-toolkit (Remotion)",
+  "scripts": {
+    "footage": "python3 tools/fetch_footage.py raw",
+    "cut": "python3 tools/cut_clips.py raw",
+    "audio": "python3 tools/make_audio.py",
+    "studio": "remotion studio",
+    "render": "remotion render FactoryReel out/naveen-tiles-by-machine.mp4 --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=256k",
+    "render:nomusic": "remotion render FactoryReel out/naveen-tiles-by-machine-nomusic.mp4 --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=256k --props='{\"music\":false,\"cta\":\"naveentile.com\"}'",
+    "cover": "remotion still Cover out/cover.png"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.518",
+    "@remotion/google-fonts": "4.0.518",
+    "@remotion/transitions": "4.0.518",
+    "@remotion/paths": "4.0.518",
+    "@remotion/shapes": "4.0.518",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "4.0.518"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}

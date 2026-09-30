@@ -1,0 +1,793 @@
+{
+ "fps": 30,
+ "bpm": 120,
+ "width": 1080,
+ "height": 1920,
+ "stages": [
+  {
+   "id": "hook"
+  },
+  {
+   "n": 1,
+   "title": "RAW MATERIALS",
+   "sub": "Natural minerals, loaded straight into the line"
+  },
+  {
+   "n": 2,
+   "title": "CRUSHING",
+   "sub": "Jaw and cone crushers break rock into grit"
+  },
+  {
+   "n": 3,
+   "title": "WET GRINDING",
+   "sub": "Auto-fed ball mills grind it ultra-fine"
+  },
+  {
+   "n": 4,
+   "title": "LIQUID SLIP",
+   "sub": "Out flows a silky clay 'slip'"
+  },
+  {
+   "n": 5,
+   "title": "SPRAY DRYING",
+   "sub": "Hot-air towers turn slip into granules"
+  },
+  {
+   "n": 6,
+   "title": "PRESSING",
+   "sub": "Granules pressed into a solid tile",
+   "chip": "Presses up to 6,500 tonnes"
+  },
+  {
+   "n": 7,
+   "title": "DRYING",
+   "sub": "Dryers pull out the last moisture"
+  },
+  {
+   "n": 8,
+   "title": "GLAZING",
+   "sub": "A glaze curtain coats every tile"
+  },
+  {
+   "n": 9,
+   "title": "DIGITAL PRINTING",
+   "sub": "HD inkjet prints marble, stone, wood"
+  },
+  {
+   "n": 10,
+   "title": "FIRING",
+   "sub": "A roller kiln fires it past 1100°C",
+   "chip": "Kilns up to 252 m long",
+   "counter": [
+    930,
+    1126
+   ],
+   "counterShot": "s46_97_1-KL"
+  },
+  {
+   "n": 11,
+   "title": "SORT & STORE",
+   "sub": "Auto-stacked, parked by rail shuttles"
+  },
+  {
+   "n": 12,
+   "title": "POLISHING",
+   "sub": "Calibrated, then polished to a mirror",
+   "chip": "Lines with up to 64 heads"
+  },
+  {
+   "n": 13,
+   "title": "GRADE & PACK",
+   "sub": "Graded, boxed and stacked by robots"
+  },
+  {
+   "n": 14,
+   "title": "DISPATCH",
+   "sub": "Loaded and on the road to you"
+  },
+  {
+   "id": "end"
+  }
+ ],
+ "shots": [
+  {
+   "key": "s03_63-PR",
+   "src": "63-PR",
+   "driveId": "1K5i4dicniLzUsKhYzzrAisKaegH7DliZ",
+   "start": 3.0,
+   "speed": 1.0,
+   "frames": 15,
+   "stage": 0
+  },
+  {
+   "key": "s01_97_3-KL",
+   "src": "97.3-KL",
+   "driveId": "1L2kx9rp27FEESQWelq6PV5NXDMhbzWfA",
+   "start": 2.4,
+   "speed": 1.0,
+   "frames": 15,
+   "stage": 0
+  },
+  {
+   "key": "s00_124-PO",
+   "src": "124-PO",
+   "driveId": "1IZyeR0clsJcpITZtuc5HD_TY5lpx_QvL",
+   "start": 5.0,
+   "speed": 1.0,
+   "frames": 15,
+   "stage": 0
+  },
+  {
+   "key": "s02_147-PK",
+   "src": "147-PK",
+   "driveId": "1IM0ZYgDhj7ZwDLj49VnAqtTW1xDIJilD",
+   "start": 3.2,
+   "speed": 1.2,
+   "frames": 15,
+   "stage": 0
+  },
+  {
+   "key": "s04_111-KL",
+   "src": "111-KL",
+   "driveId": "1pXh9RJVS5u3mwIQUTRiMRkGzToAI4_L9",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 60,
+   "stage": 0
+  },
+  {
+   "key": "s05_FC",
+   "src": "FC",
+   "driveId": "1wCt7psSKmOHp3FGsX3kh0WhWZ34XNBYN",
+   "start": 0.3,
+   "speed": 0.8,
+   "frames": 60,
+   "stage": 0,
+   "out": {
+    "type": "zoomBlur",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s06_13-BM",
+   "src": "13-BM",
+   "driveId": "19InrP9rDIStOza86k99BY8KtEQZ2GE4Z",
+   "start": 0.3,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 1
+  },
+  {
+   "key": "s07_5-CP",
+   "src": "5-CP",
+   "driveId": "1oVDUIXZ1x_fuZ08t2WVWII1Rs91BiRo_",
+   "start": 11.3,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 1
+  },
+  {
+   "key": "s08_12_3-CP",
+   "src": "12.3-CP",
+   "driveId": "1bK_sIkGkf6nHwRq2NOZWw8oCMWCyoRav",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 1
+  },
+  {
+   "key": "s09_9-CP",
+   "src": "9-CP",
+   "driveId": "1MnWinXWnZpeIyQuLkUZDWqAbqTzMjjsj",
+   "start": 1.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 1,
+   "out": {
+    "type": "slide",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s10_7-CP",
+   "src": "7-CP",
+   "driveId": "1b7HiPMN2mDvtPinLy9IQ_gzP4lKfCS57",
+   "start": 4.6,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 2
+  },
+  {
+   "key": "s11_12_2-CP",
+   "src": "12.2-CP",
+   "driveId": "1OF-G64SnjFVzYH5NDCUaiVRsPhT-bg48",
+   "start": 4.5,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 2
+  },
+  {
+   "key": "s12_11-CP",
+   "src": "11-CP",
+   "driveId": "18rKB6IX7ZKRG6HDWQJjoPZ82MxRFiMDv",
+   "start": 5.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 2
+  },
+  {
+   "key": "s13_12_1-CP",
+   "src": "12.1-CP",
+   "driveId": "1dXIUP3VM3GiswsUUYy3UQjTOD-eENZZ4",
+   "start": 1.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 2,
+   "out": {
+    "type": "zoomBlur",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s14_22_1-BM",
+   "src": "22.1-BM",
+   "driveId": "1fcCkLvP1IDpR6VnGMwteGlSXH4ijgTvs",
+   "start": 0.8,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 3
+  },
+  {
+   "key": "s15_21-BM",
+   "src": "21-BM",
+   "driveId": "15b1a0y2XG1uzXtJvuNHPAFGXze_ckQ_t",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 3
+  },
+  {
+   "key": "s16_20-BM",
+   "src": "20-BM",
+   "driveId": "1KU_O0WJuQIUzzH9IGuKFeBHiimVsvdUI",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 3
+  },
+  {
+   "key": "s17_22-BM",
+   "src": "22-BM",
+   "driveId": "1fGK30LaR-x_zendYLjK_QRZ9CRiKcAL_",
+   "start": 0.5,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 3,
+   "out": {
+    "type": "lightLeak",
+    "frames": 12
+   }
+  },
+  {
+   "key": "s18_25-BM",
+   "src": "25-BM",
+   "driveId": "1NBL5WV5NhejrBJiCDIpzbApbfH8cA1Fw",
+   "start": 1.0,
+   "speed": 0.6,
+   "frames": 60,
+   "stage": 4
+  },
+  {
+   "key": "s19_23-BM",
+   "src": "23-BM",
+   "driveId": "1YPkUej-qXHPL0v0-oDmqsjWhOtwBczUs",
+   "start": 1.0,
+   "speed": 0.6,
+   "frames": 30,
+   "stage": 4
+  },
+  {
+   "key": "s20_26_1-BM",
+   "src": "26.1-BM",
+   "driveId": "1pxG1NFXLmHsXprbYit6SVGJwu1Hb_WHJ",
+   "start": 3.0,
+   "speed": 0.8,
+   "frames": 30,
+   "stage": 4,
+   "out": {
+    "type": "zoomBlur",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s21_46-SD",
+   "src": "46-SD",
+   "driveId": "1PnSG3p-xOZ_9XA5CQ13dW62qxxbFxBqA",
+   "start": 0.5,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 5
+  },
+  {
+   "key": "s22_45-SD",
+   "src": "45-SD",
+   "driveId": "1jUFvmvqWM2LQD1gmk9299x75xCfwnEW7",
+   "start": 0.8,
+   "speed": 0.8,
+   "frames": 30,
+   "stage": 5
+  },
+  {
+   "key": "s23_44-SD",
+   "src": "44-SD",
+   "driveId": "1CrIAjShMME4G7Fj7titRCWmC4HkhAgKs",
+   "start": 16.2,
+   "speed": 0.8,
+   "frames": 30,
+   "stage": 5
+  },
+  {
+   "key": "s24_57-SD",
+   "src": "57-SD",
+   "driveId": "1b63y8oh3Bt3i0yXTqA0tgiEdCyEPcIiM",
+   "start": 1.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 5
+  },
+  {
+   "key": "s25_51_1-SD",
+   "src": "51.1-SD",
+   "driveId": "1HTRgjXwOhZf_rhErI1cEo5OYxEFtyik2",
+   "start": 1.0,
+   "speed": 0.6,
+   "frames": 30,
+   "stage": 5
+  },
+  {
+   "key": "s26_53-SD",
+   "src": "53-SD",
+   "driveId": "1VngIH91mlS6uFedfO0saU_IizAk63t6k",
+   "start": 4.5,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 5,
+   "out": {
+    "type": "slide",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s27_63-PR",
+   "src": "63-PR",
+   "driveId": "1K5i4dicniLzUsKhYzzrAisKaegH7DliZ",
+   "start": 0.6,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 6
+  },
+  {
+   "key": "s28_64-PR",
+   "src": "64-PR",
+   "driveId": "1VNGdUnh5GqTQIBoLR0G_Crxm-nWWTcey",
+   "start": 4.3,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 6
+  },
+  {
+   "key": "s29_62_1PR",
+   "src": "62.1PR",
+   "driveId": "1zfFt9o8RuEVabcUQ3i4SwssysIim0BgJ",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 6
+  },
+  {
+   "key": "s30_69-PR",
+   "src": "69-PR",
+   "driveId": "1rN-Jtk1qfk6E4pMp2prYUBb1ARPr_Vke",
+   "start": 0.1,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 6
+  },
+  {
+   "key": "s31_71-PR",
+   "src": "71-PR",
+   "driveId": "1ZsZHJLvQF3oOH9Ny7DP4ZtoW9PY_Przc",
+   "start": 1.3,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 6
+  },
+  {
+   "key": "s32_66-PR",
+   "src": "66-PR",
+   "driveId": "1rytsmkk3TJ7FNaB31dX3UWsQ2FV1gcBH",
+   "start": 9.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 6,
+   "out": {
+    "type": "zoomBlur",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s33_75-PR",
+   "src": "75-PR",
+   "driveId": "1owYxEWOrU7jWwdFo5WQGxw5ljB-DRKm2",
+   "start": 0.8,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 7
+  },
+  {
+   "key": "s34_77-DR",
+   "src": "77-DR",
+   "driveId": "1IlqJ4HMsp5qfBgjHWwnY2HLezxXiW7xB",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 7
+  },
+  {
+   "key": "s35_79-DR",
+   "src": "79-DR",
+   "driveId": "14SXU-mgX-aAL990oZ8cKU_Yh-BLgULZT",
+   "start": 4.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 7
+  },
+  {
+   "key": "s36_78-DR",
+   "src": "78-DR",
+   "driveId": "1z0OF4Me_23HIP9WqHozzRL3aEx9bwS54",
+   "start": 3.8,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 7,
+   "out": {
+    "type": "lightLeak",
+    "frames": 12
+   }
+  },
+  {
+   "key": "s37_GP",
+   "src": "GP",
+   "driveId": "1fqbJlopJtiDbnSukF8ks3q_xTHnAPnX6",
+   "start": 5.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 8
+  },
+  {
+   "key": "s38_80-GL",
+   "src": "80-GL",
+   "driveId": "1WLaYmi93P6zM6bU5Mc32JLs3Z0C8aK6b",
+   "start": 1.0,
+   "speed": 0.6,
+   "frames": 30,
+   "stage": 8
+  },
+  {
+   "key": "s39_84-GL",
+   "src": "84-GL",
+   "driveId": "1ncEIAkTgsIX8Pz76GRwTrwWibFiMH5dR",
+   "start": 5.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 8
+  },
+  {
+   "key": "s40_82-GL",
+   "src": "82-GL",
+   "driveId": "1JqubfhUfHETkUcRPNxFX0Osg2Pdf4fGI",
+   "start": 3.9,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 8,
+   "out": {
+    "type": "slide",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s41_86-DG",
+   "src": "86-DG",
+   "driveId": "1mTYl-OXMp415phLsjlrF6QRcxD9foO_u",
+   "start": 1.7,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 9
+  },
+  {
+   "key": "s42_87-DG",
+   "src": "87-DG",
+   "driveId": "172DlRkfqL_LREkN0RdTLnfEF7aWAihG0",
+   "start": 0.1,
+   "speed": 0.6,
+   "frames": 30,
+   "stage": 9
+  },
+  {
+   "key": "s43_90-DG",
+   "src": "90-DG",
+   "driveId": "1Ks8NI8ahhxlMEJMWrk4pk9BZqQxWAKUn",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 60,
+   "stage": 9,
+   "out": {
+    "type": "lightLeak",
+    "frames": 12
+   }
+  },
+  {
+   "key": "s44_94-KL",
+   "src": "94-KL",
+   "driveId": "1Iuce5yGBPyxR5LDf93FNKvwaZhjjSopN",
+   "start": 5.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 10
+  },
+  {
+   "key": "s45_95-KL",
+   "src": "95-KL",
+   "driveId": "17FuuktDlec0oBZCLTsKoAphreWsirJlW",
+   "start": 0.4,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 10
+  },
+  {
+   "key": "s46_97_1-KL",
+   "src": "97.1-KL",
+   "driveId": "1hJwEy8fno8L2BPoqYRzGGV3T4rHUny11",
+   "start": 0.6,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 10
+  },
+  {
+   "key": "s47_95_1-KL",
+   "src": "95.1-KL",
+   "driveId": "1vuSIkcbm76sACJj5poK_8YFlV4OmpnVM",
+   "start": 2.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 10
+  },
+  {
+   "key": "s48_96-KL",
+   "src": "96-KL",
+   "driveId": "1ryp7cKwmhO8Mq0lglb8MBfn55okJkRmF",
+   "start": 1.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 10
+  },
+  {
+   "key": "s49_97_2-KL",
+   "src": "97.2-KL",
+   "driveId": "1gwtfb4fC5sGHNCr8FYyL6VXxSxoDmjKC",
+   "start": 6.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 10,
+   "out": {
+    "type": "zoomBlur",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s50_97_6_3-KL",
+   "src": "97.6.3-KL",
+   "driveId": "1RiKT3SO1uWLUOOabNxsip2zg3WppYMcb",
+   "start": 1.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 11
+  },
+  {
+   "key": "s51_106-KL",
+   "src": "106-KL",
+   "driveId": "1QgNMa4nEwUZiHufn_wT2z5POcmEyeK02",
+   "start": 12.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 11
+  },
+  {
+   "key": "s52_101-KL",
+   "src": "101-KL",
+   "driveId": "15UPWEhgOqTWczvlVUq6N5xarQn0T-MRQ",
+   "start": 2.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 11
+  },
+  {
+   "key": "s53_102-KL",
+   "src": "102-KL",
+   "driveId": "1ELvex10HA9DVbHDrKoj6CeD_k44OlZs4",
+   "start": 10.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 11,
+   "out": {
+    "type": "slide",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s54_115_1-PO",
+   "src": "115.1-PO",
+   "driveId": "1X3tzreemrC5ZPShIIknIk4OOy5N0hpIK",
+   "start": 12.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 12
+  },
+  {
+   "key": "s55_119-PO",
+   "src": "119-PO",
+   "driveId": "1hSzP3sJ352abqkgJN6z2uQ6AsnIiVCyV",
+   "start": 4.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 12
+  },
+  {
+   "key": "s56_123-PO",
+   "src": "123-PO",
+   "driveId": "190ejGpQpEXNGnFfjOhJfe3k9K5rrdtQg",
+   "start": 2.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 12
+  },
+  {
+   "key": "s57_125-PO",
+   "src": "125-PO",
+   "driveId": "1Wrr5Myj62-Yf4ghBcL48Adf4UrS5UPzy",
+   "start": 9.0,
+   "speed": 0.8,
+   "frames": 30,
+   "stage": 12
+  },
+  {
+   "key": "s58_126-PO",
+   "src": "126-PO",
+   "driveId": "1Pxh2JMx788z5uT3zw-qAm3vx9pUeb7TV",
+   "start": 5.0,
+   "speed": 0.6,
+   "frames": 30,
+   "stage": 12
+  },
+  {
+   "key": "s59_132-PO",
+   "src": "132-PO",
+   "driveId": "1BXNrwibX06RMwuox5nkLel7NxBzfeQL5",
+   "start": 0.3,
+   "speed": 0.6,
+   "frames": 30,
+   "stage": 12,
+   "out": {
+    "type": "zoomBlur",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s60_135-PK",
+   "src": "135-PK",
+   "driveId": "1B8uVnxGn2bhKr6sX6m2o4DY2uoTlzYX2",
+   "start": 11.5,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 13
+  },
+  {
+   "key": "s61_136-PK",
+   "src": "136-PK",
+   "driveId": "1r2bNon5O3cdXtPuGPEnTJD4gRP7Vqc4H",
+   "start": 5.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 13
+  },
+  {
+   "key": "s62_137-PK",
+   "src": "137-PK",
+   "driveId": "1LVuu4yx9pf8Hc2WXWhDn8bIZPoZ-CNqY",
+   "start": 2.0,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 13
+  },
+  {
+   "key": "s63_145-PK",
+   "src": "145-PK",
+   "driveId": "104qlyjE9UvyDq8fjvYwnigRHcEZAyuJk",
+   "start": 1.9,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 13
+  },
+  {
+   "key": "s64_147-PK",
+   "src": "147-PK",
+   "driveId": "1IM0ZYgDhj7ZwDLj49VnAqtTW1xDIJilD",
+   "start": 4.5,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 13
+  },
+  {
+   "key": "s65_154-PK",
+   "src": "154-PK",
+   "driveId": "1tXRgKFp_ZECgFGajl2MCDuFBfrHeTgjQ",
+   "start": 0.2,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 13,
+   "out": {
+    "type": "slide",
+    "frames": 10
+   }
+  },
+  {
+   "key": "s66_162-DS",
+   "src": "162-DS",
+   "driveId": "1WVppAkBYMBeXGJQv8tCrDUmg2DlE4hzt",
+   "start": 3.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 14
+  },
+  {
+   "key": "s67_164-DS",
+   "src": "164-DS",
+   "driveId": "1ecxlnVkggT9Q_m-WqwDE4r0YZHJobXjZ",
+   "start": 1.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 14
+  },
+  {
+   "key": "s68_169DS",
+   "src": "169DS",
+   "driveId": "1ifKp8ElCdhb6j9_UOSwQavouUsYYo3ir",
+   "start": 2.5,
+   "speed": 1.2,
+   "frames": 30,
+   "stage": 14
+  },
+  {
+   "key": "s69_168-DS",
+   "src": "168-DS",
+   "driveId": "1ar4KFl-AeeqLrf-NHnDB3Eq1aKwdNWKV",
+   "start": 36.0,
+   "speed": 1.0,
+   "frames": 30,
+   "stage": 14,
+   "out": {
+    "type": "fade",
+    "frames": 12
+   }
+  },
+  {
+   "key": "s70_131-PO",
+   "src": "131-PO",
+   "driveId": "14o991gkc9gPb8DysTwd45aJM6HsxmDks",
+   "start": 5.3,
+   "speed": 0.5,
+   "frames": 180,
+   "stage": 15
+  }
+ ]
+}
