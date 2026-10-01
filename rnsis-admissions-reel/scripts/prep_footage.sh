@@ -59,3 +59,11 @@ ffmpeg -hide_banner -loglevel error -y -ss 4.0 -i "$FILM" -frames:v 1 \
 ffmpeg -hide_banner -loglevel error -y -ss 111.3 -i "$FILM" -frames:v 1 \
   -vf "crop=$CW:2160:x=($W-$CW)/2:y=0,scale=1080:1920:flags=lanczos" -q:v 2 "$OUT/still_group.jpg"
 echo "stills done"
+
+# Smooth slow motion for the two hook shots that play at ~0.65x (motion-interpolated to 60 fps).
+for name in proof_little hook_a; do
+  ffmpeg -nostdin -hide_banner -loglevel error -y -i "$OUT/$name.mp4" -an \
+    -vf "minterpolate=fps=60:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1" \
+    -c:v libx264 -preset slow -crf 15 -pix_fmt yuv420p -movflags +faststart "$OUT/${name}_smooth.mp4"
+  echo "${name}_smooth done"
+done

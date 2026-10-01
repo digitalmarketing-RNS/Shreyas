@@ -1,16 +1,23 @@
-"""Compose the original 31s music bed for the RNSIS Admissions 2027-28 reel.
+"""Compose the original 35 s score for the RNSIS Admissions 2027-28 reel.
 
-120 BPM, D major. Every section boundary sits on an edit point of the reel
-(see src/timeline.ts), so cuts, text pops and musical hits line up exactly.
+120 BPM, D major, written as a bed for a voiceover that runs the whole length:
+  0-4   hook      "Every child holds a universe of possibilities": celesta twinkles,
+                  choir, warm pad, shimmer on the key words, build into the drop
+  4-11  identities: pizzicato-string pulse, drums, a tom hit on every 1 s cut
+  11-12 break     music stops, riser + reverse cymbal
+  12-16 payoff    "ALL OF IT": full groove, strings, glockenspiel motif
+  16-24 proof     lighter groove, then a snare/riser build
+  24-28 lift      biggest section: horns, choir, string octaves, motif
+  28-32 end card  half-time, calm cadence under the call to action
+  32    final hit on the school name, ring-out to 35 s
+Every section boundary is a downbeat and an edit point in src/timeline.ts.
 
-Melodic/harmonic parts are written as MIDI and rendered with FluidSynth using
-the MuseScore General soundfont (MIT licence). Drums, bass, plucks, risers and
-impacts are synthesised here, so the whole track is original and safe to use in
-paid social ads.
+Pitched parts are MIDI rendered with FluidSynth + the MuseScore General soundfont (MIT).
+Drums, bass, plucks, risers and impacts are synthesised here. Mid-range instruments are
+kept light and high-passed so the voiceover sits on top; mix_audio.py ducks the bed under it.
 
 Usage:
-    python compose_music.py <out_dir>
-Writes music.wav (full mix, no VO) and sfx.wav (whooshes/ticks on cuts).
+    python compose_music.py <out_dir>        -> music.wav, sfx.wav
 """
 
 import os
@@ -24,32 +31,36 @@ import soundfile as sf
 from scipy.signal import butter, fftconvolve, sosfilt
 
 SR = 44100
-LENGTH = 31.5
+LENGTH = 35.0
 N = int(SR * LENGTH)
 SOUNDFONT = "/usr/share/sounds/sf2/MuseScore_General_Full.sf2"
 rng = np.random.default_rng(2027)
 
-# ---------------------------------------------------------------- harmony
-# Close voicings around D4 for smooth voice leading.
-CHORDS = {
-    "Dadd9": dict(piano=[62, 66, 69, 76], bass=38),
-    "D": dict(piano=[62, 66, 69, 74], bass=38),
-    "A": dict(piano=[61, 64, 69, 73], bass=33),
-    "Asus4": dict(piano=[62, 64, 69, 74], bass=33),
-    "Bm": dict(piano=[62, 66, 71, 74], bass=35),
-    "G": dict(piano=[62, 67, 71, 74], bass=31),
-    "Em": dict(piano=[64, 67, 71, 76], bass=40),
-}
+# Section boundaries (seconds); keep in sync with src/timeline.ts.
+HOOK, IDS, BREAK, PAYOFF, PROOF, LIFT, OUTRO, FINAL = 0, 4, 11, 12, 16, 24, 28, 32
+CUTS = [4, 5, 6, 7, 8, 9, 10]          # identity cuts
+FAC_CUTS = [20, 21, 22, 23]            # facility flashes
 
-# (start, end, chord) in seconds
+# ---------------------------------------------------------------- harmony
+CHORDS = {
+    "Dadd9": dict(v=[62, 66, 69, 76], bass=38),
+    "Gadd9": dict(v=[62, 67, 69, 71], bass=31),
+    "D": dict(v=[62, 66, 69, 74], bass=38),
+    "A": dict(v=[61, 64, 69, 73], bass=33),
+    "Asus4": dict(v=[62, 64, 69, 74], bass=33),
+    "Bm": dict(v=[62, 66, 71, 74], bass=35),
+    "G": dict(v=[62, 67, 71, 74], bass=31),
+    "Em7": dict(v=[62, 64, 67, 71], bass=40),
+}
 PROGRESSION = [
-    (0, 2, "Dadd9"), (2, 3, "A"),                                   # hook
-    (3, 5, "D"), (5, 7, "A"), (7, 9, "Bm"), (9, 10, "G"),           # identities
-    (10, 11, "A"),                                                   # break
-    (11, 12, "D"), (12, 13, "A"), (13, 14, "Bm"), (14, 15, "G"),     # ALL OF IT
-    (15, 17, "D"), (17, 19, "A"), (19, 20, "G"), (20, 20.5, "Asus4"), (20.5, 21, "A"),  # proof
-    (21, 22, "D"), (22, 23, "A"), (23, 24, "Bm"), (24, 25, "G"),     # admissions open
-    (25, 27, "Em"), (27, 29, "A"), (29, 31.5, "D"),                  # end card
+    (0, 2, "Dadd9"), (2, 3, "Gadd9"), (3, 4, "A"),
+    (4, 6, "D"), (6, 8, "A"), (8, 10, "Bm"), (10, 11, "G"),
+    (11, 12, "Asus4"),
+    (12, 13, "D"), (13, 14, "A"), (14, 15, "Bm"), (15, 16, "G"),
+    (16, 18, "D"), (18, 20, "A"), (20, 22, "Bm"), (22, 23, "G"), (23, 23.5, "Asus4"), (23.5, 24, "A"),
+    (24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"),
+    (28, 30, "Em7"), (30, 31, "G"), (31, 32, "A"),
+    (32, 35, "D"),
 ]
 
 
@@ -60,24 +71,11 @@ def chord_at(t):
     return CHORDS["D"]
 
 
-def section(t):
-    if t < 2:
-        return "intro"
-    if t < 3:
-        return "build"
-    if t < 10:
-        return "groove"
-    if t < 11:
-        return "break"
-    if t < 15:
-        return "chorus"
-    if t < 21:
-        return "proof"
-    if t < 25:
-        return "lift"
-    if t < 29:
-        return "outro"
-    return "final"
+def frange(a, b, step):
+    t = a
+    while t < b - 1e-6:
+        yield t
+        t += step
 
 
 # ---------------------------------------------------------------- MIDI parts
@@ -88,21 +86,22 @@ def sec_to_tick(t):
     return int(round(t * 2 * TPB))  # 120 BPM -> 2 beats per second
 
 
-def write_midi(path, program, notes, ccs=(), channel=0):
+def write_midi(path, program, notes, ccs=()):
     """notes: (start, dur, pitch, vel); ccs: (time, cc, value)."""
     events = []
     for s, d, p, v in notes:
-        events.append((sec_to_tick(s), 1, mido.Message("note_on", note=p, velocity=int(v), channel=channel)))
-        events.append((sec_to_tick(s + d), 0, mido.Message("note_off", note=p, velocity=0, channel=channel)))
+        v = int(max(1, min(127, v)))
+        events.append((sec_to_tick(s), 1, mido.Message("note_on", note=p, velocity=v)))
+        events.append((sec_to_tick(s + d), 0, mido.Message("note_off", note=p, velocity=0)))
     for t, cc, val in ccs:
-        events.append((sec_to_tick(t), 0, mido.Message("control_change", control=cc, value=int(val), channel=channel)))
+        events.append((sec_to_tick(t), 0, mido.Message("control_change", control=cc, value=int(max(0, min(127, val))))))
     events.sort(key=lambda e: (e[0], e[1]))
     mid = mido.MidiFile(ticks_per_beat=TPB)
     tr = mido.MidiTrack()
     mid.tracks.append(tr)
     tr.append(mido.MetaMessage("set_tempo", tempo=500000, time=0))
-    tr.append(mido.Message("program_change", program=program, channel=channel, time=0))
-    tr.append(mido.Message("control_change", control=7, value=110, channel=channel, time=0))
+    tr.append(mido.Message("program_change", program=program, time=0))
+    tr.append(mido.Message("control_change", control=7, value=110, time=0))
     last = 0
     for tick, _, msg in events:
         msg.time = tick - last
@@ -113,8 +112,7 @@ def write_midi(path, program, notes, ccs=(), channel=0):
 
 def render_midi(mid_path, wav_path, gain=0.5):
     subprocess.run(
-        ["fluidsynth", "-ni", "-g", str(gain), "-R", "0", "-C", "0", "-r", str(SR),
-         "-F", wav_path, SOUNDFONT, mid_path],
+        ["fluidsynth", "-ni", "-g", str(gain), "-R", "0", "-C", "0", "-r", str(SR), "-F", wav_path, SOUNDFONT, mid_path],
         check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
     y, sr = sf.read(wav_path, always_2d=True)
@@ -125,105 +123,117 @@ def render_midi(mid_path, wav_path, gain=0.5):
     return out
 
 
+def ramp(a, b, v0, v1, steps=12, cc=11):
+    return [(a + (b - a) * k / (steps - 1), cc, v0 + (v1 - v0) * k / (steps - 1)) for k in range(steps)]
+
+
 def piano_part():
     notes = []
-    # Intro ("a universe of possibilities"): soft open Dadd9 under the celesta twinkles,
-    # then the A chord swells into the drop.
-    notes += [(0.0, 1.95, p, 60) for p in (50, 57, 64, 66, 69)]
-    notes += [(2.0, 0.9, p, 62) for p in CHORDS["A"]["piano"]]
-    # Grooves: 3-3-2 stabs per 2s, chord taken from the progression.
-    for start, end, vel in [(3, 10, 74), (11, 15, 84), (15, 21, 72), (21, 25, 90)]:
-        t = start
-        while t < end - 1e-6:
-            for off in (0, 0.75, 1.5):
-                ht = t + off
-                if ht < end - 1e-6:
-                    for p in chord_at(ht)["piano"]:
-                        notes.append((ht, 0.42, p, vel))
-                    notes.append((ht, 0.42, chord_at(ht)["piano"][0] - 12, vel - 10))
-            t += 2
-    # Break pickup notes leading into the slam.
-    notes += [(10.5, 0.24, 69, 70), (10.75, 0.24, 73, 76)]
-    # Outro: sustained chords under the tagline.
-    for s, e, c in [(25, 27, "Em"), (27, 29, "A")]:
-        for p in CHORDS[c]["piano"]:
-            notes.append((s, e - s - 0.05, p, 64))
-        notes.append((s, e - s - 0.05, CHORDS[c]["piano"][0] - 12, 60))
-    # Final hit.
-    for p in [50, 62, 66, 69, 74, 78]:
-        notes.append((29.0, 2.4, p, 96))
+    # Hook: soft open voicings under the celesta.
+    for s, e, c in [(0, 2, "Dadd9"), (2, 3, "Gadd9"), (3, 4, "A")]:
+        ch = CHORDS[c]
+        notes += [(s, e - s - 0.05, p, 58) for p in [ch["bass"] + 12] + ch["v"][1:]]
+    # Light high ostinato (8ths) in the grooves; stays above the voice's core range.
+    for a, b, vel in [(IDS, BREAK, 62), (PAYOFF, PROOF, 70), (PROOF, 22, 58), (LIFT, OUTRO, 76)]:
+        for k, t in enumerate(frange(a, b, 0.25)):
+            ch = sorted(chord_at(t)["v"])
+            pat = [ch[3] + 12, ch[2] + 12, ch[1] + 12, ch[2] + 12]
+            notes.append((t, 0.22, pat[k % 4], vel + (8 if k % 4 == 0 else 0)))
+    # Break pickups into the slam.
+    notes += [(11.5, 0.24, 69, 72), (11.75, 0.24, 73, 78)]
+    # End card: warm sustained chords, then the final chord.
+    for s, e, c in [(28, 30, "Em7"), (30, 31, "G"), (31, 32, "A")]:
+        ch = CHORDS[c]
+        notes += [(s, e - s - 0.05, p, 64) for p in [ch["bass"] + 12] + ch["v"]]
+    notes += [(32.0, 2.8, p, 98) for p in [38, 50, 57, 62, 66, 69, 74, 78]]
+    return notes
+
+
+def pizz_part():
+    """Pizzicato ostinato that drives the montage and proof sections."""
+    notes = []
+    for a, b, vel in [(IDS, BREAK, 92), (PAYOFF, PROOF, 96), (PROOF, 23.5, 84), (LIFT, OUTRO, 100)]:
+        for k, t in enumerate(frange(a, b, 0.25)):
+            ch = chord_at(t)
+            root = ch["bass"] + 12
+            pat = [root, root + 7, root + 12, root + 7]
+            notes.append((t, 0.2, pat[k % 4], vel + (12 if k % 2 == 0 else 0)))
     return notes
 
 
 def strings_part():
     notes, ccs = [], []
-    spans = [(0, 2, "Dadd9", 40), (2, 3, "A", 70), (3, 5, "D", 70), (5, 7, "A", 72), (7, 9, "Bm", 75), (9, 10, "G", 78),
-             (11, 12, "D", 92), (12, 13, "A", 92), (13, 14, "Bm", 94), (14, 15, "G", 96),
-             (15, 17, "D", 74), (17, 19, "A", 76), (19, 20, "G", 82), (20, 21, "A", 90),
-             (21, 22, "D", 104), (22, 23, "A", 104), (23, 24, "Bm", 106), (24, 25, "G", 108),
-             (25, 27, "Em", 82), (27, 29, "A", 86), (29, 31.3, "D", 110)]
-    for s, e, c, v in spans:
+    spans = [(s, e, c) for s, e, c in PROGRESSION if not (BREAK <= s < PAYOFF)]
+    for s, e, c in spans:
         ch = CHORDS[c]
-        voicing = [ch["bass"] + 12, ch["piano"][0] - 12, ch["piano"][2] - 12] + ch["piano"][1:3]
-        if section(s) in ("lift", "final"):
-            voicing += [ch["piano"][-1] + 12]
-        for p in voicing:
-            notes.append((s, e - s, p, v))
-    # Expression swells: build before drops, dip in the break.
-    for t, val in [(0, 55), (2.0, 70), (2.9, 120), (3.0, 95), (9.5, 110), (10.0, 30), (10.9, 115),
-                   (11.0, 120), (15.0, 95), (19.0, 100), (20.9, 127), (21, 127), (25, 100), (29, 127)]:
-        ccs.append((t, 11, val))
-    # Fine-grained ramps for the build sections.
-    for a, b, v0, v1 in [(2.0, 2.95, 70, 125), (10.0, 10.95, 30, 120), (19.0, 20.95, 95, 127)]:
-        for k in range(12):
-            ccs.append((a + (b - a) * k / 11, 11, v0 + (v1 - v0) * k / 11))
+        voicing = [ch["bass"] + 12, ch["v"][0] - 12, ch["v"][2] - 12, ch["v"][1], ch["v"][2]]
+        if s >= LIFT and s < OUTRO or s >= FINAL:
+            voicing += [ch["v"][3], ch["v"][3] + 12]  # octave doubling in the lift / final
+        vel = 70 if s < IDS else 82 if s < PAYOFF else 96 if s < PROOF else 80 if s < LIFT else 112 if s < OUTRO else 88
+        notes += [(s, e - s, p, vel) for p in voicing]
+    ccs += [(0, 11, 50)] + ramp(0.2, 3.95, 50, 118)
+    ccs += [(4.0, 11, 92)] + ramp(9.0, 10.95, 92, 120) + [(11.0, 11, 40)]
+    ccs += [(12.0, 11, 122), (16.0, 11, 90)] + ramp(21.0, 23.95, 90, 127)
+    ccs += [(24.0, 11, 127), (28.0, 11, 96)] + ramp(30.0, 31.95, 96, 124) + [(32.0, 11, 127)]
     return notes, ccs
+
+
+def celesta_part():
+    """Twinkling 16th-note celesta across the hook, a sprinkle on the final hit."""
+    notes = []
+    arps = {"Dadd9": [74, 78, 81, 88, 86, 81, 78, 83], "Gadd9": [74, 79, 81, 86, 83, 81, 79, 74], "A": [73, 76, 81, 85, 83, 81, 76, 71]}
+    for k, t in enumerate(frange(0, 3.94, 0.125)):
+        name = "Dadd9" if t < 2 else "Gadd9" if t < 3 else "A"
+        notes.append((t, 0.5, arps[name][k % 8], min(112, 60 + 34 * t / 4 + (10 if k % 4 == 0 else 0))))
+    for k, p in enumerate([86, 90, 93, 98]):
+        notes.append((32.0 + k * 0.125, 1.5, p, 84))
+    return notes
+
+
+def choir_part():
+    notes = [(0.0, 2.0, p, 70) for p in (62, 66, 69, 76)]
+    notes += [(2.0, 1.0, p, 76) for p in (62, 67, 71, 74)]
+    notes += [(3.0, 0.95, p, 84) for p in (61, 64, 69, 76)]
+    for s, e, c in [(24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"), (32, 34.8, "D")]:
+        notes += [(s, e - s, p, 92) for p in CHORDS[c]["v"]]
+    ccs = [(0.0, 11, 40)] + ramp(0.1, 3.9, 40, 120) + [(24.0, 11, 110), (32.0, 11, 120)]
+    return notes, ccs
+
+
+def horns_part():
+    """French horns give the lift and the final chord their size."""
+    notes = []
+    for s, e, c in [(24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"), (32, 34.8, "D")]:
+        ch = CHORDS[c]
+        notes += [(s, e - s - 0.04, p, 100) for p in (ch["bass"] + 24, ch["v"][1] - 12, ch["v"][2] - 12)]
+    # Horn swell under "ALL OF IT".
+    notes += [(12.0, 3.95, p, 82) for p in (50, 57, 62)]
+    return notes, ramp(12.0, 13.5, 60, 110) + [(16.0, 11, 100)]
+
+
+MOTIF = [(0.0, 0.75, 81), (0.75, 0.25, 78), (1.0, 0.5, 76), (1.5, 0.5, 81),
+         (2.0, 0.75, 78), (2.75, 0.25, 74), (3.0, 0.5, 74), (3.5, 0.5, 71)]
+
+
+def glock_part():
+    notes = []
+    for base, vel in [(PAYOFF, 84), (LIFT, 100)]:
+        notes += [(base + o, d + 0.3, p, vel) for o, d, p in MOTIF]
+    notes += [(32.0, 2.4, p, 92) for p in (86, 90, 93)]
+    return notes
+
+
+def strings_melody_part():
+    """The motif sung by violins an octave down in the lift."""
+    return [(LIFT + o, d, p - 12, 104) for o, d, p in MOTIF]
 
 
 def pad_part():
     notes = []
     for s, e, c in PROGRESSION:
-        if section(s) == "break":
+        if BREAK <= s < PAYOFF:
             continue
-        for p in CHORDS[c]["piano"][:3]:
-            notes.append((s, e - s, p - 12, 70))
-    return notes
-
-
-def celesta_part():
-    """Twinkling 16th-note celesta arpeggio across the hook (0-3 s)."""
-    notes = []
-    d_arp = [74, 78, 81, 88, 86, 81, 78, 83]   # D F# A E A F# B: Dadd9/6 shimmer
-    a_arp = [73, 76, 81, 85, 83, 81, 76, 71]
-    k = 0
-    t = 0.0
-    while t < 2.94:
-        arp = d_arp if t < 2.0 else a_arp
-        vel = 62 + 30 * (t / 3.0) + (10 if k % 4 == 0 else 0)
-        notes.append((t, 0.5, arp[k % 8], min(vel, 110)))
-        k += 1
-        t += 0.125
-    return notes
-
-
-def choir_part():
-    """Airy 'oohs' that open up the space under the hook."""
-    notes = [(0.0, 2.0, p, 72) for p in (62, 66, 69, 76)]
-    notes += [(2.0, 0.95, p, 82) for p in (61, 64, 69, 71)]
-    ccs = [(0.0, 11, 40), (0.6, 11, 90), (1.6, 11, 100), (2.0, 11, 95), (2.9, 11, 127)]
-    return notes, ccs
-
-
-def bells_part():
-    motif = [(0.0, 0.75, 81), (0.75, 0.25, 78), (1.0, 0.5, 76), (1.5, 0.5, 81),
-             (2.0, 0.75, 78), (2.75, 0.25, 74), (3.0, 0.5, 74), (3.5, 0.5, 71)]
-    notes = []
-    for base, vel in [(11.0, 92), (21.0, 104)]:
-        for off, d, p in motif:
-            notes.append((base + off, d + 0.3, p, vel))
-            if base == 21.0:
-                notes.append((base + off, d + 0.3, p + 12, vel - 30))
-    notes += [(29.0, 2.0, 86, 100), (29.0, 2.0, 90, 80), (29.0, 2.0, 93, 80)]
+        notes += [(s, e - s, p - 12, 64) for p in CHORDS[c]["v"][:3]]
     return notes
 
 
@@ -244,9 +254,13 @@ def bandpass(x, lo, hi, order=2):
     return sosfilt(butter(order, [lo, hi], "band", fs=SR, output="sos"), x)
 
 
+def hp2(x, fc):
+    return highpass(x.T, fc).T
+
+
 def place(buf, sample, t, gain=1.0, pan=0.0):
     i = int(round(t * SR))
-    if i >= len(buf):
+    if i >= len(buf) or i < 0:
         return
     if sample.ndim == 1:
         l, r = np.cos((pan + 1) * np.pi / 4), np.sin((pan + 1) * np.pi / 4)
@@ -258,11 +272,18 @@ def place(buf, sample, t, gain=1.0, pan=0.0):
 def kick():
     n = int(0.45 * SR)
     t = np.arange(n) / SR
-    f = 46 + 110 * np.exp(-t / 0.035)
-    ph = 2 * np.pi * np.cumsum(f) / SR
-    body = np.sin(ph) * env_exp(n, 0.12)
-    click = highpass(rng.standard_normal(n), 2500) * env_exp(n, 0.004) * 0.25
-    return np.tanh(1.6 * (body + click)) * 0.9
+    f = 48 + 120 * np.exp(-t / 0.03)
+    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(n, 0.13)
+    click = highpass(rng.standard_normal(n), 3000) * env_exp(n, 0.003) * 0.3
+    return np.tanh(1.7 * (body + click)) * 0.9
+
+
+def snare():
+    n = int(0.3 * SR)
+    t = np.arange(n) / SR
+    body = (np.sin(2 * np.pi * 185 * t) + 0.5 * np.sin(2 * np.pi * 330 * t)) * env_exp(n, 0.05)
+    noise = bandpass(rng.standard_normal(n), 1800, 9000) * env_exp(n, 0.09)
+    return np.tanh(0.45 * body + 0.7 * noise) * 0.75
 
 
 def clap():
@@ -271,35 +292,41 @@ def clap():
     e = np.zeros(n)
     for k, d in enumerate([0, 0.011, 0.022]):
         i = int(d * SR)
-        e[i:] += env_exp(n - i, 0.006 if k < 2 else 0.11)
-    return noise * e * 0.55
-
-
-def snare():
-    n = int(0.22 * SR)
-    t = np.arange(n) / SR
-    tone = np.sin(2 * np.pi * 190 * t) * env_exp(n, 0.04)
-    noise = bandpass(rng.standard_normal(n), 1500, 8000) * env_exp(n, 0.07)
-    return (0.5 * tone + 0.6 * noise) * 0.7
+        e[i:] += env_exp(n - i, 0.006 if k < 2 else 0.12)
+    return noise * e * 0.5
 
 
 def hat(open_=False):
-    n = int((0.28 if open_ else 0.06) * SR)
-    noise = highpass(rng.standard_normal(n), 7500, 4)
-    return noise * env_exp(n, 0.09 if open_ else 0.014) * 0.22
+    n = int((0.28 if open_ else 0.05) * SR)
+    return highpass(rng.standard_normal(n), 7500, 4) * env_exp(n, 0.09 if open_ else 0.012) * 0.2
+
+
+def shaker():
+    n = int(0.07 * SR)
+    t = np.arange(n) / SR
+    return bandpass(rng.standard_normal(n), 5000, 12000) * np.sin(np.pi * t / 0.07) ** 2 * 0.12
+
+
+def tom(pitch_hz=110):
+    n = int(0.6 * SR)
+    t = np.arange(n) / SR
+    f = pitch_hz * (1 + 0.6 * np.exp(-t / 0.04))
+    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(n, 0.22)
+    skin = lowpass(rng.standard_normal(n), 2500) * env_exp(n, 0.02) * 0.4
+    return np.tanh(1.4 * (body + skin)) * 0.8
 
 
 def crash(length=2.4):
     n = int(length * SR)
     noise = highpass(rng.standard_normal((n, 2)).T, 4500, 2).T
-    return noise * env_exp(n, length / 4.5)[:, None] * 0.28
+    return noise * env_exp(n, length / 4.5)[:, None] * 0.26
 
 
-def impact():
-    n = int(2.0 * SR)
+def impact(length=2.2):
+    n = int(length * SR)
     t = np.arange(n) / SR
-    f = 38 + 60 * np.exp(-t / 0.08)
-    boom = np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(n, 0.5)
+    f = 36 + 64 * np.exp(-t / 0.08)
+    boom = np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(n, 0.55)
     hit = lowpass(rng.standard_normal(n), 1800) * env_exp(n, 0.05) * 0.6
     return np.tanh(1.3 * (boom + hit)) * 0.85
 
@@ -315,27 +342,24 @@ def riser(length):
         fc = 400 * (12000 / 400) ** (b / blocks)
         seg = bandpass(noise[max(0, a - 2000):z], fc * 0.7, min(fc * 1.4, 20000))
         out[a:z] = seg[-(z - a):]
-    sweep = np.sin(2 * np.pi * np.cumsum(200 + 900 * (t / length) ** 2) / SR) * 0.15
+    sweep = np.sin(2 * np.pi * np.cumsum(200 + 900 * (t / length) ** 2) / SR) * 0.12
     return (out * 0.5 + sweep) * (t / length) ** 2.2
 
 
 def whoosh(length=0.35):
     n = int(length * SR)
     t = np.arange(n) / SR
-    noise = bandpass(rng.standard_normal(n), 600, 6000)
-    shape = np.sin(np.pi * t / length) ** 2
-    return noise * shape * 0.35
+    return bandpass(rng.standard_normal(n), 600, 6000) * np.sin(np.pi * t / length) ** 2 * 0.35
 
 
 def shimmer(length=1.1, f_lo=1800, f_hi=5200):
-    """Rising sparkle: detuned sine partials gliding upward with tremolo."""
+    """Rising sparkle: sine partials gliding upward with tremolo."""
     n = int(length * SR)
     t = np.arange(n) / SR
     out = np.zeros(n)
     for k, ratio in enumerate([1.0, 1.5, 2.0, 2.52, 3.0]):
         f = (f_lo + (f_hi - f_lo) * (t / length) ** 0.6) * ratio / 1.6
-        ph = 2 * np.pi * np.cumsum(f) / SR + k
-        out += np.sin(ph) * (0.6 ** k)
+        out += np.sin(2 * np.pi * np.cumsum(f) / SR + k) * (0.6 ** k)
     trem = 0.6 + 0.4 * np.sin(2 * np.pi * 14 * t)
     env = (1 - np.exp(-t / 0.02)) * np.exp(-t / (length * 0.45))
     return out * trem * env * 0.18
@@ -344,7 +368,7 @@ def shimmer(length=1.1, f_lo=1800, f_hi=5200):
 def tick():
     n = int(0.08 * SR)
     t = np.arange(n) / SR
-    return np.sin(2 * np.pi * 1800 * t) * env_exp(n, 0.012) * 0.25
+    return np.sin(2 * np.pi * 1800 * t) * env_exp(n, 0.012) * 0.22
 
 
 def pluck_note(pitch, dur, vel):
@@ -355,9 +379,8 @@ def pluck_note(pitch, dur, vel):
     for h in range(1, 14):
         if f0 * h > 16000:
             break
-        out += np.sin(2 * np.pi * f0 * h * t + rng.uniform(0, 6.28)) / h * np.exp(-t * (6 + 9 * h))
-    out *= (1 - np.exp(-t / 0.002))
-    return out * (vel / 127) * 0.32
+        out += np.sin(2 * np.pi * f0 * h * t + rng.uniform(0, 6.28)) / h * np.exp(-t * (7 + 10 * h))
+    return out * (1 - np.exp(-t / 0.002)) * (vel / 127) * 0.3
 
 
 def bass_note(pitch, dur, decay=0.35):
@@ -386,126 +409,140 @@ def reverb(x, ir, wet):
     return x + out * wet
 
 
-# ---------------------------------------------------------------- arrange
+# ---------------------------------------------------------------- arrangement
 def drum_bus():
-    drums = np.zeros((N, 2))
+    d = np.zeros((N, 2))
     kicks = []
-    K, C, S, H, HO = kick(), clap(), snare(), hat(), hat(True)
+    K, S, C, H, HO, SH = kick(), snare(), clap(), hat(), hat(True), shaker()
 
-    def groove(a, b, density):
-        t = a
-        while t < b - 1e-6:
-            place(drums, K, t, 1.0)
-            kicks.append(t)
-            beat_in_bar = int(round((t - 3) / 0.5)) % 4
-            if beat_in_bar in (1, 3):
-                place(drums, C, t, 0.9, 0.05)
-            place(drums, HO if density >= 2 else H, t + 0.25, 0.8, 0.25)
-            if density >= 1:
-                place(drums, H, t + 0.125, 0.45, -0.25)
-                place(drums, H, t + 0.375, 0.45, -0.25)
-            t += 0.5
+    def beat_index(t, start):
+        return int(round((t - start) / 0.5)) % 4
 
-    groove(3, 10, 1)
-    groove(11, 15, 2)
-    groove(15, 21, 1)
-    groove(21, 25, 2)
-    # Half-time outro under the tagline.
-    for t in (25.0, 26.0, 26.75, 27.0, 28.0, 28.5):
-        place(drums, K, t, 0.85)
-        kicks.append(t)
-    for t in (25.5, 26.5, 27.5, 28.5):
-        place(drums, C, t, 0.6)
-    for k in range(32):
-        place(drums, H, 25 + k * 0.125, 0.25 if k % 2 else 0.35, 0.2)
-    # Intro ticking hats.
-    for k in range(16):
-        place(drums, H, k * 0.125, 0.1 + 0.06 * (k % 4 == 0), 0.3)
-    # Snare builds.
-    for k in range(8):
-        place(drums, S, 2.0 + k * 0.125, 0.5 + 0.7 * k / 7)
+    # Identities: cinematic pulse (kick 1 & 3 + push, clap 2 & 4, 16th shaker, tom on every cut).
+    for t in frange(IDS, BREAK, 0.5):
+        b = beat_index(t, IDS)
+        if b in (0, 2):
+            place(d, K, t, 1.0); kicks.append(t)
+        if b == 1:
+            place(d, K, t + 0.25, 0.6); kicks.append(t + 0.25)
+        if b in (1, 3):
+            place(d, C, t, 0.8, 0.05)
+    for t in frange(IDS, BREAK, 0.125):
+        place(d, SH, t, 0.9 if int(round(t * 8)) % 2 else 0.5, 0.3)
+    for i, t in enumerate(CUTS):
+        place(d, tom(98 + 6 * i), t, 0.75, -0.2 + 0.07 * i)
+
+    # Payoff + lift: full groove.
+    for a, b in [(PAYOFF, PROOF), (LIFT, OUTRO)]:
+        for t in frange(a, b, 0.5):
+            place(d, K, t, 1.0); kicks.append(t)
+            if beat_index(t, a) in (1, 3):
+                place(d, S, t, 0.9); place(d, C, t, 0.6, 0.1)
+            place(d, HO, t + 0.25, 0.7, 0.25)
+        for t in frange(a, b, 0.125):
+            place(d, H, t, 0.35 if int(round(t * 8)) % 2 else 0.2, -0.25)
+    for k, t in enumerate(frange(LIFT, OUTRO, 1.0)):
+        place(d, tom(90 - 8 * k), t + 0.75, 0.5)
+
+    # Proof: lighter groove, then a build into the lift.
+    for t in frange(PROOF, 23.0, 0.5):
+        b = beat_index(t, PROOF)
+        if b in (0, 2):
+            place(d, K, t, 0.9); kicks.append(t)
+        if b in (1, 3):
+            place(d, C, t, 0.7)
+    for t in frange(PROOF, 23.0, 0.125):
+        place(d, SH, t, 0.7 if int(round(t * 8)) % 2 else 0.4, 0.3)
+    for t in FAC_CUTS:
+        place(d, tom(120), t, 0.4)
+    for k, t in enumerate(frange(23.0, 24.0, 0.0625)):
+        place(d, S, t, 0.25 + 0.7 * k / 15)
+
+    # Hook build into the drop.
+    for k, t in enumerate(frange(3.0, 4.0, 0.125)):
+        place(d, S, t, 0.2 + 0.6 * k / 7)
     for k in range(4):
-        place(drums, S, 9.5 + k * 0.125, 0.5 + 0.1 * k)
-    for k in range(16):
-        place(drums, S, 20.0 + k * 0.0625, 0.25 + 0.65 * k / 15)
-    # Downbeat crashes + impacts on every big landing.
-    for t, g in [(3.0, 1.0), (11.0, 1.15), (21.0, 1.2), (29.0, 1.2)]:
-        place(drums, crash(), t, g)
-        place(drums, impact(), t, 0.9 * g)
+        place(d, S, 10.5 + k * 0.125, 0.45 + 0.1 * k)
+
+    # End card: half-time, then a fill into the final hit.
+    for t in (28.0, 29.25, 29.5, 30.0, 31.0):
+        place(d, K, t, 0.8); kicks.append(t)
+    for t in (29.0, 31.0):
+        place(d, C, t, 0.55)
+    for t in frange(28, 32, 0.25):
+        place(d, H, t, 0.2, 0.2)
+    for k, t in enumerate(frange(31.5, 32.0, 0.0625)):
+        place(d, S, t, 0.3 + 0.6 * k / 7)
+
+    # Landings.
+    for t, g in [(IDS, 1.0), (PAYOFF, 1.15), (LIFT, 1.2), (FINAL, 1.25)]:
+        place(d, crash(), t, g)
+        place(d, impact(), t, 0.85 * g)
         kicks.append(t)
-    place(drums, impact(), 0.0, 0.35)
-    place(drums, crash(1.6), 15.0, 0.6)
-    place(drums, crash(2.0), 25.0, 0.6)
-    return drums, sorted(kicks)
-
-
-def fx_bus():
-    fx = np.zeros((N, 2))
-    place(fx, riser(1.2), 1.8, 1.3)
-    place(fx, riser(1.0), 10.0, 1.0)
-    place(fx, riser(2.0), 19.0, 0.9)
-    rc = crash(1.0)[::-1] * 1.4  # reverse cymbal into the slam
-    place(fx, rc, 10.0, 1.0)
-    return fx
-
-
-def sfx_bus():
-    sfx = np.zeros((N, 2))
-    for t in (4, 5, 6, 7, 8, 9):
-        place(sfx, whoosh(0.3), t - 0.15, 0.55)
-    for t in (3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0):
-        place(sfx, tick(), t + 0.05, 0.6)
-    for t in (19.0, 19.5, 20.0, 20.5):
-        place(sfx, tick(), t, 0.5)
-        place(sfx, whoosh(0.25), t - 0.12, 0.35)
-    # Hook words: "Every child holds" / "A UNIVERSE" / "OF POSSIBILITIES".
-    place(sfx, whoosh(0.4), 0.0, 0.35)
-    place(sfx, reverb(np.stack([shimmer()] * 2, axis=1), reverb_ir(2.2), 0.8), 0.48, 0.9)
-    place(sfx, reverb(np.stack([shimmer(1.3, 2400, 7000)] * 2, axis=1), reverb_ir(2.2), 0.8), 1.48, 1.0)
-    place(sfx, whoosh(0.5), 14.75, 0.5)
-    place(sfx, whoosh(0.5), 24.75, 0.5)
-    return sfx
+    place(d, impact(), 0.0, 0.3)
+    place(d, crash(1.8), PROOF, 0.5)
+    place(d, crash(2.0), OUTRO, 0.55)
+    return d, sorted(kicks)
 
 
 def bass_bus():
     bass = np.zeros((N, 2))
-    for a, b, octave_jump in [(3, 9.5, False), (11, 15, True), (15, 20, False), (21, 25, True)]:
-        t = a
-        while t < b - 1e-6:
-            p = chord_at(t)["bass"]
-            if octave_jump and int(round(t / 0.25)) % 2 == 1:
-                p += 12
+    for a, b, octave in [(IDS, 10.75, False), (PAYOFF, PROOF, True), (PROOF, 23.0, False), (LIFT, OUTRO, True)]:
+        for t in frange(a, b, 0.25):
+            p = chord_at(t)["bass"] + (12 if octave and int(round(t * 4)) % 2 else 0)
             place(bass, bass_note(p, 0.24), t, 0.9)
-            t += 0.25
-    for s, e, c in [(25, 27, "Em"), (27, 29, "A")]:
-        place(bass, bass_note(CHORDS[c]["bass"], e - s - 0.05, decay=2.5), s, 0.7)
-    place(bass, bass_note(38, 2.3, decay=1.5), 29.0, 1.0)
+    for s, e, c in [(28, 30, "Em7"), (30, 31, "G"), (31, 32, "A")]:
+        place(bass, bass_note(CHORDS[c]["bass"], e - s - 0.04, decay=2.0), s, 0.7)
+    place(bass, bass_note(38, 2.8, decay=1.6), FINAL, 1.0)
+    place(bass, bass_note(33, 0.95, decay=0.8), 3.0, 0.6)  # pickup under the build
     return bass
 
 
 def pluck_bus():
     pl = np.zeros((N, 2))
     pattern = [0, 1, 2, 3, 2, 1, 2, 3]
-    for a, b, vel in [(3, 10, 92), (11, 15, 100), (15, 21, 86), (21, 25, 108), (25, 29, 60)]:
-        k = 0
-        t = a
-        while t < b - 1e-6:
-            ch = sorted(chord_at(t)["piano"])
-            p = ch[pattern[k % 8]] + 12
-            accent = 1.0 if k % 4 == 0 else 0.75
-            place(pl, pluck_note(p, 0.12, vel * accent), t, 1.0, 0.35 if k % 2 else -0.35)
-            k += 1
-            t += 0.125
+    for a, b, vel in [(PROOF, 23.0, 88), (LIFT, OUTRO, 96)]:
+        for k, t in enumerate(frange(a, b, 0.125)):
+            ch = sorted(chord_at(t)["v"])
+            place(pl, pluck_note(ch[pattern[k % 8]] + 12, 0.1, vel * (1 if k % 4 == 0 else 0.72)), t, 1.0, 0.35 if k % 2 else -0.35)
     return pl
 
 
-def sidechain(kicks, depth=0.55, tau=0.11):
-    t = np.arange(N) / SR
+def fx_bus():
+    fx = np.zeros((N, 2))
+    place(fx, riser(1.4), 2.6, 1.1)
+    place(fx, riser(1.0), BREAK, 1.0)
+    place(fx, crash(1.0)[::-1] * 1.4, BREAK, 1.0)          # reverse cymbal into "ALL OF IT"
+    place(fx, riser(2.5), 21.5, 0.9)
+    place(fx, crash(1.0)[::-1] * 1.0, 23.0, 0.8)
+    place(fx, riser(1.5), 30.5, 0.6)
+    return fx
+
+
+def sfx_bus():
+    sfx = np.zeros((N, 2))
+    place(sfx, whoosh(0.4), 0.0, 0.3)
+    place(sfx, reverb(np.stack([shimmer()] * 2, axis=1), reverb_ir(2.2), 0.8), 1.45, 0.9)       # "A UNIVERSE"
+    place(sfx, reverb(np.stack([shimmer(1.3, 2400, 7000)] * 2, axis=1), reverb_ir(2.2), 0.8), 2.15, 1.0)  # "OF POSSIBILITIES"
+    for t in CUTS[1:]:
+        place(sfx, whoosh(0.3), t - 0.15, 0.45)
+    for t in CUTS:
+        place(sfx, tick(), t + 0.04, 0.5)
+    for t in FAC_CUTS:
+        place(sfx, whoosh(0.3), t - 0.15, 0.35)
+        place(sfx, tick(), t, 0.45)
+    place(sfx, whoosh(0.5), PROOF - 0.25, 0.45)
+    place(sfx, whoosh(0.5), OUTRO - 0.25, 0.45)
+    return sfx
+
+
+def sidechain(kicks, depth=0.5, tau=0.11):
     env = np.zeros(N)
     for k in kicks:
         i = int(k * SR)
         n = min(N - i, int(0.5 * SR))
-        env[i:i + n] = np.maximum(env[i:i + n], np.exp(-np.arange(n) / (tau * SR)))
+        if n > 0:
+            env[i:i + n] = np.maximum(env[i:i + n], np.exp(-np.arange(n) / (tau * SR)))
     return (1 - depth * env)[:, None]
 
 
@@ -513,67 +550,62 @@ def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
     tmp = tempfile.mkdtemp()
 
-    def midi_stem(name, program, notes, ccs=(), gain=0.5):
+    def stem(name, program, notes, ccs=(), gain=0.5):
         mp, wp = os.path.join(tmp, name + ".mid"), os.path.join(tmp, name + ".wav")
         write_midi(mp, program, notes, ccs)
         return render_midi(mp, wp, gain)
 
-    piano = midi_stem("piano", 0, piano_part(), gain=0.55)
+    piano = stem("piano", 0, piano_part(), gain=0.5)
+    pizz = stem("pizz", 45, pizz_part(), gain=0.6)
     s_notes, s_ccs = strings_part()
-    strings = midi_stem("strings", 48, s_notes, s_ccs, gain=0.45)
-    pad = midi_stem("pad", 89, pad_part(), gain=0.35)
-    bells = midi_stem("bells", 9, bells_part(), gain=0.5)
-    celesta = midi_stem("celesta", 8, celesta_part(), gain=0.55)
+    strings = stem("strings", 48, s_notes, s_ccs, gain=0.45)
+    melody = stem("violins", 40, strings_melody_part(), gain=0.4)
+    celesta = stem("celesta", 8, celesta_part(), gain=0.55)
     c_notes, c_ccs = choir_part()
-    choir = midi_stem("choir", 53, c_notes, c_ccs, gain=0.45)
+    choir = stem("choir", 53, c_notes, c_ccs, gain=0.42)
+    h_notes, h_ccs = horns_part()
+    horns = stem("horns", 60, h_notes, h_ccs, gain=0.45)
+    glock = stem("glock", 9, glock_part(), gain=0.45)
+    pad = stem("pad", 89, pad_part(), gain=0.32)
 
     drums, kicks = drum_bus()
     duck = sidechain(kicks)
     bass = bass_bus() * duck
-    plucks = pluck_bus() * sidechain(kicks, 0.35)
-    fx = fx_bus()
-    sfx = sfx_bus()
+    plucks = pluck_bus() * sidechain(kicks, 0.3)
+    fx, sfx = fx_bus(), sfx_bus()
 
-    # Lift the hook section so the first seconds carry as much weight as the drop.
-    tt = np.arange(N) / SR
-    intro = (1 + 1.6 * np.clip((2.4 - tt) / 0.4, 0, 1))[:, None]
-    piano, strings, pad, bells = piano * intro, strings * intro, pad * intro, bells * intro
-
-    ir = reverb_ir()
-    piano = reverb(piano, ir, 0.35)
-    strings = reverb(strings, ir, 0.45) * sidechain(kicks, 0.3)
-    pad = reverb(pad, ir, 0.5) * duck
-    bells = reverb(bells, ir, 0.55)
-    space = reverb_ir(2.8, 0.03)  # big, airy room for the "universe" intro
+    hall, room, space = reverb_ir(2.2), reverb_ir(1.1, 0.03), reverb_ir(2.8, 0.03)
+    piano = hp2(reverb(piano, hall, 0.35), 120)
+    pizz = hp2(reverb(pizz, room, 0.35), 90) * sidechain(kicks, 0.25)
+    strings = hp2(reverb(strings, hall, 0.45), 90) * sidechain(kicks, 0.25)
+    melody = hp2(reverb(melody, hall, 0.5), 150)
     celesta = reverb(celesta, space, 0.7)
-    choir = highpass(reverb(choir, space, 0.6).T, 200).T
-    plucks = reverb(plucks, reverb_ir(1.2, 0.03), 0.3)
+    choir = hp2(reverb(choir, space, 0.6), 200)
+    horns = hp2(reverb(horns, hall, 0.45), 70)
+    glock = reverb(glock, hall, 0.55)
+    pad = hp2(reverb(pad, hall, 0.5), 160) * duck
+    plucks = reverb(plucks, room, 0.3)
     drums = drums + reverb(drums * 0.12, reverb_ir(0.9), 1.0) - drums * 0.12
 
-    # Keep the sub region for kick/bass only; phones can't reproduce it anyway.
-    pad = highpass(pad.T, 150).T
-    strings = highpass(strings.T, 90).T
-    piano = highpass(piano.T, 80).T
-    mix = (
-        piano * 1.15 + strings * 1.3 + pad * 0.55 + bells * 0.9 + plucks * 0.95
-        + celesta * 1.7 + choir * 1.3
-        + bass * 0.7 + drums * 0.72 + fx * 0.7
-    )
-    mix = highpass(mix.T, 32).T
-    lows = lowpass(mix.T, 110).T
-    mix = mix - 0.35 * lows  # ~-3.7 dB low shelf
-    # Hard stop for the break (10.0-11.0) except reverb tails, riser and pickups.
+    # The hook carries weight on its own; lift its melodic layers.
     t = np.arange(N) / SR
-    gate = np.ones(N)
-    gate[(t >= 10.02) & (t < 11.0)] = 0.0
-    gate = np.convolve(gate, np.ones(400) / 400, mode="same")
-    break_keep = piano * 0.9 + strings * 1.1 + fx * 0.6
-    mix = mix * gate[:, None] + break_keep * (1 - gate[:, None])
-    # Tail fade.
-    fade = np.clip((LENGTH - t) / 1.2, 0, 1)
-    mix *= fade[:, None]
-    sfx *= fade[:, None]
+    hook = (1 + 1.4 * np.clip((3.6 - t) / 0.4, 0, 1))[:, None]
+    piano, strings, pad = piano * hook, strings * hook, pad * hook
 
+    mix = (piano * 0.9 + pizz * 1.0 + strings * 1.25 + melody * 0.9 + celesta * 1.7 + choir * 1.25
+           + horns * 1.1 + glock * 0.85 + pad * 0.55 + plucks * 0.8 + bass * 0.75 + drums * 0.78 + fx * 0.7)
+    mix = hp2(mix, 32)
+    mix = mix - 0.3 * lowpass(mix.T, 110).T  # gentle low shelf: phones can't use the sub anyway
+
+    # Break (11-12): hard stop, keep reverb tails, pickups and the riser.
+    gate = np.ones(N)
+    gate[(t >= BREAK + 0.02) & (t < PAYOFF)] = 0.0
+    gate = np.convolve(gate, np.ones(400) / 400, mode="same")
+    keep = piano * 0.9 + strings * 1.25 + fx * 0.7
+    mix = mix * gate[:, None] + keep * (1 - gate[:, None])
+
+    fade = np.clip((LENGTH - t) / 1.5, 0, 1)[:, None]
+    mix, sfx = mix * fade, sfx * fade
     mix = np.tanh(mix * 1.1) / 1.1
     mix /= np.max(np.abs(mix)) / 0.89
     sfx /= max(np.max(np.abs(sfx)), 1e-9) / 0.5

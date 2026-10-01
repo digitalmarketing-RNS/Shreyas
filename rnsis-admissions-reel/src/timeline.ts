@@ -1,19 +1,19 @@
 // Edit decision list. 30 fps, 120 BPM music => one beat every 15 frames, and every
 // section boundary below is a downbeat in scripts/compose_music.py.
 export const FPS = 30;
-export const DURATION = 945; // 31.5 s
+export const DURATION = 1050; // 35 s
 
 export const T = {
   hook: 0, // "Every child holds A UNIVERSE OF POSSIBILITIES"
-  identities: 90, // seven 1-second identity cuts
-  breakCard: 300, // "At RNS International School, they get to be..."
-  payoff: 330, // "ALL OF IT." + VO "every child discovers their unique talents"
-  drone: 450, // CBSE affiliated, since 2013
-  stages: 510, // Nursery -> Grade 10
-  facilities: 570, // four half-second facility flashes
-  offer: 630, // ADMISSIONS OPEN 2027-28
-  end: 750, // end card + VO tagline
-  finalHit: 870, // crest + "RNS International School" VO
+  identities: 120, // seven 1-second identity cuts
+  breakCard: 330, // "At RNS International School, they get to be..."
+  payoff: 360, // "ALL OF IT." + individual attention
+  drone: 480, // CBSE affiliated, since 2013
+  stages: 540, // Nursery -> Grade 10
+  facilities: 600, // four 1-second facility flashes
+  offer: 720, // ADMISSIONS OPEN 2027-28 (on screen only, not in the VO)
+  end: 840, // end card
+  finalHit: 960, // crest + "RNS International School" VO
 } as const;
 
 export type Shot = {
@@ -29,30 +29,31 @@ export type Shot = {
 };
 
 export const SHOTS: Shot[] = [
-  {src: 'proof_little', from: 0, dur: 30, rate: 0.87, push: [1.02, 1.08]},
-  {src: 'hook_a', from: 30, dur: 30, rate: 0.87, push: [1.02, 1.08]},
-  {src: 'hook_c', from: 60, dur: 30, push: [1.02, 1.08]},
+  // Hook: smooth (motion-interpolated) slow motion to let the opening line breathe.
+  {src: 'proof_little_smooth', from: 0, dur: 42, rate: 0.6, push: [1.02, 1.1]},
+  {src: 'hook_a_smooth', from: 42, dur: 39, rate: 0.65, push: [1.02, 1.09]},
+  {src: 'hook_c', from: 81, dur: 39, rate: 0.92, push: [1.02, 1.08]},
 
-  {src: 'id_explorer', from: 90, dur: 30, rate: 0.95, punch: true},
-  {src: 'id_artist', from: 120, dur: 30, punch: true},
-  {src: 'id_scientist', from: 150, dur: 30, punch: true},
-  {src: 'id_innovator', from: 180, dur: 30, punch: true},
-  {src: 'id_athlete', from: 210, dur: 30, push: [1.0, 1.05]},
-  {src: 'id_performer', from: 240, dur: 30, rate: 0.9, punch: true},
-  {src: 'id_leader', from: 270, dur: 30, rate: 0.7, punch: true, zoom: 1.25, y: -230},
+  {src: 'id_explorer', from: 120, dur: 30, rate: 0.95, punch: true},
+  {src: 'id_artist', from: 150, dur: 30, punch: true},
+  {src: 'id_scientist', from: 180, dur: 30, punch: true},
+  {src: 'id_innovator', from: 210, dur: 30, punch: true},
+  {src: 'id_athlete', from: 240, dur: 30, push: [1.0, 1.05]},
+  {src: 'id_performer', from: 270, dur: 30, rate: 0.9, punch: true},
+  {src: 'id_leader', from: 300, dur: 30, rate: 0.7, punch: true, zoom: 1.25, y: -230},
 
-  {src: 'payoff_group', from: 330, dur: 120, rate: 0.915, push: [1.0, 1.06]},
+  {src: 'payoff_group', from: 360, dur: 120, rate: 0.915, push: [1.0, 1.06]},
 
-  {src: 'proof_drone', from: 450, dur: 60, trim: 18, push: [1.0, 1.05]},
-  {src: 'hook_a', from: 510, dur: 30, rate: 0.87, push: [1.1, 1.16]},
-  {src: 'proof_big', from: 540, dur: 30, rate: 0.87, push: [1.04, 1.1]},
-  {src: 'fac_lab', from: 570, dur: 15, trim: 6, punch: true},
-  {src: 'fac_library', from: 585, dur: 15, trim: 6, punch: true},
-  {src: 'fac_computer', from: 600, dur: 15, trim: 6, punch: true},
-  {src: 'fac_sports', from: 615, dur: 15, trim: 6, punch: true},
+  {src: 'proof_drone', from: 480, dur: 60, trim: 18, push: [1.0, 1.05]},
+  {src: 'hook_a_smooth', from: 540, dur: 30, rate: 0.84, push: [1.1, 1.16]},
+  {src: 'proof_big', from: 570, dur: 30, rate: 0.87, push: [1.04, 1.1]},
+  {src: 'fac_lab', from: 600, dur: 30, rate: 0.95, punch: true},
+  {src: 'fac_library', from: 630, dur: 30, trim: 6, punch: true},
+  {src: 'fac_computer', from: 660, dur: 30, trim: 3, punch: true},
+  {src: 'fac_sports', from: 690, dur: 30, trim: 2, punch: true},
 
-  {src: 'offer_bus', from: 630, dur: 60, rate: 0.895, push: [1.08, 1.02]},
-  {src: 'offer_front', from: 690, dur: 60, rate: 0.975, push: [1.02, 1.08]},
+  {src: 'offer_bus', from: 720, dur: 60, rate: 0.895, push: [1.08, 1.02]},
+  {src: 'offer_front', from: 780, dur: 60, rate: 0.975, push: [1.02, 1.08]},
 ];
 
 // The seven "possibilities" that follow the hook "Every child holds a universe of possibilities".

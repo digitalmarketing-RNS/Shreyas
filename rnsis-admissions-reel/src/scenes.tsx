@@ -33,7 +33,7 @@ const Pop: React.FC<{delay?: number; children: React.ReactNode; from?: number}> 
   return <div style={{transform: `scale(${from - (from - 1) * s})`, filter: `blur(${blur}px)`}}>{children}</div>;
 };
 
-// ------------------------------------------------------------------ 0-3 s
+// ------------------------------------------------------------------ 0-4 s
 /** Four-point sparkle glyph. */
 const Sparkle: React.FC<{size: number; color?: string}> = ({size, color = COLORS.white}) => (
   <svg width={size} height={size} viewBox="0 0 24 24">
@@ -44,7 +44,7 @@ const Sparkle: React.FC<{size: number; color?: string}> = ({size, color = COLORS
 /** Twinkling star field for the "universe of possibilities" hook. */
 const Starfield: React.FC = () => {
   const frame = useCurrentFrame();
-  const fadeOut = interpolate(frame, [80, 90], [1, 0], clamp);
+  const fadeOut = interpolate(frame, [110, 120], [1, 0], clamp);
   const burst = (at: number) => Math.max(0, 1 - Math.abs(frame - at - 4) / 10);
   return (
     <AbsoluteFill style={{opacity: fadeOut, pointerEvents: 'none'}}>
@@ -55,7 +55,7 @@ const Starfield: React.FC = () => {
         const phase = random(`p${i}`) * Math.PI * 2;
         const speed = 0.15 + random(`v${i}`) * 0.25;
         const twinkle = 0.35 + 0.65 * Math.abs(Math.sin(frame * speed + phase));
-        const glow = 1 + 1.4 * Math.max(burst(15), burst(45));
+        const glow = 1 + 1.4 * Math.max(burst(45), burst(67));
         const gold = random(`c${i}`) > 0.7;
         return (
           <div
@@ -93,18 +93,18 @@ export const HookText: React.FC = () => {
         <Pop from={1.12}>
           <div style={{...baseText, fontSize: 80, fontWeight: 800}}>Every child holds</div>
         </Pop>
-        <Pop delay={15} from={1.6}>
+        <Pop delay={45} from={1.6}>
           <div style={{position: 'relative'}}>
             <div style={{...baseText, fontSize: 148, fontWeight: 900, letterSpacing: -2}}>A UNIVERSE</div>
-            <div style={{position: 'absolute', left: -46, top: -34, opacity: spark(15), transform: `rotate(${frame * 3}deg) scale(${0.5 + spark(15)})`}}>
+            <div style={{position: 'absolute', left: -46, top: -34, opacity: spark(45), transform: `rotate(${frame * 3}deg) scale(${0.5 + spark(45)})`}}>
               <Sparkle size={56} color={COLORS.gold} />
             </div>
-            <div style={{position: 'absolute', right: -40, bottom: -18, opacity: spark(19), transform: `rotate(${-frame * 3}deg) scale(${0.4 + spark(19)})`}}>
+            <div style={{position: 'absolute', right: -40, bottom: -18, opacity: spark(49), transform: `rotate(${-frame * 3}deg) scale(${0.4 + spark(49)})`}}>
               <Sparkle size={40} />
             </div>
           </div>
         </Pop>
-        <Pop delay={45} from={1.7}>
+        <Pop delay={67} from={1.7}>
           <Pill size={80} rotate={-2.5} style={{marginTop: 14, letterSpacing: 1}}>
             OF POSSIBILITIES
           </Pill>
@@ -114,7 +114,7 @@ export const HookText: React.FC = () => {
   );
 };
 
-// ------------------------------------------------------------------ 3-10 s
+// ------------------------------------------------------------------ 4-11 s
 export const IdentityText: React.FC<{index: number}> = ({index}) => {
   const frame = useCurrentFrame();
   const {article, word} = IDENTITIES[index];
@@ -151,7 +151,7 @@ export const IdentityText: React.FC<{index: number}> = ({index}) => {
   );
 };
 
-// ------------------------------------------------------------------ 10-11 s
+// ------------------------------------------------------------------ 11-12 s
 export const BreakCard: React.FC = () => {
   const frame = useCurrentFrame();
   const a = useEnter(0, 200, 20);
@@ -179,10 +179,10 @@ export const BreakCard: React.FC = () => {
   );
 };
 
-// ------------------------------------------------------------------ 11-15 s
+// ------------------------------------------------------------------ 12-16 s
 export const PayoffText: React.FC = () => {
   const frame = useCurrentFrame();
-  const cap = interpolate(frame, [26, 34], [0, 1], clamp);
+  const cap = interpolate(frame, [28, 36], [0, 1], clamp);
   return (
     <AbsoluteFill>
       <Scrim area="upper" strength={0.55} />
@@ -213,16 +213,16 @@ export const PayoffText: React.FC = () => {
             transform: `translateY(${(1 - cap) * 20}px)`,
           }}
         >
-          Every child discovers
+          With individual attention
           <br />
-          their unique talents.
+          for every child.
         </div>
       </Stack>
     </AbsoluteFill>
   );
 };
 
-// ------------------------------------------------------------------ 15-17 s
+// ------------------------------------------------------------------ 16-18 s
 export const CbseText: React.FC = () => {
   const a = useEnter(0);
   const b = useEnter(5);
@@ -245,7 +245,7 @@ export const CbseText: React.FC = () => {
   );
 };
 
-// ------------------------------------------------------------------ 17-19 s
+// ------------------------------------------------------------------ 18-20 s
 export const StagesText: React.FC = () => {
   const label = useEnter(0);
   return (
@@ -268,11 +268,11 @@ export const StagesText: React.FC = () => {
   );
 };
 
-// ------------------------------------------------------------------ 19-21 s
+// ------------------------------------------------------------------ 20-24 s
 export const FacilitiesText: React.FC = () => {
   const frame = useCurrentFrame();
-  const i = Math.min(3, Math.floor(frame / 15));
-  const local = frame - i * 15;
+  const i = Math.min(3, Math.floor(frame / 30));
+  const local = frame - i * 30;
   const slide = interpolate(local, [0, 5], [-80, 0], {...clamp, easing: Easing.out(Easing.cubic)});
   return (
     <AbsoluteFill>
@@ -289,10 +289,10 @@ export const FacilitiesText: React.FC = () => {
   );
 };
 
-// ------------------------------------------------------------------ 21-25 s
+// ------------------------------------------------------------------ 24-28 s
 export const OfferText: React.FC = () => {
   const frame = useCurrentFrame();
-  const sub = interpolate(frame, [24, 32], [0, 1], clamp);
+  const sub = interpolate(frame, [16, 24], [0, 1], clamp);
   const breathe = 1 + 0.015 * Math.sin((frame / 30) * Math.PI * 2);
   return (
     <AbsoluteFill>
@@ -313,32 +313,32 @@ export const OfferText: React.FC = () => {
           </div>
         </Pop>
         <div style={{...baseText, fontSize: 46, fontWeight: 700, marginTop: 48, opacity: sub, transform: `translateY(${(1 - sub) * 20}px)`}}>
-          Nursery to Grade 10 · CBSE
+          Give your child the start they deserve.
         </div>
       </Stack>
     </AbsoluteFill>
   );
 };
 
-// ------------------------------------------------------------------ 25-31.5 s
+// ------------------------------------------------------------------ 28-35 s
 export const EndCard: React.FC<{finalHit: number}> = ({finalHit}) => {
   const frame = useCurrentFrame();
   const wipe = interpolate(frame, [0, 10], [100, 0], {...clamp, easing: Easing.out(Easing.cubic)});
-  const crest = useEnter(4, 160, 14);
-  const l1 = useEnter(10);
-  const l2 = useEnter(15);
-  const l3 = useEnter(20);
-  const l4 = useEnter(26);
-  const l5 = useEnter(32);
-  const l6 = useEnter(38);
+  const crest = useEnter(2, 160, 14);
+  const l1 = useEnter(5);
+  const l2 = useEnter(8);
+  const l3 = useEnter(12);
+  const l4 = useEnter(16);
+  const l5 = useEnter(18);
+  const l6 = useEnter(26);
   const hit = frame - finalHit;
   const hitPulse = hit >= 0 ? 1 + 0.12 * Math.exp(-hit / 6) * Math.cos(hit / 2.2) : 1;
   const shine = interpolate(hit, [0, 18], [-60, 160], clamp);
-  const btnPulse = 1 + 0.035 * Math.max(0, Math.sin(((frame - 40) / 30) * Math.PI * 2));
-  const bgZoom = interpolate(frame, [0, 195], [1.12, 1.0], clamp);
+  const btnPulse = 1 + 0.035 * Math.max(0, Math.sin(((frame - 24) / 30) * Math.PI * 2));
+  const bgZoom = interpolate(frame, [0, 210], [1.12, 1.0], clamp);
   const tagWords = ['Inspiring', 'to', 'learn.', 'Empowering', 'to', 'excel.'];
-  // Word onsets of the VO line "Inspiring to learn, empowering to excel" (placed at 25.35 s).
-  const tagStart = [15, 35, 41, 66, 77, 83];
+  // Tagline builds word by word after the call to action (text only).
+  const tagStart = [66, 72, 78, 90, 96, 102];
 
   return (
     <AbsoluteFill style={{transform: `translateY(${wipe}%)`}}>
