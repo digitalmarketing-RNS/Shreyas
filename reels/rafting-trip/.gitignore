@@ -1,0 +1,16 @@
+raw/
+music/
+fonts/
+shots/
+out/
+models/
+tracks/
+me/
+# derived from personal reference photos - keep out of the public repo
+ref_feats.npy
+photo_pos.json
+*.mp4
+*.wav
+*.jpg
+*.jpeg
+*.png
