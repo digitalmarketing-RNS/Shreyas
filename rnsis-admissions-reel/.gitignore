@@ -1,0 +1,4 @@
+node_modules/
+# Regenerated from the source film by scripts/prep_footage.sh
+public/clips/
+__pycache__/
