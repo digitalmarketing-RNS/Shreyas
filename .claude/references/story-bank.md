@@ -38,7 +38,7 @@ Verified from the files themselves:
 
 - Naveen Tiles robots reel: 20.0 s, 1080x1920, 30 fps, rendered with Remotion 4.0.518
 - RNS International School admissions reel 2027-28: 31.5 s, 1080x1920, 30 fps, rendered with Remotion 4.0.532
-- Together: 51.5 s, posted to LinkedIn as one joined file
+- Together: 51.5 s. Single-reel post for RNSIS drafted in `linkedin/03-post-rnsis-reel.md`
 
 ## 3. Shipped
 

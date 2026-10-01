@@ -4,6 +4,7 @@
 |---|---|
 | `01-profile-audit.md` | Audit of `linkedin.com/in/best-digital-marketing-freelancer`, with rewrites ready to paste: headline, About, Featured, Experience, Skills, banner, recommendation request |
 | `02-post-ai-reels.md` | Ready-to-post LinkedIn post about the two Claude-built reels (Naveen Tiles robots, RNS International School admissions 2027-28), plus first comment, alternative hooks and posting notes |
+| `03-post-rnsis-reel.md` | Post for the RNS International School admissions reel on its own, with its own first comment |
 
 ## The skills
 
