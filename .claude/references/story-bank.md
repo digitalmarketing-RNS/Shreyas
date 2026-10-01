@@ -44,7 +44,7 @@ Verified from the files themselves:
 
 - **Naveen Tiles robotics reel.** Real factory footage with a security-camera-style overlay. Seven robots: Picker-01, Picker-02, Shuttle-01, Shuttle-02, Stacker-01, Stacker-02, Stacker-03. Each gets a TYPE / TASK / ZONE / STATUS tag that types itself out. Ends on "Technology at work." Naveen Ceramic & Vitrified Tiles, since 1983, naveentile.com.
 - **RNS International School admissions reel 2027-28.** Real campus footage with kinetic type: "Every child holds a universe" → An Explorer / An Innovator / A Performer → "All of it." → CBSE affiliated, since 2013, RR Nagar, Bengaluru → Nursery to Grade 10 → Admissions open 2027-28 → Book a campus visit. rnsischool.edu.in.
-- How they were made: taught Claude skills first, then Claude wrote both reels as Remotion code and rendered them.
+- How they were made: taught Claude skills first, then Claude did the entire edit, start to finish (confirmed by Shreyas, 1 Oct 2026): every cut and every text animation, written as Remotion code and rendered. Shreyas wrote the brief and reviewed.
 
 ## 4. Turning points
 
