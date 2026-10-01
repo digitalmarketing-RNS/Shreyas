@@ -1,0 +1,47 @@
+{
+  "h0_154-PK": {
+    "file": "clips/h0_154-PK.mp4",
+    "padFrames": 0,
+    "totalFrames": 72
+  },
+  "u1_115-KL": {
+    "file": "clips/u1_115-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "u2_113-KL": {
+    "file": "clips/u2_113-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "u3_102-KL": {
+    "file": "clips/u3_102-KL.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "u4_101-KL": {
+    "file": "clips/u4_101-KL.mp4",
+    "padFrames": 6,
+    "totalFrames": 78
+  },
+  "u5_147-PK": {
+    "file": "clips/u5_147-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "u6_150-PK": {
+    "file": "clips/u6_150-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "u7_153-PK": {
+    "file": "clips/u7_153-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "e0_147-PK": {
+    "file": "clips/e0_147-PK.mp4",
+    "padFrames": 12,
+    "totalFrames": 144
+  }
+}

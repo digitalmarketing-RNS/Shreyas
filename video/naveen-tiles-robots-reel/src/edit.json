@@ -1,0 +1,28 @@
+{
+  "fps": 30,
+  "bpm": 120,
+  "width": 1080,
+  "height": 1920,
+  "stages": [
+    {"id": "hook"},
+    {"n": 1, "tag": "PICKER-01", "type": "VACUUM GANTRY", "task": "TILE PICK & PLACE", "zone": "SORT & STORE"},
+    {"n": 2, "tag": "PICKER-02", "type": "VACUUM GANTRY", "task": "SUCTION LIFT", "zone": "SORT & STORE"},
+    {"n": 3, "tag": "SHUTTLE-01", "type": "RAIL SHUTTLE", "task": "STACK TRANSFER", "zone": "TILE STORAGE"},
+    {"n": 4, "tag": "SHUTTLE-02", "type": "RAIL SHUTTLE", "task": "STACK PARKING", "zone": "TILE STORAGE"},
+    {"n": 5, "tag": "STACKER-01", "type": "ROBOTIC ARM", "task": "CARTON STACKING", "zone": "PACKING"},
+    {"n": 6, "tag": "STACKER-02", "type": "ROBOTIC ARM", "task": "LIFT & PLACE", "zone": "PACKING"},
+    {"n": 7, "tag": "STACKER-03", "type": "ROBOTIC ARM", "task": "PALLET STACKING", "zone": "PACKING"},
+    {"id": "end"}
+  ],
+  "shots": [
+    {"key": "h0_154-PK", "src": "154-PK", "driveId": "1tXRgKFp_ZECgFGajl2MCDuFBfrHeTgjQ", "start": 0.0, "speed": 0.8, "frames": 60, "stage": 0, "out": {"type": "glitch", "frames": 10}},
+    {"key": "u1_115-KL", "src": "115-KL", "driveId": "1VxHFoJ-XzN33uXeotDqE9fLwu7ORrVS9", "start": 0.4, "speed": 1.0, "frames": 60, "stage": 1, "out": {"type": "glitch", "frames": 8}, "roi": [[0, 400, 860, 600, 420], [59, 400, 860, 600, 420]]},
+    {"key": "u2_113-KL", "src": "113-KL", "driveId": "1q6CiJkpENOLT6xHM50WsABQQkk3gSQkC", "start": 0.5, "speed": 1.0, "frames": 60, "stage": 2, "out": {"type": "glitch", "frames": 8}, "roi": [[0, 20, 780, 1040, 420], [29, 40, 880, 1020, 600], [59, 150, 960, 910, 640]]},
+    {"key": "u3_102-KL", "src": "102-KL", "driveId": "1ELvex10HA9DVbHDrKoj6CeD_k44OlZs4", "start": 8.0, "speed": 1.5, "frames": 60, "stage": 3, "out": {"type": "glitch", "frames": 8}, "roi": [[0, 580, 1110, 300, 280], [29, 530, 1110, 300, 280], [59, 440, 1110, 300, 280]]},
+    {"key": "u4_101-KL", "src": "101-KL", "driveId": "15UPWEhgOqTWczvlVUq6N5xarQn0T-MRQ", "start": 0.3, "speed": 1.5, "frames": 60, "stage": 4, "out": {"type": "glitch", "frames": 8}, "roi": [[0, 640, 990, 240, 280], [29, 640, 970, 210, 240], [59, 600, 870, 200, 200]]},
+    {"key": "u5_147-PK", "src": "147-PK", "driveId": "1IM0ZYgDhj7ZwDLj49VnAqtTW1xDIJilD", "start": 2.0, "speed": 1.0, "frames": 60, "stage": 5, "out": {"type": "glitch", "frames": 8}, "roi": [[0, 180, 660, 420, 360], [14, 20, 810, 500, 360], [29, 20, 600, 480, 450], [44, 20, 570, 480, 660], [59, 20, 690, 420, 520]]},
+    {"key": "u6_150-PK", "src": "150-PK", "driveId": "1cRPDDhU-iJyW26zaZ9INvx2N_tjhPr84", "start": 3.7, "speed": 1.0, "frames": 60, "stage": 6, "out": {"type": "glitch", "frames": 8}, "roi": [[0, 10, 580, 380, 360], [14, 40, 590, 320, 320], [29, 100, 580, 320, 300], [44, 140, 580, 340, 300], [59, 180, 600, 340, 320]]},
+    {"key": "u7_153-PK", "src": "153-PK", "driveId": "1tA6qEa_d7YEqLnREw-aEpQpXR3hJjNm6", "start": 11.0, "speed": 1.0, "frames": 60, "stage": 7, "out": {"type": "glitch", "frames": 12}, "roi": [[0, 460, 1220, 560, 400], [10, 460, 1220, 560, 400], [20, 440, 1000, 620, 600], [30, 460, 720, 620, 600], [40, 80, 440, 700, 880], [50, 20, 560, 400, 560], [59, 40, 500, 400, 420]]},
+    {"key": "e0_147-PK", "src": "147-PK", "driveId": "1IM0ZYgDhj7ZwDLj49VnAqtTW1xDIJilD", "start": 6.0, "speed": 0.5, "frames": 120, "stage": 8}
+  ]
+}
