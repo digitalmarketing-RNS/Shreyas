@@ -6,13 +6,12 @@ video files or from what you told me. Nothing is made up.
 
 ## Before you post
 
-1. **Upload one video, not two.** A LinkedIn post can only hold one video
-   (LinkedIn Help, "Share a video on LinkedIn FAQ"). Both reels have been joined
-   into one file: `RNS-Group-AI-Reels-LinkedIn-25MB.mp4`, 51.5 s, vertical
-   1080x1920, robots first and then the school. It was re-encoded to about
-   25 MB so it could be sent through chat. LinkedIn compresses every upload
-   below that anyway. It's not in the repo because of its size. It was sent
-   to you in the chat.
+1. **Videos.** Upload the two original reels, robots first and then the
+   school, so the P.S. matches. LinkedIn's help page says a post holds one
+   video ("Share a video on LinkedIn FAQ"). If it won't take the second clip,
+   use the backup sent in chat: `RNS-Group-AI-Reels-LinkedIn-25MB.mp4`, both
+   reels joined into one file (51.5 s, vertical 1080x1920, 24 MB). It's not in
+   the repo because of its size.
 2. **Tag the brands by hand.** Mentions don't survive copy-paste. Retype
    `@Naveen Tiles` and `@RNS International School` (and `@RNS Group` if you add
    it) in the LinkedIn editor and pick the pages from the dropdown.
