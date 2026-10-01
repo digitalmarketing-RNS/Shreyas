@@ -1,0 +1,9 @@
+raw/
+music/
+fonts/
+shots/
+out/
+*.mp4
+*.wav
+*.jpg
+*.png
