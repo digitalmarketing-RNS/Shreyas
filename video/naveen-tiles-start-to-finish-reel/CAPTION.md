@@ -1,24 +1,40 @@
 # Instagram post kit: "Start to finish, inside our state-of-the-art tile plant"
 
-## Caption
+## Caption (SEO, 5 hashtags)
 
-> How a NAVEEN tile is made: 14 steps from raw earth to your floor, inside our state-of-the-art tile plant. 🏭
->
-> Crushing, wet grinding, spray drying, pressing, glazing, HD digital printing, firing in kilns up to 252 m long, polishing on lines with up to 64 heads, then robotic packing. Every step precision engineered at Murudeshwar Ceramics.
->
-> Making tiles since 1983. 🇮🇳
->
-> Which step surprised you most? 👇
-> 🌐 naveentile.com
->
-> #NaveenTiles #MurudeshwarCeramics #HowItsMade #TileManufacturing #VitrifiedTiles #StateOfTheArt #PrecisionEngineering #MadeInIndia #Tiles #Flooring #InteriorDesign #SatisfyingVideos #Manufacturing #PGVT #GVT
+Target keywords: **tile manufacturing**, **tile factory**, tile manufacturing process, vitrified tile manufacturer. The first line is what Instagram search indexes and what shows before "…more".
+
+```
+Tile manufacturing, start to finish: inside our state-of-the-art tile factory 🏭
+
+The complete tile manufacturing process at NAVEEN in 14 steps: raw materials → crushing → wet grinding → spray drying → pressing → drying → glazing → digital printing → firing → sorting → polishing → grading → robotic packing → dispatch.
+
+⚙️ Presses up to 6,500 tonnes
+🔥 Kilns up to 252 m long
+✨ Polishing lines with up to 64 heads
+📦 860 lakh sq ft of tiles every year
+
+Ceramic & vitrified tile manufacturer since 1983 · ISO 9001 certified · Murudeshwar Ceramics
+
+Dealers, architects and builders: explore the full range at naveentile.com (link in bio) 🔗
+
+#tilemanufacturing #tilefactory #vitrifiedtiles #madeinindia #naveentiles
+```
+
+**Alt text** (Advanced settings → Accessibility → Write alt text):
+Inside the NAVEEN tile manufacturing plant: 14 steps of the tile manufacturing process, from raw materials to dispatch, with presses, a roller kiln, digital printing, polishing lines and robotic packing.
+
+**Rename original audio:** Naveen Tiles – tile factory sounds
 
 ## Posting checklist
 
 - Post as a Reel and choose `NaveenTiles_StartToFinish_cover.jpg` as the cover. Its text stays inside the 4:5 grid crop.
 - The reel runs 78 s, within Instagram's 90 s limit.
+- Instagram allows 5 hashtags. Keep the 5 above and don't add more.
+- Location tag: the plant at Sira, Tumakuru.
+- URLs in captions aren't clickable, so naveentile.com should be the link in bio.
 - For a trending sound, post the no-music version and keep "Original audio" at about 30%, so the factory sounds stay underneath.
-- Tag the location and the brand account.
+- Pin this reel to the profile after posting.
 
 ## Wording notes
 
