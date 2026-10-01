@@ -1,34 +1,40 @@
 """Render the rafting reel from edl.py.
 
-Pipeline: per-shot 1080x1920 clips (cropped, graded, exact frame counts) + per-shot
-natural sound -> concat -> mix with the song -> text overlay -> final MP4s.
+Pipeline: per-shot 1080x1920 clips (cropped on Shreyas, graded, exact frame counts)
++ per-shot natural sound -> concat. finish.py then mixes the song and adds the text.
+
+Face tracking: track=True shots follow the face that best matches the reference
+embeddings in ref_feats.npy (built from photos of Shreyas with face.py). Tracks are
+cached in tracks/ so re-renders are fast.
 """
-import os, subprocess, sys
+import json, os, subprocess, sys
 import numpy as np
 import soundfile as sf
+import cv2
 from PIL import Image, ImageOps
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from edl import SHOTS, SONG_IN, FPS, REEL_LEN, TEXT
+from edl import SHOTS, FPS
 
 W, H = 1080, 1920
 SR = 48000
-CROP_W = 608  # 9:16 window out of a 1920x1080 frame
 RAW = "raw"
 OUT = "shots"
 os.makedirs(OUT, exist_ok=True)
+os.makedirs("tracks", exist_ok=True)
 
 # Light travel grade: a touch of contrast and vibrance, warm highlights, cool shadows.
 GRADE = ("eq=contrast=1.07:saturation=1.13:gamma=0.98,"
          "colorbalance=rs=-0.02:bs=0.03:rh=0.03:gh=0.01:bh=-0.03")
-SHARPEN = "unsharp=5:5:0.55:3:3:0.0"
+SHARPEN = "unsharp=5:5:0.6:3:3:0.0"
+FACE_ROW = 0.38   # where his face sits in a zoomed video crop (fraction from the top)
 
 # Ambient bed under the photo shots so the sound never drops to dead silence.
 PHOTO_AMB = {
-    "B1": ("GX019678", 12.0, 0.35), "B2": ("GX019678", 16.0, 0.35),
-    "D3": ("GX019694", 15.0, 0.70), "N4": ("GX019694", 24.0, 0.60),
-    "N7": ("GX019678", 20.0, 0.40), "N7b": ("GX019678", 21.0, 0.40),
-    "N8": ("GX019687", 3.0, 0.9), "N8b": ("GX019687", 3.5, 0.9), "N8c": ("GX019694", 26.0, 0.7),
+    "B2": ("GX019678", 12.0, 0.35), "B6": ("GX019678", 16.0, 0.40),
+    "D2": ("GX019694", 15.0, 0.70), "D4": ("GX019694", 24.0, 0.65),
+    "N1": ("GX019694", 26.0, 0.60), "N2": ("GX019694", 27.0, 0.60), "N4": ("GX019694", 28.0, 0.60),
+    "N7": ("GX019678", 20.0, 0.40), "N7b": ("GX019678", 21.0, 0.40), "N8": ("GX019678", 22.0, 0.40),
 }
 
 
@@ -42,26 +48,58 @@ def frames_of(a, b):
     return round(b * FPS) - round(a * FPS)
 
 
-def x_expr(cx, seg_start):
-    """ffmpeg crop x expression; source time = seg_start + t."""
-    def px(c):
-        return min(max(c * 1920 - CROP_W / 2, 0), 1920 - CROP_W)
+# --- face track --------------------------------------------------------------
+def face_track(src, t0, t1, step=0.2, thr=0.42):
+    key = f"tracks/{src}_{t0:.2f}_{t1:.2f}.json"
+    if os.path.exists(key):
+        return json.load(open(key))
+    from face import faces
+    R = np.load("ref_feats.npy"); M = R.mean(0); M /= np.linalg.norm(M)
+    cap = cv2.VideoCapture(f"{RAW}/{src}.MP4")
+    pts, t = [], t0
+    while t <= t1 + 1e-6:
+        cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000); ok, fr = cap.read()
+        if not ok:
+            break
+        best = None
+        for r, f, _ in faces(fr):
+            s = float(f @ M)
+            if s > thr and (best is None or s > best[0]):
+                best = (s, r)
+        if best:
+            x, y, w, h = [float(v) for v in best[1][:4]]
+            pts.append([round(t, 3), (x + w / 2) / 1920, (y + h / 2) / 1080])
+        t += step
+    json.dump(pts, open(key, "w"))
+    return pts
+
+
+def smooth_path(pts, fallback, t0, t1, win=0.8):
+    """Gap-filled, moving-average (t -> (cx, cy)) sampled every 1/FPS."""
+    ts = np.arange(t0, t1 + 1e-6, 1 / FPS)
+    if len(pts) < 2:
+        fy = pts[0][2] if pts else 0.45
+        fx = pts[0][1] if pts else fallback
+        return ts, np.full_like(ts, fx), np.full_like(ts, fy)
+    P = np.array(pts)
+    cx = np.interp(ts, P[:, 0], P[:, 1]); cy = np.interp(ts, P[:, 0], P[:, 2])
+    k = max(1, int(win * FPS)); ker = np.ones(k) / k
+    pad = lambda a: np.pad(a, (k // 2, k - 1 - k // 2), mode="edge")
+    return ts, np.convolve(pad(cx), ker, "valid"), np.convolve(pad(cy), ker, "valid")
+
+
+def keyframe_path(cx, t0, t1):
+    ts = np.arange(t0, t1 + 1e-6, 1 / FPS)
     if not isinstance(cx, list):
-        return f"{px(cx):.1f}"
-    T = f"({seg_start:.4f}+t)"
-    kf = [(t, px(c)) for t, c in cx]
-    expr = f"{kf[-1][1]:.1f}"
-    for (t0, x0), (t1, x1) in reversed(list(zip(kf, kf[1:]))):
-        lerp = f"{x0:.1f}+({x1 - x0:.1f})*({T}-{t0:.4f})/{t1 - t0:.4f}"
-        expr = f"if(lt({T},{t1:.4f}),{lerp},{expr})"
-    return f"if(lt({T},{kf[0][0]:.4f}),{kf[0][1]:.1f},{expr})"
+        return ts, np.full_like(ts, cx), np.full_like(ts, 0.5)
+    kt, kv = zip(*cx)
+    return ts, np.interp(ts, kt, kv), np.full_like(ts, 0.5)
 
 
+# --- audio -------------------------------------------------------------------
 def extract_audio(src, t0, dur, speed=1.0):
     tmp = f"{OUT}/_a.wav"
-    af = "aresample=48000"
-    if speed != 1.0:
-        af += f",atempo={speed}"
+    af = "aresample=48000" + (f",atempo={speed}" if speed != 1.0 else "")
     run(["ffmpeg", "-v", "error", "-y", "-ss", f"{t0:.4f}", "-t", f"{dur + 0.3:.4f}", "-i", f"{RAW}/{src}.MP4",
          "-vn", "-af", af, "-ac", "2", "-ar", str(SR), tmp])
     a, _ = sf.read(tmp, dtype="float32")
@@ -81,33 +119,52 @@ def fit(a, n):
     return a
 
 
+def encoder(out):
+    return subprocess.Popen(
+        ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", f"{W}x{H}", "-r", str(FPS),
+         "-i", "-", "-vf", f"{SHARPEN},{GRADE},format=yuv420p", "-c:v", "libx264", "-crf", "13",
+         "-preset", "medium", out], stdin=subprocess.PIPE)
+
+
+# --- shots -------------------------------------------------------------------
 def render_video(name, a, b, src, p):
     nf = frames_of(a, b)
     segs = p.get("ramp") or [(p["src_in"], p["src_in"] + (b - a) + 0.2, 1.0)]
-    parts, audio, done = [], [], 0
+    span0, span1 = segs[0][0], segs[-1][1]
+    if p.get("track"):
+        ts, pcx, pcy = smooth_path(face_track(src, span0, span1), p.get("cx", 0.5), span0, span1)
+    else:
+        ts, pcx, pcy = keyframe_path(p.get("cx", 0.5), span0, span1)
+    zoom = p.get("zoom", 1.0)
+    ch = 1080 / zoom; cw = ch * 9 / 16
+    enc = encoder(f"{OUT}/{name}.mp4")
+    audio, done = [], 0
     for i, (s0, s1, speed) in enumerate(segs):
         last = i == len(segs) - 1
         seg_frames = nf - done if last else round((s1 - s0) / speed * FPS)
         done += seg_frames
-        out = f"{OUT}/{name}_{i}.mp4"
-        # crop sees source time (t), then retime; 60p source gives clean 0.5x slow-mo at 30p
-        vf = (f"crop={CROP_W}:1080:x='{x_expr(p['cx'], s0)}':y=0,"
-              f"setpts=(PTS-STARTPTS)/{speed},fps={FPS},"
-              f"scale={W}:{H}:flags=lanczos,{SHARPEN},{GRADE},format=yuv420p")
-        run(["ffmpeg", "-v", "error", "-y", "-ss", f"{s0:.4f}", "-t", f"{(s1 - s0) + 0.5:.4f}",
-             "-i", f"{RAW}/{src}.MP4", "-vf", vf, "-r", str(FPS), "-frames:v", str(seg_frames), "-an",
-             "-c:v", "libx264", "-crf", "13", "-preset", "medium", out])
-        parts.append(out)
+        dec = subprocess.Popen(
+            ["ffmpeg", "-v", "error", "-ss", f"{s0:.4f}", "-t", f"{(s1 - s0) + 0.5:.4f}", "-i", f"{RAW}/{src}.MP4",
+             "-vf", f"setpts=(PTS-STARTPTS)/{speed},fps={FPS}", "-frames:v", str(seg_frames),
+             "-f", "rawvideo", "-pix_fmt", "bgr24", "-"], stdout=subprocess.PIPE)
+        for j in range(seg_frames):
+            buf = dec.stdout.read(1920 * 1080 * 3)
+            if len(buf) < 1920 * 1080 * 3:
+                break
+            fr = np.frombuffer(buf, np.uint8).reshape(1080, 1920, 3)
+            st = s0 + j / FPS * speed
+            cx = np.interp(st, ts, pcx) * 1920
+            cy = np.interp(st, ts, pcy) * 1080 + (0.5 - FACE_ROW) * ch if p.get("track") else 540
+            x0 = min(max(cx - cw / 2, 0), 1920 - cw); y0 = min(max(cy - ch / 2, 0), 1080 - ch)
+            # sub-pixel crop + resize in one affine warp
+            sx = cw / W
+            M = np.float32([[sx, 0, x0], [0, sx, y0]])
+            out = cv2.warpAffine(fr, M, (W, H), flags=cv2.INTER_CUBIC | cv2.WARP_INVERSE_MAP, borderMode=cv2.BORDER_REPLICATE)
+            enc.stdin.write(out.tobytes())
+        dec.stdout.close(); dec.wait()
         audio.append(extract_audio(src, s0, seg_frames / FPS * speed, speed))
-    if len(parts) == 1:
-        os.replace(parts[0], f"{OUT}/{name}.mp4")
-    else:
-        lst = f"{OUT}/{name}.txt"
-        with open(lst, "w") as fh:
-            fh.writelines(f"file '{os.path.basename(x)}'\n" for x in parts)
-        run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", f"{OUT}/{name}.mp4"])
-    nat = fit(np.concatenate(audio), int(round(nf / FPS * SR))) * p.get("nat", 0.6)
-    return nat
+    enc.stdin.close(); enc.wait()
+    return fit(np.concatenate(audio), int(round(nf / FPS * SR))) * p.get("nat", 0.6)
 
 
 def ease(x):
@@ -117,32 +174,24 @@ def ease(x):
 def render_photo(name, a, b, src, p):
     nf = frames_of(a, b)
     im = ImageOps.exif_transpose(Image.open(f"{RAW}/{src}.JPG")).convert("RGB")
-    scale = (H * 1.3) / im.size[1]  # keep enough pixels for the push-in
-    im = im.resize((round(im.size[0] * scale), round(im.size[1] * scale)), Image.LANCZOS)
     IW, IH = im.size
-    out = f"{OUT}/{name}.mp4"
-    proc = subprocess.Popen(
-        ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
-         "-i", "-", "-vf", f"{GRADE},format=yuv420p", "-frames:v", str(nf),
-         "-c:v", "libx264", "-crf", "13", "-preset", "medium", out], stdin=subprocess.PIPE)
+    fx, fy = json.load(open("photo_pos.json"))[src]["fx"], json.load(open("photo_pos.json"))[src]["fy"]
+    enc = encoder(f"{OUT}/{name}.mp4")
     for i in range(nf):
         k = ease(i / max(nf - 1, 1))
         z = p["z0"] + (p["z1"] - p["z0"]) * k
-        fx = p["f0"][0] + (p["f1"][0] - p["f0"][0]) * k
-        fy = p["f0"][1] + (p["f1"][1] - p["f0"][1]) * k
         ch = IH / z; cw = ch * 9 / 16
         cx = min(max(fx * IW, cw / 2), IW - cw / 2)
-        cy = min(max(fy * IH, ch / 2), IH - ch / 2)
+        cy = min(max(fy * IH + p.get("lift", 0.12) * ch, ch / 2), IH - ch / 2)
         fr = im.transform((W, H), Image.EXTENT, (cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2), Image.BICUBIC)
-        proc.stdin.write(fr.tobytes())
-    proc.stdin.close(); proc.wait()
+        enc.stdin.write(np.asarray(fr)[:, :, ::-1].tobytes())
+    enc.stdin.close(); enc.wait()
     amb_src, amb_t, g = PHOTO_AMB.get(name, ("GX019678", 10.0, 0.3))
     return fit(extract_audio(amb_src, amb_t, nf / FPS), int(round(nf / FPS * SR))) * g
 
 
 def main():
     only = sys.argv[1:]
-    nat_parts = []
     for name, a, b, kind, src, p in SHOTS:
         if only and name not in only:
             continue
