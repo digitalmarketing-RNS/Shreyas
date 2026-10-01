@@ -32,10 +32,8 @@ FACE_ROW = 0.38   # where his face sits in a zoomed video crop (fraction from th
 
 # Ambient bed under the photo shots so the sound never drops to dead silence.
 PHOTO_AMB = {
-    "B2": ("GX019678", 12.0, 0.35), "B4": ("GX019678", 16.0, 0.40),
-    "D2": ("GX019694", 15.0, 0.70), "D3": ("GX019694", 24.0, 0.65), "D3b": ("GX019694", 24.5, 0.65),
-    "D3c": ("GX019694", 25.0, 0.65), "N2": ("GX019694", 27.0, 0.60),
-    "N5": ("GX019678", 20.0, 0.40), "N6": ("GX019678", 20.5, 0.40), "N8": ("GX019678", 22.0, 0.40),
+    "D1": ("GX019694", 15.0, 0.70), "D1b": ("GX019694", 16.0, 0.70), "D2": ("GX019694", 24.0, 0.65),
+    "M1": ("GX019678", 20.0, 0.40), "M2": ("GX019678", 22.0, 0.40),
 }
 
 
@@ -100,7 +98,12 @@ def keyframe_path(cx, t0, t1):
 # --- audio -------------------------------------------------------------------
 def extract_audio(src, t0, dur, speed=1.0):
     tmp = f"{OUT}/_a.wav"
-    af = "aresample=48000" + (f",atempo={speed}" if speed != 1.0 else "")
+    af = "aresample=48000"
+    s = speed
+    while s < 0.5:  # atempo only goes down to 0.5x, so chain it
+        af += ",atempo=0.5"; s /= 0.5
+    if s != 1.0:
+        af += f",atempo={s:.5f}"
     run(["ffmpeg", "-v", "error", "-y", "-ss", f"{t0:.4f}", "-t", f"{dur + 0.3:.4f}", "-i", f"{RAW}/{src}.MP4",
          "-vn", "-af", af, "-ac", "2", "-ar", str(SR), tmp])
     a, _ = sf.read(tmp, dtype="float32")
