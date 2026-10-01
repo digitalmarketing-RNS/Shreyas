@@ -1,15 +1,15 @@
 {
-  "name": "naveen-tiles-by-machine-reel",
+  "name": "naveen-tiles-start-to-finish-reel",
   "version": "1.0.0",
   "private": true,
-  "description": "Instagram Reel (9:16): how a Naveen tile is made, start to finish, by machine. Built with claude-code-video-toolkit (Remotion)",
+  "description": "Instagram Reel (9:16): how a Naveen tile is made, start to finish, inside a state-of-the-art plant. Built with claude-code-video-toolkit (Remotion)",
   "scripts": {
     "footage": "python3 tools/fetch_footage.py raw",
     "cut": "python3 tools/cut_clips.py raw",
     "audio": "python3 tools/make_audio.py",
     "studio": "remotion studio",
-    "render": "remotion render FactoryReel out/naveen-tiles-by-machine.mp4 --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=256k",
-    "render:nomusic": "remotion render FactoryReel out/naveen-tiles-by-machine-nomusic.mp4 --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=256k --props='{\"music\":false,\"cta\":\"naveentile.com\"}'",
+    "render": "remotion render FactoryReel out/naveen-tiles-start-to-finish.mp4 --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=256k",
+    "render:nomusic": "remotion render FactoryReel out/naveen-tiles-start-to-finish-nomusic.mp4 --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=256k --props='{\"music\":false,\"cta\":\"naveentile.com\"}'",
     "cover": "remotion still Cover out/cover.png"
   },
   "dependencies": {

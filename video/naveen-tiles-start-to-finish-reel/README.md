@@ -1,9 +1,9 @@
-# Naveen Tiles: "Start to finish, by machine" (Instagram Reel)
+# Naveen Tiles: "Start to finish, inside our state-of-the-art tile plant" (Instagram Reel)
 
-A 78-second vertical reel (1080×1920, 30 fps). It shows the whole process at the Murudeshwar Ceramics plant, from raw material to dispatch, in 14 steps. All 71 shots show machines only; the one exception is people loading the truck at the dispatch step. The footage comes from the numbered "Naveen Tile-Factory Sept" Drive folder. Built with [Remotion](https://www.remotion.dev/) on components from [claude-code-video-toolkit](https://github.com/digitalsamba/claude-code-video-toolkit).
+A 78-second vertical reel (1080×1920, 30 fps). It shows the whole process at the Murudeshwar Ceramics plant, from raw material to dispatch, in 14 steps. The 71 shots focus on the plant's equipment; people appear only at the dispatch loading step. The footage comes from the numbered "Naveen Tile-Factory Sept" Drive folder. Built with [Remotion](https://www.remotion.dev/) on components from [claude-code-video-toolkit](https://github.com/digitalsamba/claude-code-video-toolkit).
 
-- **Master:** `renders/NaveenTiles_ByMachine_master.mp4` (89 MB, 9 Mbps H.264, AAC 256k, −13.3 LUFS; kept under GitHub's 100 MB file limit)
-- **Cover:** `renders/NaveenTiles_ByMachine_cover.jpg`
+- **Master:** `renders/NaveenTiles_StartToFinish_master.mp4` (89 MB, 9 Mbps H.264, AAC 256k, −13.3 LUFS; kept under GitHub's 100 MB file limit)
+- **Cover:** `renders/NaveenTiles_StartToFinish_cover.jpg`
 - **Caption and posting notes:** [`CAPTION.md`](CAPTION.md)
 
 ## Structure
@@ -13,7 +13,7 @@ The music is 120 BPM, so a bar is 2 s. Every cut lands on a beat.
 | Time | Section | Drive clips |
 |---|---|---|
 | 0–2 s | Teaser: PRESS · FIRE · POLISH · PACK, one per beat | 63-PR, 97.3-KL, 124-PO, 147-PK |
-| 2–4 s | "How a tile is made: start to finish, by machine" | 111-KL |
+| 2–4 s | "How a tile is made: inside our state-of-the-art tile plant" | 111-KL |
 | 4–6 s | "Inside the factory of Murudeshwar Ceramics" | FC gate board |
 | 6–10 s | 01 Raw materials | 13-BM, 5-CP, 12.3-CP, 9-CP |
 | 10–14 s | 02 Crushing | 7-CP, 12.2-CP, 11-CP, 12.1-CP |
@@ -29,13 +29,15 @@ The music is 120 BPM, so a bar is 2 s. Every cut lands on a beat.
 | 56–62 s | 12 Polishing: "Lines with up to 64 heads" | 115.1-PO, 119-PO, 123-PO, 125-PO, 126-PO, 132-PO |
 | 62–68 s | 13 Grade & pack (robots) | 135-PK, 136-PK, 137-PK, 145-PK, 147-PK, 154-PK |
 | 68–72 s | 14 Dispatch (people loading the truck) | 162-DS, 164-DS, 169DS, 168-DS |
-| 72–78 s | "Every step. By machine." Official logo, facts (1983 · 860 lakh sq ft/yr · ISO 9001), naveentile.com | 131-PO |
+| 72–78 s | "Every step. Precision engineered." Official logo, facts (1983 · 860 lakh sq ft/yr · ISO 9001), naveentile.com | 131-PO |
 
 The exact trims, speeds and captions, with each clip's Drive file id, are in [`src/edit.json`](src/edit.json).
 
 ## Where the on-screen facts come from
 
 These are all from naveentile.com, read on 30 Sep 2026:
+
+- **"State-of-the-art"** is the website's own description of its plants ("state-of-the-art manufacturing facilities", Manufacturers page). The video avoids "fully automated" and "by machine" because operators and the loading crew appear in the footage.
 
 - The **logo** is the official `naveen-logo.webp` from the website header.
 - **"Since 1983"** comes from the site title "Leading Tile Manufacturers in India Since 1983".
@@ -51,7 +53,7 @@ You need Node 18+, Python 3.10+ with `numpy scipy`, and `ffmpeg`.
 npm install
 npm run footage   # downloads the source clips from Drive into raw/
 npm run cut       # rotates, trims, grades and applies slow-mo, writing public/clips/
-npm run audio     # original score + SFX + machine ambience, writing public/audio/
+npm run audio     # original score + SFX + factory ambience, writing public/audio/
 npm run studio    # preview
 npm run render && npm run render:nomusic && npm run cover
 ```

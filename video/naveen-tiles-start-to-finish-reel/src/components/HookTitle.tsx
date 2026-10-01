@@ -8,7 +8,7 @@ const TEASER = ['PRESS', 'FIRE', 'POLISH', 'PACK'];
 /**
  * Three-bar opener:
  *  bar 1 - one word per beat over four teaser shots
- *  bar 2 - the title
+ *  bar 2 - the title: inside our state-of-the-art tile plant
  *  bar 3 - who makes it, over the factory gate
  */
 export const HookTitle: React.FC<{ durationInFrames: number }> = ({ durationInFrames }) => {
@@ -45,20 +45,21 @@ export const HookTitle: React.FC<{ durationInFrames: number }> = ({ durationInFr
     const a = spring({ frame: f, fps, config: { damping: 16, stiffness: 170 } });
     const b = spring({ frame: f - BEAT_FRAMES, fps, config: { damping: 16, stiffness: 170 } });
     const c = spring({ frame: f - 2 * BEAT_FRAMES, fps, config: { damping: 18, stiffness: 150 } });
+    const d = spring({ frame: f - 2 * BEAT_FRAMES - 8, fps, config: { damping: 16, stiffness: 170 } });
     return (
       <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 160 }}>
         <AbsoluteFill style={{ background: 'radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 85%)' }} />
         <div style={{ fontFamily: theme.body, fontWeight: 800, fontSize: 38, letterSpacing: 10, color: theme.white, opacity: a, transform: `translateY(${(1 - a) * 20}px)` }}>
           HOW A TILE IS MADE
         </div>
-        <div style={{ fontFamily: theme.display, fontSize: 170, lineHeight: 1.0, color: theme.white, marginTop: 18, opacity: b, transform: `translateY(${(1 - b) * 50}px)`, textShadow: '0 10px 50px rgba(0,0,0,0.6)' }}>
-          START TO FINISH
+        <div style={{ fontFamily: theme.display, fontSize: 160, lineHeight: 1.0, color: theme.white, marginTop: 18, opacity: b, transform: `translateY(${(1 - b) * 50}px)`, textShadow: '0 10px 50px rgba(0,0,0,0.6)' }}>
+          INSIDE OUR
         </div>
         <div
           style={{
             marginTop: 18,
             fontFamily: theme.display,
-            fontSize: 118,
+            fontSize: 104,
             color: theme.white,
             background: theme.orange,
             padding: '2px 30px 8px',
@@ -67,7 +68,10 @@ export const HookTitle: React.FC<{ durationInFrames: number }> = ({ durationInFr
             boxShadow: '0 20px 60px rgba(240,100,30,0.45)',
           }}
         >
-          BY MACHINE
+          STATE-OF-THE-ART
+        </div>
+        <div style={{ fontFamily: theme.display, fontSize: 160, lineHeight: 1.0, color: theme.white, marginTop: 18, opacity: d, transform: `translateY(${(1 - d) * 50}px)`, textShadow: '0 10px 50px rgba(0,0,0,0.6)' }}>
+          TILE PLANT
         </div>
       </AbsoluteFill>
     );

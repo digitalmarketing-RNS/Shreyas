@@ -23,9 +23,9 @@ export const Cover: React.FC<{ clip: string; at: number }> = ({ clip, at }) => (
         <br />
         FINISH
       </div>
-      <div style={{ marginTop: 20, fontFamily: theme.display, fontSize: 110, color: theme.white, background: theme.orange, padding: '0 28px 6px', transform: 'rotate(-2deg)' }}>BY MACHINE</div>
+      <div style={{ marginTop: 20, fontFamily: theme.display, fontSize: 100, color: theme.white, background: theme.orange, padding: '0 28px 6px', transform: 'rotate(-2deg)' }}>STATE-OF-THE-ART</div>
       <div style={{ marginTop: 40, fontFamily: theme.body, fontWeight: 700, fontSize: 38, color: theme.white, background: 'rgba(8,14,30,0.6)', padding: '12px 26px', borderRadius: 14 }}>
-        14 steps · rock to your floor
+        14 steps · raw earth to your floor
       </div>
     </AbsoluteFill>
     <Vignette intensity={0.4} centerSize={50} />

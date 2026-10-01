@@ -32,7 +32,7 @@ export const ProgressRail: React.FC<{ offset: number }> = ({ offset }) => {
       >
         <span>NAVEEN</span>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: theme.orange, display: 'inline-block' }} />
-        <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>START → FINISH · BY MACHINE</span>
+        <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>RAW EARTH → FINISHED TILE</span>
       </div>
       <div style={{ position: 'absolute', left: theme.safe.left, top: 246, display: 'flex', gap }}>
         {Array.from({ length: PROCESS_STEPS }, (_, i) => {

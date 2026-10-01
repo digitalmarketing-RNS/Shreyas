@@ -25,11 +25,11 @@ export const EndCard: React.FC<{ cta: string }> = ({ cta }) => {
     <AbsoluteFill>
       <AbsoluteFill style={{ background: 'linear-gradient(180deg, rgba(10,16,34,0.45) 0%, rgba(10,16,34,0.2) 40%, rgba(10,16,34,0.6) 100%)' }} />
       <AbsoluteFill style={{ alignItems: 'center', paddingTop: 300 }}>
-        <div style={{ fontFamily: theme.display, fontSize: 112, color: theme.white, lineHeight: 1.04, opacity: l1, transform: `translateY(${(1 - l1) * 50}px)`, textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+        <div style={{ fontFamily: theme.display, fontSize: 100, color: theme.white, lineHeight: 1.04, opacity: l1, transform: `translateY(${(1 - l1) * 50}px)`, textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
           EVERY STEP.
         </div>
-        <div style={{ fontFamily: theme.display, fontSize: 112, color: theme.white, lineHeight: 1.04, opacity: l2, transform: `translateY(${(1 - l2) * 50}px)`, textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
-          BY <span style={{ color: theme.orange }}>MACHINE.</span>
+        <div style={{ fontFamily: theme.display, fontSize: 100, color: theme.white, lineHeight: 1.04, opacity: l2, transform: `translateY(${(1 - l2) * 50}px)`, textShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
+          PRECISION <span style={{ color: theme.orange }}>ENGINEERED.</span>
         </div>
 
         <div
