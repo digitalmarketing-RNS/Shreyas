@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from scipy.signal import butter, sosfilt
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from edl import SONG_IN, REEL_LEN, TEXT
+from edl import SONG_IN, REEL_LEN, TEXT, MUSIC_ENV, NAT_ENV, FADE_OUT
 
 SR = 48000
 N = int(round(REEL_LEN * SR))
@@ -37,12 +37,11 @@ nat, _ = sf.read("nat.wav", dtype="float32"); nat = nat[:N]
 sos = butter(4, [120, 9000], btype="band", fs=SR, output="sos")
 nat = sosfilt(sos, nat, axis=0).astype(np.float32)
 
-# music: tucked under the hook's screams, full from the breakdown, fades at the end
-m_env = env([(0, 0.62), (1.80, 0.62), (1.84, 1.0), (36.70, 1.0), (37.40, 0.0)])
-# natural sound: loud on the hook, low texture under the song, swells for the splash
-# and for the final laugh as the song fades out
-n_env = env([(0, 1.0), (1.82, 1.0), (1.86, 0.30), (9.9, 0.30), (10.2, 0.75), (10.9, 0.75), (11.0, 0.40),
-             (16.30, 0.40), (16.37, 0.75), (17.2, 0.75), (17.6, 0.45), (36.40, 0.45), (37.0, 1.0), (37.40, 1.0)])
+# music: tucked under the hook's screams, full from the breakdown, fades after the
+# splash; natural sound: loud on the hook, low under the song, swells for the drop
+# and for the splash as the song fades
+m_env = env(MUSIC_ENV)
+n_env = env(NAT_ENV)
 
 mix = music * m_env + nat * n_env
 nomusic = nat * env([(0, 1.0), (37.4, 1.0)])
@@ -87,7 +86,7 @@ img.save("text.png")
 
 t_in, t_out = TEXT["t_in"], TEXT["t_out"]
 overlay = (f"[1:v]format=rgba,fade=in:st={t_in}:d=0.25:alpha=1,fade=out:st={t_out - 0.25}:d=0.25:alpha=1[t];"
-           f"[0:v][t]overlay=0:0:shortest=1,format=yuv420p[v]")
+           f"[0:v][t]overlay=0:0:shortest=1,fade=out:st={REEL_LEN - FADE_OUT:.3f}:d={FADE_OUT},format=yuv420p[v]")
 
 
 def export(audio, path, text=True):

@@ -17,30 +17,31 @@ The cut follows the song (129 BPM). Every cut lands on a detected beat.
 
 | Reel time | Song | Picture |
 |---|---|---|
-| 0:00–0:01.8 | intro drums | Flash-forward: his raft slamming into the big rapid |
-| 0:01.8–0:16.4 | "Shaamein malang si…" (drums drop out) | The calm before. Shreyas relaxing on the raft, paddles up, floating in the circle, then he runs and leaps off the raft in slow-mo on "baaghi **udaan**". Floating after, then grinning as the rapids get close |
-| 0:16.4 | drums return on "Ilahi mera **jee** aaye aaye" | Hard cut into the whitewater |
-| 0:16.4–0:23.6 | chorus | The rapid, the DSLR hero shot of him with his paddle up in the spray, him waving mid-rapid, another DSLR push-in |
-| 0:23.6–0:37.4 | "na na na…" | Fast montage: DSLR burst, paddle cheer, the post-rapid wave, paddling, squad poses (flex, arms out, arms crossed), ending on him smiling to camera as the music fades |
+| 0:00–0:01.8 | intro drums | Flash-forward: his raft slamming into the big rapid, slow-mo on the impact |
+| 0:01.8–0:16.4 | "Shaamein malang si…" (drums drop out) | The calm before. Relaxing on the raft, paddles up, floating, paddling off, grinning as the rapids get close, then the raft lines up and tips into the rapid |
+| 0:16.4 | drums return on "Ilahi mera **jee** aaye aaye" | Hard cut into the whitewater, slow-mo as the wave hits |
+| 0:16.4–0:23.6 | chorus | DSLR hero shot of him with his paddle up in the spray, a three-photo burst cut one frame per beat, him waving mid-rapid |
+| 0:23.6–0:32.7 | "na na na…" | Fast montage: paddle cheer, the post-rapid wave, paddling, photo dump of his poses (flex, dab), ending on a photo of him standing on the raft |
+| 0:32.7–0:38.4 | end of the phrase, music fades | Finale: he stands on the raft edge and leaps in slow-mo. The splash lands on the last beat, then a fade to black |
 
 Hook text from 0:02 to 0:07: *they said it'll be a / "chill" rafting trip* (Poppins).
-The grade adds light contrast and vibrance, with warm highlights and cool shadows.
-Natural GoPro sound (screams, splashes, laughs) sits under the music and comes up
-on the hook, the jump splash, the drop and the final laugh.
+Photos cut in with a short camera-shutter flash. The grade adds light contrast and
+vibrance, warm highlights, cool shadows and a soft vignette. Natural GoPro sound
+(screams, splashes, laughs) sits under the music and takes over for the final splash.
 
 ## Posting it
 
 Two exports were delivered:
 
-- `Rafting_Reel_Ilahi_v2.mp4` has the song mixed in. Post it as is.
-- `Rafting_Reel_no_music_v2.mp4` is the same edit with only natural sound. It is
+- `Rafting_Reel_Ilahi_v3.mp4` has the song mixed in. Post it as is.
+- `Rafting_Reel_no_music_v3.mp4` is the same edit with only natural sound. It is
   the safer option if Instagram mutes or limits the first one for copyright. Upload
   it, tap **Add audio**, pick **"Ilahi" (Arijit Singh)** and set the start to
   **0:27–0:28** of the song. The cuts are timed to the song from 0:27.56, so the
   drop at 0:16 of the reel lines up with the drums. Nudge the start by a fraction
   if Instagram's copy of the track is offset. Keep the natural sound at about
   20–30% under the music.
-- `cover_v2.jpg` is a 9:16 cover frame from the hero rapid photo.
+- `cover_v3.jpg` is a 9:16 cover frame from the hero rapid photo.
 
 Suggested caption: `they said "chill" 🙂🌊 #rafting #whitewaterrafting #travelreels #weekendvibes #ilahi`
 
@@ -62,4 +63,4 @@ Requirements: ffmpeg, Python 3 with `numpy pillow soundfile scipy opencv-python-
    overlay, normalises loudness to -14 LUFS and exports H.264 1080x1920 at 30 fps.
 
 All editorial decisions (shot order, source in-points, which shots follow his face,
-zoom, slow-mo, photo push-ins, sound levels) are in `edl.py`.
+zoom, speed ramps, photo push-ins and flashes, sound levels) are in `edl.py`.

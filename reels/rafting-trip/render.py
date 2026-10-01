@@ -24,17 +24,18 @@ os.makedirs(OUT, exist_ok=True)
 os.makedirs("tracks", exist_ok=True)
 
 # Light travel grade: a touch of contrast and vibrance, warm highlights, cool shadows.
-GRADE = ("eq=contrast=1.07:saturation=1.13:gamma=0.98,"
-         "colorbalance=rs=-0.02:bs=0.03:rh=0.03:gh=0.01:bh=-0.03")
+GRADE = ("eq=contrast=1.08:saturation=1.14:gamma=0.98,"
+         "colorbalance=rs=-0.02:bs=0.03:rh=0.03:gh=0.01:bh=-0.03,vignette=angle=PI/5")
+FLASH = [0.85, 0.45, 0.15]  # white blend on the first frames of a photo cut (camera shutter)
 SHARPEN = "unsharp=5:5:0.6:3:3:0.0"
 FACE_ROW = 0.38   # where his face sits in a zoomed video crop (fraction from the top)
 
 # Ambient bed under the photo shots so the sound never drops to dead silence.
 PHOTO_AMB = {
-    "B2": ("GX019678", 12.0, 0.35), "B6": ("GX019678", 16.0, 0.40),
-    "D2": ("GX019694", 15.0, 0.70), "D4": ("GX019694", 24.0, 0.65),
-    "N1": ("GX019694", 26.0, 0.60), "N2": ("GX019694", 27.0, 0.60), "N4": ("GX019694", 28.0, 0.60),
-    "N7": ("GX019678", 20.0, 0.40), "N7b": ("GX019678", 21.0, 0.40), "N8": ("GX019678", 22.0, 0.40),
+    "B2": ("GX019678", 12.0, 0.35), "B4": ("GX019678", 16.0, 0.40),
+    "D2": ("GX019694", 15.0, 0.70), "D3": ("GX019694", 24.0, 0.65), "D3b": ("GX019694", 24.5, 0.65),
+    "D3c": ("GX019694", 25.0, 0.65), "N2": ("GX019694", 27.0, 0.60),
+    "N5": ("GX019678", 20.0, 0.40), "N6": ("GX019678", 20.5, 0.40), "N8": ("GX019678", 22.0, 0.40),
 }
 
 
@@ -175,7 +176,8 @@ def render_photo(name, a, b, src, p):
     nf = frames_of(a, b)
     im = ImageOps.exif_transpose(Image.open(f"{RAW}/{src}.JPG")).convert("RGB")
     IW, IH = im.size
-    fx, fy = json.load(open("photo_pos.json"))[src]["fx"], json.load(open("photo_pos.json"))[src]["fy"]
+    pos = json.load(open("photo_pos.json")).get(src, {})
+    fx, fy = p.get("face") or (pos["fx"], pos["fy"])  # "face" overrides when his face is hidden
     enc = encoder(f"{OUT}/{name}.mp4")
     for i in range(nf):
         k = ease(i / max(nf - 1, 1))
@@ -184,7 +186,10 @@ def render_photo(name, a, b, src, p):
         cx = min(max(fx * IW, cw / 2), IW - cw / 2)
         cy = min(max(fy * IH + p.get("lift", 0.12) * ch, ch / 2), IH - ch / 2)
         fr = im.transform((W, H), Image.EXTENT, (cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2), Image.BICUBIC)
-        enc.stdin.write(np.asarray(fr)[:, :, ::-1].tobytes())
+        px = np.asarray(fr)[:, :, ::-1]
+        if p.get("flash") and i < len(FLASH):
+            px = (px * (1 - FLASH[i]) + 255 * FLASH[i]).astype(np.uint8)
+        enc.stdin.write(px.tobytes())
     enc.stdin.close(); enc.wait()
     amb_src, amb_t, g = PHOTO_AMB.get(name, ("GX019678", 10.0, 0.3))
     return fit(extract_audio(amb_src, amb_t, nf / FPS), int(round(nf / FPS * SR))) * g
