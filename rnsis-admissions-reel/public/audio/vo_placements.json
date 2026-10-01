@@ -1,0 +1,87 @@
+[
+ {
+  "id": "hook",
+  "start": 0.3,
+  "end": 3.515
+ },
+ {
+  "id": "id_explorer",
+  "start": 4.02,
+  "end": 5.034
+ },
+ {
+  "id": "id_artist",
+  "start": 5.02,
+  "end": 5.968
+ },
+ {
+  "id": "id_scientist",
+  "start": 6.02,
+  "end": 7.113
+ },
+ {
+  "id": "id_innovator",
+  "start": 7.053,
+  "end": 8.017
+ },
+ {
+  "id": "id_athlete",
+  "start": 8.02,
+  "end": 8.996
+ },
+ {
+  "id": "id_performer",
+  "start": 9.02,
+  "end": 9.954
+ },
+ {
+  "id": "id_leader",
+  "start": 10.02,
+  "end": 10.814
+ },
+ {
+  "id": "get_to_be",
+  "start": 10.85,
+  "end": 11.971
+ },
+ {
+  "id": "all_of_it",
+  "start": 12.02,
+  "end": 12.881
+ },
+ {
+  "id": "attention",
+  "start": 13.0,
+  "end": 15.806
+ },
+ {
+  "id": "cbse",
+  "start": 15.95,
+  "end": 18.295
+ },
+ {
+  "id": "stages",
+  "start": 18.3,
+  "end": 19.96
+ },
+ {
+  "id": "facilities",
+  "start": 20.08,
+  "end": 22.855
+ },
+ {
+  "id": "start",
+  "start": 24.35,
+  "end": 26.697
+ },
+ {
+  "id": "cta",
+  "start": 28.35,
+  "end": 30.373
+ },
+ {
+  "id": "name",
+  "start": 32.05,
+  "end": 34.294
+ }
+]
