@@ -1,0 +1,117 @@
+{
+  "s00_hook_tile": {
+    "file": "clips/s00_hook_tile.mp4",
+    "padFrames": 11,
+    "totalFrames": 83
+  },
+  "s01_raw_loader": {
+    "file": "clips/s01_raw_loader.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s02_crusher": {
+    "file": "clips/s02_crusher.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s03_belt": {
+    "file": "clips/s03_belt.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s04_ballmill": {
+    "file": "clips/s04_ballmill.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s05_slip": {
+    "file": "clips/s05_slip.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s06_spray_flame": {
+    "file": "clips/s06_spray_flame.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s07_spray_powder": {
+    "file": "clips/s07_spray_powder.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s08_press": {
+    "file": "clips/s08_press.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s09_rollers": {
+    "file": "clips/s09_rollers.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s10_dryer_hall": {
+    "file": "clips/s10_dryer_hall.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s11_dryer_exit": {
+    "file": "clips/s11_dryer_exit.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s12_glaze": {
+    "file": "clips/s12_glaze.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s13_print": {
+    "file": "clips/s13_print.mp4",
+    "padFrames": 12,
+    "totalFrames": 84
+  },
+  "s14_kiln_panel": {
+    "file": "clips/s14_kiln_panel.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s15_kiln_exit": {
+    "file": "clips/s15_kiln_exit.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s16_polish_head": {
+    "file": "clips/s16_polish_head.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s17_polish_sheen": {
+    "file": "clips/s17_polish_sheen.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s18_robot_box": {
+    "file": "clips/s18_robot_box.mp4",
+    "padFrames": 5,
+    "totalFrames": 47
+  },
+  "s19_robot_swing": {
+    "file": "clips/s19_robot_swing.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s20_crew": {
+    "file": "clips/s20_crew.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s21_truck": {
+    "file": "clips/s21_truck.mp4",
+    "padFrames": 12,
+    "totalFrames": 54
+  },
+  "s22_end_tile": {
+    "file": "clips/s22_end_tile.mp4",
+    "padFrames": 12,
+    "totalFrames": 144
+  }
+}
