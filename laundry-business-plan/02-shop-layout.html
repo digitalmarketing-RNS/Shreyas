@@ -1,0 +1,595 @@
+<title>Banaswadi Laundry Floor Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a drawing sheet. Title block on top, the plan beside its key, then trade sheets (electrician, plumber) as tables. */
+:root{
+  --paper:#EDF1F3;
+  --sheet:#FAFBFC;
+  --ink:#1C2730;
+  --muted:#55646F;
+  --rule:#C6D0D7;
+  --wet:#22709F;
+  --wet-zone:#DCE9F2;
+  --front-zone:#EAEEEA;
+  --clean:#1E7A57;
+  --dirty:#B05821;
+  --display:"Archivo Narrow","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1419; --sheet:#141C22; --ink:#DAE3E9; --muted:#93A2AD; --rule:#2A3741;
+    --wet:#62A8D8; --wet-zone:#152A3B; --front-zone:#1A2120; --clean:#4FBD90; --dirty:#E08B52;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1419; --sheet:#141C22; --ink:#DAE3E9; --muted:#93A2AD; --rule:#2A3741;
+  --wet:#62A8D8; --wet-zone:#152A3B; --front-zone:#1A2120; --clean:#4FBD90; --dirty:#E08B52;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.55 var(--body)}
+.page{max-width:1140px;margin:0 auto;padding-inline:20px;padding-block:28px 72px;display:grid;gap:52px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-weight:700;font-size:clamp(32px,5.2vw,50px);line-height:1.02;letter-spacing:-0.01em}
+h2{font-weight:700;font-size:26px;line-height:1.12}
+h3{font-weight:600;font-size:19px;line-height:1.2}
+p{margin:0}
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.lede{max-width:60ch;font-size:18px}
+section{display:grid;gap:18px;min-width:0}
+.sec-head{display:grid;gap:6px}
+.sec-head p{color:var(--muted);max-width:66ch}
+
+/* title block */
+.titleblock{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);border:1.5px solid var(--ink);background:var(--sheet)}
+.tb-main{display:grid;gap:14px;padding:26px 28px}
+.tb-meta{margin:0;border-left:1.5px solid var(--ink);display:grid;grid-template-columns:auto 1fr;align-content:start}
+.tb-meta dt,.tb-meta dd{margin:0;padding:11px 14px;border-bottom:1px solid var(--rule);font-size:14px}
+.tb-meta dt{font:500 11px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-right:6px}
+.tb-meta dd{font-family:var(--mono);font-size:13px;line-height:1.5}
+.tb-meta dt:last-of-type,.tb-meta dd:last-of-type{border-bottom:0}
+@media (max-width:760px){
+  .titleblock{grid-template-columns:minmax(0,1fr)}
+  .tb-meta{border-left:0;border-top:1.5px solid var(--ink)}
+}
+
+/* tables */
+.tbl{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule)}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:15px}
+th{font:600 11px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--ink);vertical-align:bottom}
+td{padding:12px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.name{font-weight:700;font-family:var(--display);font-size:17px;white-space:nowrap}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.total td{border-top:1.5px solid var(--ink);font-weight:700}
+.note{font-size:14.5px;color:var(--muted);max-width:72ch}
+.chip{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.05em;padding:4px 7px;border:1px solid currentColor;border-radius:3px;margin-right:6px;vertical-align:2px}
+.chip.wet{color:var(--wet)}
+.chip.later{color:var(--muted);border-style:dashed}
+
+/* drawings */
+.plan-grid{display:grid;grid-template-columns:minmax(0,580px) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:940px){.plan-grid{grid-template-columns:minmax(0,1fr)}}
+figure{margin:0;display:grid;gap:10px;min-width:0}
+.drawing{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);padding:14px}
+.drawing svg{display:block;width:100%;height:auto}
+.drawing.plan svg{min-width:440px;max-width:540px;margin:0 auto}
+.drawing.elev svg{min-width:460px;max-width:580px;margin:0 auto}
+figcaption{font-size:14.5px;color:var(--muted);max-width:68ch}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend svg{width:36px;height:12px;flex:none}
+
+.key{list-style:none;padding:0;margin:0;display:grid;gap:11px}
+.key li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;font-size:15px}
+.key .t{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--sheet);font:600 11px/22px var(--mono);text-align:center;margin-top:1px}
+.key .t.sq{border-radius:3px}
+.side{display:grid;gap:22px;align-content:start;min-width:0}
+.side .panel{background:var(--sheet);border:1px solid var(--rule);padding:18px 18px 20px;display:grid;gap:14px}
+
+.why{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 32px}
+.why li{display:grid;gap:4px;align-content:start;padding-top:12px;border-top:1px solid var(--rule)}
+.why b{font-family:var(--display);font-size:18px;font-weight:600}
+@media (max-width:760px){.why{grid-template-columns:minmax(0,1fr)}}
+
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
+@media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+.two > div{display:grid;gap:14px;min-width:0}
+.plumb{margin:0;padding:0;list-style:none;display:grid;gap:10px;background:var(--sheet);border:1px solid var(--rule);padding:16px 18px}
+.plumb li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.plumb li:last-child{border-bottom:0;padding-bottom:0}
+.plumb li > span:first-child{font:600 11px/1.6 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:520px){.plumb li{grid-template-columns:minmax(0,1fr);gap:2px}}
+
+.checks{list-style:none;padding:0;margin:0;display:grid;gap:10px;max-width:78ch}
+.checks li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;font-size:15.5px}
+.checks li::before{content:"";width:15px;height:15px;border:1.5px solid var(--ink);border-radius:2px;margin-top:4px}
+
+footer{font-size:13.5px;color:var(--muted);border-top:1.5px solid var(--ink);padding-top:14px;max-width:90ch}
+
+/* svg drawing classes */
+.wall{fill:var(--ink)}
+.z-wet{fill:var(--wet-zone)}
+.z-front{fill:var(--front-zone)}
+.z-wc{fill:var(--sheet)}
+.fx{fill:var(--sheet);stroke:var(--ink);stroke-width:1.4}
+.mc{fill:var(--sheet);stroke:var(--wet);stroke-width:2.2}
+.fut{fill:none;stroke:var(--wet);stroke-width:1.6;stroke-dasharray:6 4}
+.thin{fill:none;stroke:var(--ink);stroke-width:1}
+.swing{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.leaf{fill:none;stroke:var(--ink);stroke-width:2}
+.lbl{fill:var(--ink);font:600 13px var(--display);letter-spacing:.02em}
+.lbl-c{fill:var(--ink);font:600 13px var(--display);letter-spacing:.14em}
+.lbl-sm{fill:var(--muted);font:400 11px var(--body)}
+.dim{stroke:var(--muted);stroke-width:1;fill:none}
+.dimtxt{fill:var(--muted);font:400 10.5px var(--mono)}
+.water{stroke:var(--wet);stroke-width:1.6;stroke-dasharray:6 3;fill:none}
+.drain{stroke:var(--muted);stroke-width:1.8;stroke-dasharray:1.5 3;fill:none;stroke-linecap:round}
+.vent{stroke:var(--wet);stroke-width:3;stroke-dasharray:4 3;fill:none}
+.duct{stroke:var(--wet);stroke-width:8;fill:none;opacity:.55}
+.valve{fill:var(--wet)}
+.f-clean{stroke:var(--clean);stroke-width:2.6;fill:none;stroke-linejoin:round}
+.f-dirty{stroke:var(--dirty);stroke-width:2.6;stroke-dasharray:7 5;fill:none;stroke-linejoin:round}
+.ah-clean{fill:var(--clean)}
+.ah-dirty{fill:var(--dirty)}
+.shutter{stroke:var(--ink);stroke-width:4;stroke-dasharray:12 6;fill:none}
+.street{fill:var(--rule)}
+.tag circle,.tag rect{fill:var(--ink)}
+.tilegrid line{stroke:var(--rule);stroke-width:1}
+.hatch-line{stroke:var(--muted);stroke-width:1}
+.tag text{fill:var(--sheet);font:600 10.5px var(--mono);text-anchor:middle}
+.cam{fill:var(--ink)}
+.mid{text-anchor:middle}
+.end{text-anchor:end}
+</style>
+
+<main class="page">
+
+  <header class="titleblock">
+    <div class="tb-main">
+      <p class="eyebrow">Drawing LS-02 · Shop layout sized to the video</p>
+      <h1>Banaswadi Laundry Floor Plan</h1>
+      <p class="lede">Laid out for the space you actually have: a front shop of about 9 × 11 ft and a back room of about 7½ × 7 ft, with no toilet. Two washers and a dryer fit on the back room's right wall. The front shop holds the counter, steam ironing and ready orders.</p>
+    </div>
+    <dl class="tb-meta">
+      <dt>Site</dt><dd>Dodda Banaswadi Main Rd, near the fire station</dd>
+      <dt>Front shop</dt><dd>≈ 9 × 11 ft (big 2 ft tiles)</dd>
+      <dt>Back room</dt><dd>≈ 7½ × 7 ft (small 1 ft tiles)</dd>
+      <dt>Status</dt><dd>Sizes estimated from the 2 Oct video. Count the tiles to confirm.</dd>
+    </dl>
+  </header>
+
+  <section aria-labelledby="machines">
+    <div class="sec-head">
+      <h2 id="machines">Where each machine goes</h2>
+      <p>The washers and dryer stand where the old black counter is now. The steam ironing table goes on the front shop's right wall.</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Machine</th><th>Position</th><th>Why there</th><th>Hook-ups it needs</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="name"><span class="chip wet">STACK 1</span>Washer 1 + Dryer 1</td>
+            <td>Back room, right wall, starting about 1½ ft from the window wall. Dryer on top of the washer.</td>
+            <td>Next to the old water and drain points at the window wall, so the pipes and dryer vent stay short.</td>
+            <td>16 A + 32 A isolators, water valve, drain standpipe, 100 mm vent</td>
+          </tr>
+          <tr>
+            <td class="name"><span class="chip wet">STACK 2</span>Washer 2</td>
+            <td>Right beside Stack 1. It ends about 9 inches before the white-door wall.</td>
+            <td>Shares the same water line, drain and floor trap. Lets two loads run at once, and keeps you working if one washer breaks down.</td>
+            <td>16 A isolator, water valve, drain standpipe</td>
+          </tr>
+          <tr>
+            <td class="name"><span class="chip later">LATER</span>Dryer 2</td>
+            <td>On top of Washer 2.</td>
+            <td>Takes no extra floor space. Add it once evening orders start backing up at the dryer.</td>
+            <td>32 A circuit wired and capped from day one</td>
+          </tr>
+          <tr>
+            <td class="name">Steam ironing table</td>
+            <td>Front shop, right wall, starting about 1½ ft from the white-door wall. The ironer stands in the middle of the shop.</td>
+            <td>The open shutter carries out the heat and steam. The rail for ironed orders sits right after the table, near the counter.</td>
+            <td>25 A socket at 1 m, ceiling fan above</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Every machine fits in the back room's 7 ft right wall: the two stacks need 4¾ ft of it. The plan's ₹2.5 lakh machine budget covers one washer and one dryer. Washer 2 adds about ₹45–60k for a heavy-duty domestic model or ₹1.1–1.3 lakh for a commercial one.</p>
+  </section>
+
+  <section aria-labelledby="plan">
+    <div class="sec-head">
+      <h2 id="plan">Floor plan</h2>
+      <p>Seen from above, with the street at the bottom. The blue area is the wet zone. Each grid line on the front and back rooms matches their own tiles: 2 ft in front, 1 ft at the back.</p>
+    </div>
+    <div class="plan-grid">
+      <figure>
+        <div class="drawing plan">
+          <svg viewBox="0 0 470 924" role="img" aria-label="Floor plan. Back room about 7.5 by 7 feet: folding counter under the window, sink and water softener beside it, two washer stacks on the right wall, sorting bins on the left wall. Front shop about 9 by 11 feet: ready-order pigeonholes on the left wall, steam ironing table and a two-tier hanging rail on the right wall, counter on the shutter line at front left, customer space at front right.">
+            <defs>
+              <marker id="pl-ah-c" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-clean"/></marker>
+              <marker id="pl-ah-d" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-dirty"/></marker>
+              <pattern id="pl-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatch-line" x1="0" y1="0" x2="0" y2="8"/></pattern>
+            </defs>
+
+            <!-- dimensions -->
+            <line class="dim" x1="60" y1="16" x2="360" y2="16"/>
+            <line class="dim" x1="60" y1="10" x2="60" y2="22"/>
+            <line class="dim" x1="360" y1="10" x2="360" y2="22"/>
+            <text class="dimtxt mid" x="210" y="11">back room ≈ 7½ ft</text>
+            <line class="dim" x1="28" y1="60" x2="28" y2="340"/>
+            <line class="dim" x1="22" y1="60" x2="34" y2="60"/>
+            <line class="dim" x1="22" y1="340" x2="34" y2="340"/>
+            <text class="dimtxt mid" x="20" y="200" transform="rotate(-90 20 200)">≈ 7 ft</text>
+            <line class="dim" x1="28" y1="360" x2="28" y2="800"/>
+            <line class="dim" x1="22" y1="360" x2="34" y2="360"/>
+            <line class="dim" x1="22" y1="800" x2="34" y2="800"/>
+            <text class="dimtxt mid" x="20" y="580" transform="rotate(-90 20 580)">≈ 11 ft</text>
+
+            <!-- zones + tile grids -->
+            <rect class="z-wet" x="60" y="60" width="300" height="280"/>
+            <rect class="z-front" x="60" y="360" width="360" height="440"/>
+            <g class="tilegrid">
+              <line x1="100" y1="60" x2="100" y2="340"/><line x1="140" y1="60" x2="140" y2="340"/><line x1="180" y1="60" x2="180" y2="340"/><line x1="220" y1="60" x2="220" y2="340"/><line x1="260" y1="60" x2="260" y2="340"/><line x1="300" y1="60" x2="300" y2="340"/><line x1="340" y1="60" x2="340" y2="340"/>
+              <line x1="60" y1="100" x2="360" y2="100"/><line x1="60" y1="140" x2="360" y2="140"/><line x1="60" y1="180" x2="360" y2="180"/><line x1="60" y1="220" x2="360" y2="220"/><line x1="60" y1="260" x2="360" y2="260"/><line x1="60" y1="300" x2="360" y2="300"/>
+              <line x1="140" y1="360" x2="140" y2="800"/><line x1="220" y1="360" x2="220" y2="800"/><line x1="300" y1="360" x2="300" y2="800"/><line x1="380" y1="360" x2="380" y2="800"/>
+              <line x1="60" y1="440" x2="420" y2="440"/><line x1="60" y1="520" x2="420" y2="520"/><line x1="60" y1="600" x2="420" y2="600"/><line x1="60" y1="680" x2="420" y2="680"/><line x1="60" y1="760" x2="420" y2="760"/>
+            </g>
+            <rect x="370" y="60" width="50" height="280" fill="url(#pl-hatch)"/>
+            <text class="lbl-sm mid" x="395" y="204" transform="rotate(-90 395 200)">not part of the shop</text>
+
+            <!-- walls -->
+            <rect class="wall" x="50" y="50" width="10" height="750"/>
+            <rect class="wall" x="420" y="50" width="10" height="750"/>
+            <rect class="wall" x="50" y="50" width="70" height="10"/>
+            <rect class="wall" x="300" y="50" width="130" height="10"/>
+            <rect class="fx" x="120" y="50" width="180" height="10"/>
+            <line class="thin" x1="120" y1="55" x2="300" y2="55"/>
+            <rect class="wall" x="360" y="60" width="10" height="280"/>
+            <rect class="wall" x="60" y="340" width="60" height="20"/>
+            <rect class="wall" x="220" y="340" width="200" height="20"/>
+            <text class="lbl-sm mid" x="210" y="41">high window</text>
+
+            <!-- white door, swings into the front shop -->
+            <line class="leaf" x1="120" y1="360" x2="120" y2="460"/>
+            <path class="swing" d="M220,360 A100,100 0 0 1 120,460"/>
+
+            <!-- back room: folding counter, sink, softener -->
+            <rect class="fx" x="60" y="60" width="160" height="70"/>
+            <text class="lbl mid" x="140" y="92">Folding counter</text>
+            <text class="lbl-sm mid" x="140" y="108">under the window</text>
+            <rect class="fx" x="228" y="60" width="60" height="50"/>
+            <rect class="thin" x="235" y="67" width="46" height="36" rx="5"/>
+            <g class="tag"><circle cx="258" cy="85" r="9"/><text x="258" y="89">3</text></g>
+            <rect class="fx" x="300" y="70" width="48" height="44"/>
+            <g class="tag"><circle cx="324" cy="92" r="9"/><text x="324" y="96">1</text></g>
+
+            <!-- water -->
+            <circle class="valve" cx="354" cy="64" r="3.5"/>
+            <polyline class="water" points="288,64 354,64 354,300"/>
+            <circle class="valve" cx="354" cy="166" r="3.5"/>
+            <circle class="valve" cx="354" cy="264" r="3.5"/>
+
+            <!-- stacks -->
+            <rect class="mc" x="248" y="120" width="99" height="92"/>
+            <text class="lbl mid" x="297" y="162">W1</text>
+            <text class="lbl-sm mid" x="297" y="179">+ D1 on top</text>
+            <rect class="mc" x="248" y="218" width="99" height="92"/>
+            <text class="lbl mid" x="297" y="260">W2</text>
+            <text class="lbl-sm mid" x="297" y="277">D2 on top later</text>
+
+            <!-- vent + exhaust -->
+            <line class="vent" x1="294" y1="120" x2="294" y2="58"/>
+            <g class="tag"><circle cx="294" cy="34" r="9"/><text x="294" y="38">5</text></g>
+            <circle class="fx" cx="150" cy="55" r="6.5"/>
+            <line class="thin" x1="145" y1="50" x2="155" y2="60"/>
+            <line class="thin" x1="155" y1="50" x2="145" y2="60"/>
+            <g class="tag"><circle cx="150" cy="34" r="9"/><text x="150" y="38">6</text></g>
+
+            <!-- bins -->
+            <rect class="fx" x="64" y="148" width="46" height="46"/>
+            <rect class="fx" x="64" y="200" width="46" height="46"/>
+            <rect class="fx" x="64" y="252" width="46" height="46"/>
+            <g class="tag"><circle cx="126" cy="150" r="9"/><text x="126" y="154">2</text></g>
+
+            <!-- floor trap + drain -->
+            <polyline class="drain" points="238,210 238,112"/>
+            <rect class="fx" x="232" y="210" width="12" height="12"/>
+            <line class="thin" x1="232" y1="210" x2="244" y2="222"/>
+            <line class="thin" x1="244" y1="210" x2="232" y2="222"/>
+            <g class="tag"><circle cx="212" cy="236" r="9"/><text x="212" y="240">4</text></g>
+
+            <!-- DB + camera -->
+            <rect class="fx" x="252" y="330" width="24" height="10"/>
+            <g class="tag"><circle cx="238" cy="322" r="9"/><text x="238" y="326">7</text></g>
+            <polygon class="cam" points="324,338 336,338 330,327"/>
+            <g class="tag"><circle cx="306" cy="324" r="9"/><text x="306" y="328">8</text></g>
+
+            <!-- front shop -->
+            <rect class="fx" x="60" y="380" width="60" height="280"/>
+            <text class="lbl-sm mid" x="90" y="524" transform="rotate(-90 90 520)">Ready orders · pigeonholes to 7 ft</text>
+
+            <rect class="mc" x="340" y="420" width="80" height="180" style="stroke:var(--ink)"/>
+            <rect class="fx" x="346" y="426" width="68" height="26"/>
+            <text class="lbl-sm mid" x="380" y="443">boiler</text>
+            <text class="lbl mid" x="380" y="530" transform="rotate(-90 380 526)">Steam ironing</text>
+            <circle class="thin" cx="292" cy="515" r="9"/>
+            <circle class="cam" cx="301" cy="515" r="2.5"/>
+            <text class="lbl-sm mid" x="292" y="541">ironer</text>
+
+            <rect class="fx" x="350" y="610" width="70" height="120"/>
+            <line class="thin" x1="375" y1="616" x2="375" y2="724"/>
+            <line class="thin" x1="397" y1="616" x2="397" y2="724"/>
+            <text class="lbl-sm mid" x="362" y="674" transform="rotate(-90 362 670)">2-tier rail</text>
+
+            <rect class="fx" x="60" y="720" width="200" height="70"/>
+            <text class="lbl mid" x="160" y="750">Counter</text>
+            <text class="lbl-sm mid" x="160" y="767">scale · billing · UPI QR</text>
+
+            <rect class="fx" x="372" y="744" width="44" height="44" rx="4"/>
+            <text class="lbl-sm mid" x="394" y="770">stool</text>
+            <text class="lbl-c mid" x="310" y="762">CUSTOMERS</text>
+            <text class="lbl-sm mid" x="310" y="778">step in here</text>
+
+            <polygon class="cam" points="420,364 420,378 408,371"/>
+            <g class="tag"><circle cx="396" cy="384" r="9"/><text x="396" y="388">8</text></g>
+
+            <!-- flows -->
+            <polyline class="f-dirty" points="180,718 180,268 114,268" marker-end="url(#pl-ah-d)"/>
+            <polyline class="f-clean" points="246,166 164,166 164,134" marker-end="url(#pl-ah-c)"/>
+
+            <!-- shutter + street -->
+            <line class="shutter" x1="60" y1="800" x2="420" y2="800"/>
+            <text class="lbl-sm mid" x="240" y="820">Rolling shutter · counter faces the street</text>
+            <text class="lbl-sm mid" x="240" y="836">Glow signboard above the shutter</text>
+            <line class="dim" x1="60" y1="852" x2="420" y2="852"/>
+            <line class="dim" x1="60" y1="846" x2="60" y2="858"/>
+            <line class="dim" x1="420" y1="846" x2="420" y2="858"/>
+            <text class="dimtxt mid" x="240" y="866">front shop ≈ 9 ft</text>
+            <rect class="street" x="0" y="876" width="470" height="44"/>
+            <text class="lbl-c mid" x="240" y="903">STREET</text>
+          </svg>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><svg viewBox="0 0 36 12"><line class="f-dirty" x1="0" y1="6" x2="36" y2="6"/></svg>Dirty bags</span>
+          <span><svg viewBox="0 0 36 12"><line class="f-clean" x1="0" y1="6" x2="36" y2="6"/></svg>Clean clothes</span>
+          <span><svg viewBox="0 0 36 12"><line class="water" x1="0" y1="6" x2="36" y2="6"/></svg>Water line</span>
+          <span><svg viewBox="0 0 36 12"><line class="drain" x1="0" y1="6" x2="36" y2="6"/></svg>Drain</span>
+          <span><svg viewBox="0 0 36 12"><line class="vent" x1="0" y1="6" x2="36" y2="6"/></svg>Dryer vent (overhead)</span>
+        </div>
+        <figcaption>Machines are drawn as 10 kg commercial units, about 700 mm wide and 750 mm deep. The hatched strip behind the front shop's right side is left out of the layout.</figcaption>
+      </figure>
+
+      <div class="side">
+        <div class="panel">
+          <h3>Key</h3>
+          <ol class="key">
+            <li><span class="t">1</span><span>Water softener and filter in the corner by the old water points</span></li>
+            <li><span class="t">2</span><span>Three sorting bins (whites, colours, towels), with a locked chemical shelf on the wall above</span></li>
+            <li><span class="t">3</span><span>Small utility sink at the old water points. It drains into the old sink outlet.</span></li>
+            <li><span class="t">4</span><span>Floor trap. The back-room floor slopes towards it, and it drains to the same outlet.</span></li>
+            <li><span class="t">5</span><span>Dryer vent, carried out through the window</span></li>
+            <li><span class="t">6</span><span>Exhaust fan in the window</span></li>
+            <li><span class="t">7</span><span>Machine DB with a 30 mA RCCB, on the white-door wall</span></li>
+            <li><span class="t">8</span><span>CCTV: one camera on the machines, one on the counter</span></li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h3>Check the size by counting tiles</h3>
+          <p><b>Front shop:</b> the tiles are about 2 ft (600 mm). I count roughly 4½ across and 5½ deep, which makes it about 9 × 11 ft.</p>
+          <p><b>Back room:</b> the old tiles are about 1 ft (300 mm). I count roughly 7½ across and 7 deep.</p>
+          <p class="note">Measure one tile of each kind first. If your count is different, tell me and I'll redraw.</p>
+        </div>
+        <div class="panel">
+          <h3>Smallest space this works in</h3>
+          <p>Back room: about 7 ft wide, with a right wall at least 6½ ft long. Front shop: about 8 ft wide and 10 ft deep.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="why">
+    <div class="sec-head"><h2 id="why">Why it's laid out this way</h2></div>
+    <ul class="why">
+      <li><b>No toilet needed</b><span>The old counter in the back room already has water pipes and a sink drain at the window wall. The sink, both washers and the floor trap all connect there.</span></li>
+      <li><b>Machines replace the old counter</b><span>The right wall is about 7 ft long and the two stacks need 4¾ ft of it. Stacking is what makes three machines fit in a 7½ ft room.</span></li>
+      <li><b>Folding happens under the window</b><span>Daylight makes stains easy to spot, and the folding counter is one step from the dryer.</span></li>
+      <li><b>The counter sits on the shutter line</b><span>Customers are served at the front, the way small shops in the area work, so the 9 ft shop needs no waiting area. A stool covers anyone who steps in.</span></li>
+      <li><b>Ready orders are stored up the wall</b><span>Floor-to-7-ft pigeonholes on the left wall hold 60–80 packed orders in 1½ ft of depth. The 2-tier rail doubles the hanging space for shirts.</span></li>
+      <li><b>Dirty bags stay on one side</b><span>Bags go from the counter straight up the left side into the bins. They never go on the folding counter, the ironing table or the pigeonholes.</span></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="elev">
+    <div class="sec-head">
+      <h2 id="elev">Machine wall, side view</h2>
+      <p>The back room's right wall, about 7 ft long, seen from inside. Your electrician and plumber can work from these heights.</p>
+    </div>
+    <div class="plan-grid">
+      <figure>
+        <div class="drawing elev">
+          <svg viewBox="0 0 500 534" role="img" aria-label="Side view of the 7 foot machine wall. The water softener is in the window-wall corner, then Washer 1 with Dryer 1 on top, then Washer 2 with a dashed outline for the future Dryer 2, ending about 230 millimetres before the white-door wall. Valves at 1.1 metres, standpipes behind the washers, the dryer vent runs over the softener to the window, and the isolators sit above the stacks at about 2.2 metres.">
+            <rect class="wall" x="68" y="20" width="12" height="135"/>
+            <rect class="fx" x="68" y="155" width="12" height="105"/>
+            <line class="thin" x1="74" y1="155" x2="74" y2="260"/>
+            <rect class="wall" x="68" y="260" width="12" height="210"/>
+            <text class="lbl-sm end" x="62" y="211">window</text>
+            <rect class="wall" x="400" y="20" width="12" height="450"/>
+            <rect class="wall" x="60" y="470" width="352" height="8"/>
+            <line class="dim" x1="80" y1="20" x2="400" y2="20" style="stroke-dasharray:5 4"/>
+            <text class="lbl-sm mid" x="240" y="38">ceiling ≈ 3.0 m (measure)</text>
+
+            <rect class="fx" x="92" y="320" width="50" height="150"/>
+            <text class="lbl-sm mid" x="117" y="398" transform="rotate(-90 117 394)">softener</text>
+
+            <rect class="mc" x="149" y="322" width="105" height="148"/>
+            <circle class="thin" cx="201" cy="398" r="32"/>
+            <text class="lbl mid" x="201" y="403">W1</text>
+            <rect class="mc" x="149" y="174" width="105" height="148"/>
+            <circle class="thin" cx="201" cy="250" r="32"/>
+            <text class="lbl mid" x="201" y="255">D1</text>
+            <rect class="mc" x="260" y="322" width="105" height="148"/>
+            <circle class="thin" cx="312" cy="398" r="32"/>
+            <text class="lbl mid" x="312" y="403">W2</text>
+            <rect class="fut" x="260" y="174" width="105" height="148"/>
+            <text class="lbl-sm mid" x="312" y="246">Dryer 2</text>
+            <text class="lbl-sm mid" x="312" y="262">later</text>
+
+            <line class="water" x1="117" y1="320" x2="117" y2="305"/>
+            <line class="water" x1="117" y1="305" x2="365" y2="305"/>
+            <circle class="valve" cx="240" cy="305" r="4"/>
+            <circle class="valve" cx="350" cy="305" r="4"/>
+            <line class="drain" x1="244" y1="470" x2="244" y2="350"/>
+            <line class="drain" x1="355" y1="470" x2="355" y2="350"/>
+
+            <line class="duct" x1="80" y1="192" x2="149" y2="192"/>
+
+            <polyline class="thin" points="400,95 189,95"/>
+            <line class="thin" x1="189" y1="95" x2="189" y2="118"/>
+            <line class="thin" x1="213" y1="95" x2="213" y2="118"/>
+            <line class="thin" x1="300" y1="95" x2="300" y2="118"/>
+            <line class="thin" x1="324" y1="95" x2="324" y2="118"/>
+            <rect class="fx" x="180" y="118" width="18" height="22"/>
+            <rect class="fx" x="204" y="118" width="18" height="22"/>
+            <rect class="fx" x="291" y="118" width="18" height="22"/>
+            <rect class="fut" x="315" y="118" width="18" height="22"/>
+            <text class="lbl-sm end" x="394" y="88">from DB</text>
+
+            <g class="tag"><rect x="111" y="287" width="18" height="18" rx="3"/><text x="120" y="300">A</text></g>
+            <g class="tag"><rect x="248" y="343" width="18" height="18" rx="3"/><text x="257" y="356">B</text></g>
+            <g class="tag"><rect x="106" y="163" width="18" height="18" rx="3"/><text x="115" y="176">C</text></g>
+            <g class="tag"><rect x="248" y="99" width="18" height="18" rx="3"/><text x="257" y="112">D</text></g>
+
+            <line class="dim" x1="432" y1="470" x2="432" y2="174"/>
+            <line class="dim" x1="426" y1="470" x2="438" y2="470"/>
+            <line class="dim" x1="426" y1="322" x2="438" y2="322"/>
+            <line class="dim" x1="426" y1="174" x2="438" y2="174"/>
+            <text class="dimtxt mid" x="448" y="396" transform="rotate(-90 448 396)">≈ 990 mm</text>
+            <text class="dimtxt mid" x="448" y="248" transform="rotate(-90 448 248)">≈ 990 mm</text>
+            <line class="dim" x1="476" y1="470" x2="476" y2="20"/>
+            <line class="dim" x1="470" y1="470" x2="482" y2="470"/>
+            <line class="dim" x1="470" y1="20" x2="482" y2="20"/>
+            <text class="dimtxt mid" x="490" y="245" transform="rotate(-90 490 245)">≈ 3.0 m</text>
+
+            <line class="dim" x1="80" y1="494" x2="400" y2="494"/>
+            <line class="dim" x1="80" y1="488" x2="80" y2="500"/>
+            <line class="dim" x1="149" y1="488" x2="149" y2="500"/>
+            <line class="dim" x1="254" y1="488" x2="254" y2="500"/>
+            <line class="dim" x1="260" y1="488" x2="260" y2="500"/>
+            <line class="dim" x1="365" y1="488" x2="365" y2="500"/>
+            <line class="dim" x1="400" y1="488" x2="400" y2="500"/>
+            <text class="dimtxt mid" x="114" y="512">450</text>
+            <text class="dimtxt mid" x="201" y="512">700</text>
+            <text class="dimtxt mid" x="312" y="512">700</text>
+            <text class="dimtxt mid" x="240" y="524">wall ≈ 2,130 mm (7 ft)</text>
+          </svg>
+        </div>
+        <figcaption>The window wall is on the left and the white-door wall on the right. Dashed parts are hidden behind the machines or come later. Sizes are in mm.</figcaption>
+      </figure>
+      <div class="side">
+        <div class="panel">
+          <h3>What the letters mark</h3>
+          <ol class="key">
+            <li><span class="t sq">A</span><span>Water valves at 1.1 m, one per washer, fed from the softener</span></li>
+            <li><span class="t sq">B</span><span>50 mm drain standpipe, 0.6–0.9 m high, behind each washer</span></li>
+            <li><span class="t sq">C</span><span>100 mm dryer vent over the softener and out through a metal plate in the window</span></li>
+            <li><span class="t sq">D</span><span>Isolators at about 2.2 m, above splash height: 16 A per washer, 32 A per dryer. Dryer 2's isolator is wired and capped.</span></li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h3>Remove first</h3>
+          <p>Take out the old black grilled counter, but keep its water pipes and drain. They serve the sink and both washers.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="trades">
+    <div class="sec-head">
+      <h2 id="trades">Brief for the electrician and plumber</h2>
+      <p>Hand these over before work starts, so walls and floors only need opening once.</p>
+    </div>
+    <div class="two">
+      <div>
+        <h3>Electrician: separate circuits</h3>
+        <div class="tbl">
+          <table style="min-width:520px">
+            <thead><tr><th>Circuit</th><th class="num">Load</th><th class="num">Breaker</th><th>Point</th></tr></thead>
+            <tbody>
+              <tr><td>Washer 1</td><td class="num">2–2.5 kW</td><td class="num">16 A</td><td>Isolator above Stack 1</td></tr>
+              <tr><td>Dryer 1</td><td class="num">5–6 kW</td><td class="num">32 A</td><td>Isolator above Stack 1</td></tr>
+              <tr><td>Washer 2</td><td class="num">2–2.5 kW</td><td class="num">16 A</td><td>Isolator above Stack 2</td></tr>
+              <tr><td>Dryer 2 (wire now)</td><td class="num">5–6 kW</td><td class="num">32 A</td><td>Capped isolator above Stack 2</td></tr>
+              <tr><td>Steam iron + vacuum table</td><td class="num">3–4.5 kW</td><td class="num">25 A</td><td>Socket at 1 m, front right wall</td></tr>
+              <tr><td>Lights, fans, exhaust</td><td class="num">≈ 0.6 kW</td><td class="num">10 A</td><td>Ceiling</td></tr>
+              <tr><td>Counter, router, CCTV</td><td class="num">≈ 0.4 kW</td><td class="num">16 A</td><td>3 sockets under the counter, on the inverter</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">That adds up to about 17 kW connected now and about 23 kW once Dryer 2 arrives, so you need a 3-phase supply. Put the two dryers on different phases. Add a 30 mA RCCB for the back room, a dedicated earth pit, and 5000–6500 K LED panels over the counter and folding counter so stains are easy to see.</p>
+      </div>
+      <div>
+        <h3>Plumber</h3>
+        <ul class="plumb">
+          <li><span>Supply</span><span>Old water point → sediment filter → softener → 20 mm line behind the stacks at 1.1 m. One valve per washer and one for the sink.</span></li>
+          <li><span>Pressure</span><span>Check the minimum water pressure in each washer's manual. Add a small booster pump if they fill slowly.</span></li>
+          <li><span>Drain</span><span>Each washer pumps into a 50 mm standpipe. The standpipes, the sink and the floor trap all join the old sink drain at the window wall.</span></li>
+          <li><span>Floor</span><span>Replace the old 1 ft tiles with anti-skid tiles, sloped about 1 in 100 towards the floor trap, with 150 mm tiled skirting. The front shop's tiles stay as they are.</span></li>
+          <li><span>Sink</span><span>Small steel utility sink, about 450 × 400 mm, beside the folding counter. Add a splash guard on the folding-counter side.</span></li>
+          <li><span>Vent + fan</span><span>100 mm aluminium dryer duct and a 300 mm exhaust fan, both through the window. Clean the dryer's lint filter after every load.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="check">
+    <div class="sec-head"><h2 id="check">Check these before work starts</h2></div>
+    <ul class="checks">
+      <li>Count the tiles in both rooms (2 ft in front, 1 ft at the back) and measure the window's sill and top.</li>
+      <li>Measure the back room's right wall, where the black counter stands. The stacks need about 6¼ ft of it, counting the 1½ ft gap from the window wall. If the wall is shorter, move the softener elsewhere and start Stack 1 nearer the window wall.</li>
+      <li>Measure the white door's clear width. Commercial machines are about 700 mm wide. If the opening is under about 750 mm, take the door off its hinges to bring them in.</li>
+      <li>Confirm that the old water point and the sink drain at the window wall both work.</li>
+      <li>Get the landlord's written permission to remove the black counter, re-tile the back room, fit a vent plate in the window and install the exhaust fan.</li>
+      <li>Apply to BESCOM for a 3-phase connection before you order the machines.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="cost">
+    <div class="sec-head">
+      <h2 id="cost">Cost of the layout work</h2>
+      <p>The business plan set aside about ₹2.25 lakh for interiors, electrical, plumbing and the signboard. This smaller layout costs less.</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Work</th><th class="num">Estimate (₹)</th></tr></thead>
+        <tbody>
+          <tr><td>Remove the old black counter and debris</td><td class="num">2,000–3,000</td></tr>
+          <tr><td>Back room: anti-skid tiles (≈ 55 sq ft), slope, floor trap, waterproofing</td><td class="num">12,000–18,000</td></tr>
+          <tr><td>Plumbing: filter, valves, standpipes, drain connections, small sink</td><td class="num">15,000–25,000</td></tr>
+          <tr><td>Electrical: 3-phase DB, RCCB, 7 circuits, earth pit, light points</td><td class="num">35,000–50,000</td></tr>
+          <tr><td>Dryer vent kit, window plate, exhaust fan</td><td class="num">6,000–10,000</td></tr>
+          <tr><td>Front counter, 5 ft with drawers</td><td class="num">15,000–22,000</td></tr>
+          <tr><td>Folding counter, 4 ft, in the back room</td><td class="num">8,000–12,000</td></tr>
+          <tr><td>Pigeonhole shelving, 7 ft long, floor to 7 ft</td><td class="num">20,000–30,000</td></tr>
+          <tr><td>2-tier hanging rail</td><td class="num">5,000–8,000</td></tr>
+          <tr><td>Sorting bins, basket trolley, stool</td><td class="num">5,000–8,000</td></tr>
+          <tr><td>LED panels, 5000–6500 K</td><td class="num">6,000–10,000</td></tr>
+          <tr><td>Glow signboard</td><td class="num">30,000–40,000</td></tr>
+          <tr class="total"><td>Total</td><td class="num">1,59,000–2,36,000</td></tr>
+          <tr><td>Optional: booster pump, only if pressure is low</td><td class="num">6,000–10,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The water softener (about ₹30k) and the stacking kits come out of the machine budget.</p>
+  </section>
+
+  <footer>
+    This layout is drawn from the store video of 2 Oct 2026. Room sizes come from counting the 2 ft front tiles and 1 ft back tiles, and machine sizes are typical for 10 kg commercial units. Measure the shop and check the machines' spec sheets before ordering anything.
+  </footer>
+</main>
