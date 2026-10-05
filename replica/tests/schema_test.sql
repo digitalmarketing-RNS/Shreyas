@@ -150,6 +150,64 @@ do $$ begin
     values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000a002', 100000, 'cash', 'pending');
 end $$;
 
+-- T24 an SMS template must name its DLT template ID, header and category
+insert into channel_accounts (id, org_id, type, provider, display_name, dlt_entity_id)
+  values ('00000000-0000-0000-0000-0000000ac501', '00000000-0000-0000-0000-00000000000a', 'sms', 'msg91', 'Alpha SMS', '1201160000000000001');
+insert into sms_headers (id, org_id, channel_account_id, header, category)
+  values ('00000000-0000-0000-0000-0000000a4e01', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000ac501', 'ALPHAC', 'service');
+do $$ begin
+  begin
+    insert into templates (org_id, channel, name, body, dlt_template_id)
+      values ('00000000-0000-0000-0000-00000000000a', 'sms', 'no header', 'Hi {#var#}', '1207160000000000001');
+    raise exception 'T24 SMS template without header/category accepted';
+  exception when check_violation then null;
+  end;
+  insert into templates (org_id, channel, name, body, dlt_template_id, sms_header_id, dlt_category)
+    values ('00000000-0000-0000-0000-00000000000a', 'sms', 'fee due', 'Fee due {#var#}', '1207160000000000002',
+            '00000000-0000-0000-0000-0000000a4e01', 'service_implicit');
+end $$;
+
+-- T25 the same outbound send cannot be queued twice (outbox idempotency)
+insert into messages (org_id, lead_id, channel, direction, idempotency_key)
+  values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000a002', 'sms', 'out', 'bcast-1:lead-a002');
+do $$ begin
+  begin
+    insert into messages (org_id, lead_id, channel, direction, idempotency_key)
+      values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000a002', 'sms', 'out', 'bcast-1:lead-a002');
+    raise exception 'T25 duplicate send queued';
+  exception when unique_violation then null;
+  end;
+end $$;
+
+-- T26 refunds need a second person to approve (maker-checker); T27 gateways get an unguessable webhook token
+insert into payment_gateways (id, org_id, provider, display_name)
+  values ('00000000-0000-0000-0000-0000000a6a01', '00000000-0000-0000-0000-00000000000a', 'razorpay', 'Alpha Razorpay');
+insert into payments (id, org_id, lead_id, gateway_id, attempt_ref, amount_paise, status)
+  values ('00000000-0000-0000-0000-0000000a9a01', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000a002',
+          '00000000-0000-0000-0000-0000000a6a01', 'ATT0001', 50000, 'success');
+do $$ begin
+  begin
+    insert into refunds (org_id, payment_id, refund_ref, amount_paise, requested_by_member_id, approved_by_member_id)
+      values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000a9a01', 'RF1', 50000,
+              '00000000-0000-0000-0000-0000000a0001', '00000000-0000-0000-0000-0000000a0001');
+    raise exception 'T26 self-approved refund accepted';
+  exception when check_violation then null;
+  end;
+  if (select length(webhook_token) from payment_gateways where id = '00000000-0000-0000-0000-0000000a6a01') < 32 then
+    raise exception 'T27 webhook token missing or short';
+  end if;
+end $$;
+
+-- T28 a suppressed address is unique per org and channel
+insert into suppressions (org_id, channel, address, reason) values ('00000000-0000-0000-0000-00000000000a', 'whatsapp', '+919800000002', 'stop_keyword');
+do $$ begin
+  begin
+    insert into suppressions (org_id, channel, address, reason) values ('00000000-0000-0000-0000-00000000000a', 'whatsapp', '+919800000002', 'manual');
+    raise exception 'T28 duplicate suppression';
+  exception when unique_violation then null;
+  end;
+end $$;
+
 -- ---------------------------------------------------------------- scope = own: Asha sees only her leads
 select set_config('app.scope', 'own', true),
        set_config('app.visible_members', '{00000000-0000-0000-0000-0000000a0001}', true);

@@ -9,6 +9,7 @@
 --     for the tenant they are working on. Only migrations run as the owner.
 
 create extension if not exists citext;
+create extension if not exists pgcrypto;
 create extension if not exists pg_trgm;
 
 create schema if not exists app;
@@ -274,8 +275,10 @@ create table leads (
   mobile_e164 text check (mobile_e164 ~ '^\+[1-9][0-9]{6,14}$'),
   alt_mobiles text[] not null default '{}',
   date_of_birth date,
-  is_minor boolean,                              -- drives guardian consent (see consents)
+  is_minor boolean,                              -- under 18: DPDP s.9 needs verified parental consent
   guardian jsonb,                                -- {name, relation, email, mobile}
+  parental_consent_status text not null default 'not_required'
+    check (parental_consent_status in ('not_required','pending','verified','refused')),
   state text,
   city text,
   campus_id uuid references campuses(id) on delete set null,
@@ -508,28 +511,6 @@ create index on follow_ups (opportunity_id) where opportunity_id is not null;
 create index on follow_ups (org_id, starts_at);
 create index on follow_ups (event_type_id);
 
-create table calls (
-  id uuid primary key default gen_random_uuid(),
-  org_id uuid not null references orgs(id) on delete cascade,
-  lead_id uuid references leads(id) on delete set null,
-  opportunity_id uuid references opportunities(id) on delete set null,
-  member_id uuid references members(id) on delete set null,
-  direction text not null check (direction in ('outbound','inbound')),
-  via text not null check (via in ('native_dialer','provider','manual_log')),
-  status text not null check (status in ('initiated','ringing','connected','completed','missed','no_answer','busy','failed')),
-  outcome text,
-  provider text,
-  provider_call_id text,
-  virtual_number text,
-  started_at timestamptz not null default now(),
-  duration_s int check (duration_s >= 0),
-  recording_url text,
-  created_at timestamptz not null default now(),
-  unique (provider, provider_call_id)
-);
-create index on calls (lead_id, started_at desc);
-create index on calls (member_id, started_at desc);
-create index on calls (org_id, started_at desc);
 
 -- ---------------------------------------------------------------- messaging: channels, templates, messages, consent
 
@@ -551,7 +532,9 @@ create table channel_accounts (
   type text not null check (type in ('whatsapp','sms','email','telephony')),
   provider text not null,                     -- 'meta_cloud', 'msg91', 'ses', 'exotel', ...
   display_name text not null,
-  status text not null default 'pending' check (status in ('pending','connected','restricted','disconnected')),
+  status text not null default 'pending' check (status in ('pending','connected','restricted','disconnected','reconnect_required')),
+  onboarding_state text,                      -- WhatsApp: code_received > token_exchanged > waba_subscribed > phone_registered > payment_method_pending > live
+  webhook_token text unique default encode(gen_random_bytes(18), 'hex'),  -- unguessable path segment for provider callbacks
   config jsonb not null default '{}',         -- non-secret settings
   secret_id uuid references secrets(id) on delete set null,
   -- WhatsApp
@@ -559,7 +542,9 @@ create table channel_accounts (
   wa_phone_number_id text unique,
   wa_display_phone text,
   wa_quality text,                            -- as reported by Meta
-  wa_messaging_limit text,                    -- as reported by Meta
+  wa_messaging_limit text,                    -- as reported by Meta, e.g. TIER_250
+  wa_data_region text,                        -- must be 'IN' before the number is registered
+  wa_currency char(3),                        -- WABA billing currency; India customers must be INR from 2027
   -- SMS (India DLT)
   dlt_entity_id text,
   sms_header text,
@@ -572,6 +557,56 @@ create table channel_accounts (
 );
 create index on channel_accounts (org_id, type);
 create unique index channel_accounts_one_default on channel_accounts (org_id, type) where is_default;
+
+create table calls (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references orgs(id) on delete cascade,
+  lead_id uuid references leads(id) on delete set null,
+  opportunity_id uuid references opportunities(id) on delete set null,
+  member_id uuid references members(id) on delete set null,
+  direction text not null check (direction in ('outbound','inbound')),
+  via text not null check (via in ('native_dialer','provider','manual_log')),
+  purpose text not null default 'service' check (purpose in ('promotional','service','transactional')),
+  channel_account_id uuid references channel_accounts(id) on delete set null,
+  caller_id text,                               -- 140-series for promotional, 160-series for service
+  status text not null check (status in ('initiated','ringing','connected','completed','missed','no_answer','busy','failed')),
+  outcome text,
+  provider text,
+  provider_call_id text,
+  virtual_number text,
+  started_at timestamptz not null default now(),
+  duration_s int check (duration_s >= 0),
+  recording_url text,
+  created_at timestamptz not null default now(),
+  unique (provider, provider_call_id)
+);
+create index on calls (lead_id, started_at desc);
+create index on calls (member_id, started_at desc);
+create index on calls (org_id, started_at desc);
+create index on calls (channel_account_id);
+
+-- which provider identity (agent number, agent id) each counsellor uses
+create table telephony_agents (
+  member_id uuid not null references members(id) on delete cascade,
+  channel_account_id uuid not null references channel_accounts(id) on delete cascade,
+  org_id uuid not null references orgs(id) on delete cascade,
+  agent_ref text not null,
+  primary key (member_id, channel_account_id)
+);
+create index on telephony_agents (org_id);
+create index on telephony_agents (channel_account_id);
+
+create table sms_headers (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references orgs(id) on delete cascade,
+  channel_account_id uuid not null references channel_accounts(id) on delete cascade,
+  header text not null,                        -- registered sender ID (DLT)
+  category text not null check (category in ('promotional','service','transactional','government')),
+  status text not null default 'active' check (status in ('active','inactive')),
+  created_at timestamptz not null default now(),
+  unique (channel_account_id, header)
+);
+create index on sms_headers (org_id);
 
 create table templates (
   id uuid primary key default gen_random_uuid(),
@@ -594,17 +629,36 @@ create table templates (
   wa_quality text,
   wa_rejection_reason text,
   wa_components jsonb,
-  -- SMS (India DLT)
+  -- SMS (India DLT): one template is bound to one header; text must match the registered text
   dlt_template_id text,
+  sms_header_id uuid references sms_headers(id) on delete restrict,
+  dlt_category text check (dlt_category in ('promotional','service_implicit','service_explicit','transactional')),
+  whitelisted_url_prefixes text[] not null default '{}',
+  provider_template_ref text,                  -- e.g. MSG91 flow_id
   sms_encoding text check (sms_encoding in ('gsm7','unicode')),
   active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (org_id, channel, name),
   check (channel <> 'whatsapp' or (wa_name is not null and wa_language is not null and wa_category is not null)),
-  check (channel <> 'sms' or dlt_template_id is not null)
+  check (channel <> 'sms' or (dlt_template_id is not null and sms_header_id is not null and dlt_category is not null))
 );
 create index on templates (channel_account_id);
+create index on templates (sms_header_id);
+
+-- versioned privacy notices per tenant (DPDP s.5 / Rule 3); a consent points at the notice it was given under
+create table notices (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references orgs(id) on delete cascade,
+  version int not null,
+  language text not null default 'en',
+  body text not null,
+  data_items jsonb not null default '[]',
+  purposes jsonb not null default '[]',
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  unique (org_id, version, language)
+);
 
 create table consents (
   id uuid primary key default gen_random_uuid(),
@@ -615,13 +669,26 @@ create table consents (
   status text not null check (status in ('granted','withdrawn')),
   given_by text not null default 'self' check (given_by in ('self','guardian')),
   method text not null,                        -- 'form_checkbox', 'whatsapp_reply_stop', 'guardian_otp', ...
-  evidence jsonb not null default '{}',        -- notice version, ip, message id, ...
+  notice_id uuid references notices(id) on delete restrict,
+  evidence jsonb not null default '{}',        -- ip, device, message id, how the guardian was verified, ...
   recorded_by_member_id uuid references members(id) on delete set null,
   recorded_at timestamptz not null default now()
 );
 -- current consent = latest row per (lead, channel, purpose)
 create index on consents (lead_id, channel, purpose, recorded_at desc);
 create index on consents (org_id);
+create index on consents (notice_id);
+
+-- addresses that must never be messaged on a channel (hard bounce, complaint, STOP, erasure)
+create table suppressions (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references orgs(id) on delete cascade,
+  channel text not null check (channel in ('email','sms','whatsapp','call')),
+  address text not null,                       -- normalised email or E.164 number
+  reason text not null check (reason in ('hard_bounce','complaint','unsubscribe','stop_keyword','manual','erasure')),
+  created_at timestamptz not null default now(),
+  unique (org_id, channel, address)
+);
 
 create table conversations (
   id uuid primary key default gen_random_uuid(),
@@ -747,13 +814,16 @@ create table messages (
   status text not null default 'queued' check (status in ('queued','sent','delivered','read','failed','bounced','received','skipped_opt_out')),
   error_code text,
   provider_message_id text,
+  idempotency_key text,                         -- written before the provider call (outbox)
+  pricing jsonb,                                -- WhatsApp pricing object from status webhooks
   sent_at timestamptz,
   delivered_at timestamptz,
   read_at timestamptz,
   opened_at timestamptz,
   clicked_at timestamptz,
   created_at timestamptz not null default now(),
-  unique (channel_account_id, provider_message_id)
+  unique (channel_account_id, provider_message_id),
+  unique (org_id, idempotency_key)
 );
 create index on messages (lead_id, created_at desc);
 create index on messages (org_id, created_at desc);
@@ -783,9 +853,15 @@ create table payment_gateways (
   mode text not null default 'test' check (mode in ('test','live')),
   display_name text not null,
   merchant_id text,
-  secret_id uuid references secrets(id) on delete set null,
+  auth_type text not null default 'keys' check (auth_type in ('keys','oauth','external_link')),
+  secret_id uuid references secrets(id) on delete set null,          -- keys, or OAuth access+refresh tokens
   webhook_secret_id uuid references secrets(id) on delete set null,
-  status text not null default 'pending' check (status in ('pending','connected','disabled')),
+  webhook_token text not null unique default encode(gen_random_bytes(18), 'hex'),  -- /webhooks/pay/{provider}/{token}
+  token_expires_at timestamptz,                 -- OAuth access token (Razorpay: 90 days)
+  refresh_expires_at timestamptz,               -- OAuth refresh token (Razorpay: 180 days)
+  external_url text,                            -- bank portal link (SBI Collect, ICICI Eazypay)
+  capabilities jsonb not null default '{}',
+  status text not null default 'pending' check (status in ('pending','connected','disabled','reconnect_required')),
   is_default boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -837,10 +913,14 @@ create table payments (
   product_id uuid references payment_products(id) on delete set null,
   link_id uuid references payment_links(id) on delete set null,
   gateway_id uuid references payment_gateways(id) on delete set null,
+  attempt_ref text unique,                      -- our txnid, new for every attempt (null for offline)
   provider_order_id text,
   provider_payment_id text,
   method text,                                  -- upi, card, netbanking, wallet, cash, cheque, dd, ...
-  status text not null default 'initiated' check (status in ('initiated','pending','success','failed','refunded','partially_refunded')),
+  status text not null default 'created' check (status in (
+    'created','pending','success','failed','expired','cancelled','unknown','refunded','partially_refunded')),
+  gateway_status text,                          -- the gateway's own word, kept for audit
+  amount_sent text,                             -- exact amount string sent (PayU/Easebuzz hashes include it)
   amount_paise bigint not null check (amount_paise >= 0),
   refunded_paise bigint not null default 0 check (refunded_paise >= 0),
   currency char(3) not null default 'INR',
@@ -860,6 +940,24 @@ create index on payments (lead_id);
 create index on payments (org_id, status, created_at desc);
 create index on payments (link_id);
 create index on payments (product_id);
+
+create table refunds (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null references orgs(id) on delete cascade,
+  payment_id uuid not null references payments(id) on delete restrict,
+  refund_ref text not null unique,              -- our id, sent to the gateway for idempotency
+  amount_paise bigint not null check (amount_paise > 0),
+  reason text,
+  status text not null default 'requested' check (status in ('requested','approved','pending','refunded','failed','rejected')),
+  requested_by_member_id uuid references members(id) on delete set null,
+  approved_by_member_id uuid references members(id) on delete set null,   -- maker-checker
+  provider_refund_id text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check (approved_by_member_id is null or approved_by_member_id <> requested_by_member_id)
+);
+create index on refunds (payment_id);
+create index on refunds (org_id, status);
 
 -- ---------------------------------------------------------------- inbound webhooks (all providers), outbound webhooks, API keys
 
@@ -1024,6 +1122,23 @@ create table data_requests (
 create index on data_requests (org_id, status, due_at);
 create index on data_requests (lead_id);
 
+-- personal data breach register: CERT-In within 6 h, Board within 72 h, people without delay
+create table incidents (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid references orgs(id) on delete cascade,   -- null = platform-wide, copied to each affected org
+  detected_at timestamptz not null,
+  description text not null,
+  affected_count int,
+  affected_categories text[] not null default '{}',
+  cert_in_reported_at timestamptz,
+  org_notified_at timestamptz,                  -- when we told the institution (target: under 6 h)
+  board_reported_at timestamptz,
+  principals_notified_at timestamptz,
+  status text not null default 'open' check (status in ('open','contained','closed')),
+  created_at timestamptz not null default now()
+);
+create index on incidents (org_id, detected_at desc);
+
 -- ---------------------------------------------------------------- updated_at triggers
 
 do $$
@@ -1049,6 +1164,14 @@ grant select, insert, update, delete on all tables in schema public to app_user,
 grant usage on all sequences in schema public to app_user, app_worker;
 grant execute on all functions in schema app to app_user, app_worker;
 revoke update, delete on audit_log from app_user, app_worker;
+-- on Supabase, nothing is exposed through the anon/authenticated API roles; the app connects as app_user
+do $$ declare r text; begin
+  foreach r in array array['anon','authenticated'] loop
+    if exists (select 1 from pg_roles where rolname = r) then
+      execute format('revoke all on all tables in schema public from %I', r);
+    end if;
+  end loop;
+end $$;
 -- orgs and users are managed by the platform (signup, invites) through security-definer functions
 revoke insert, update, delete on orgs, users from app_user;
 
@@ -1065,6 +1188,8 @@ begin
     if t = 'activity_types' then
       execute 'create policy tenant on activity_types using (org_id is null or org_id = app.current_org())
                with check (org_id = app.current_org())';
+    elsif t = 'incidents' then
+      execute 'create policy tenant on incidents using (org_id = app.current_org()) with check (org_id = app.current_org())';
     elsif t = 'webhook_events' then
       -- inbound webhooks arrive before the tenant is known; only the worker reads them
       execute 'create policy tenant on webhook_events to app_worker using (true) with check (true)';
