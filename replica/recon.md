@@ -7,20 +7,20 @@ Date: 2026-10-05
 
 ## How this was researched
 
-Public sources only. Nobody signed in, signed up, submitted a form or asked for a demo. Eight readers each read a fixed list of public pages, capped at 9 to 15 pages each (about 70 pages in total). Nothing was crawled or bulk-downloaded, and no JavaScript, network calls or private endpoints were inspected. Their text, images and code were not copied. Everything below describes what the product does, in our own words. Exact UI labels are kept only where they are facts about the interface (field names, status values). Each row in `features.csv` gives its source URL.
+Public sources only. Nobody signed in, signed up, submitted a form or asked for a demo. Pages were fetched one at a time with automated fetch tools (Firecrawl, WebFetch), and some fetches were retried after rate limits. There was no site-wide crawl. Eight readers each worked from a fixed list of public pages, capped at 9 to 15 each, about 70 pages in all. The lead researcher read three more pages directly: [1], [68] and [69]. For the enquiry widget embedded on Meritto's own pages (served from widgets.nopaperforms.com), the rendered page markup was read to list its visible and hidden field names. Nothing was submitted, no network traffic was captured, and no JavaScript bundles or private endpoints were inspected. Their text, images and code were not copied. Everything below describes what the product does, in our own words. Exact UI labels are kept only where they are facts about the interface (field names, status values). Each row in `features.csv` gives its source URL.
 
-**Terms of service ([69]).** Meritto's terms bar *customers* from using the service to "build a competitive product or service" or to "copy any features, functions, or graphics", and from scraping or crawling the platform. The terms also say that visiting the site counts as accepting them. What this means for us:
-- No Meritto customer account may be used for this project, by you or anyone on the team. Public sources only, which is what was done.
-- Their brand names stay out of the clone: Meritto, NoPaperForms, Collexo, Mio AI, Niaa, Echo, Zing, Amplify, METS, Calendar Pro, Pixi and "One View Lead Profile". So do their screenshots, copy and templates. `/replica-brand` enforces this before launch.
-- This is not legal advice. If you plan to sell the product, a lawyer should read their terms and your plans before launch.
+**Terms of service ([69], read directly).** The terms say they apply to anyone who accesses or visits the site. Their acceptable-use section is written for customers: a customer may not "reverse engineer the Services or the Software or access the Services to (a) build a competitive product or service, or (b) copy any features, functions, or graphics of the Services", and may not scrape, crawl or otherwise copy the platform by automated or similar means. Whether any of this binds someone who only reads public pages is a legal question this recon does not answer. Our own rules apply either way:
+- No Meritto customer account may be used for this project, by you or anyone on the team. Public pages only. No site-wide crawling.
+- Their names stay out of our product because of trademark risk: Meritto, NoPaperForms (NPF), Collexo, Mio AI, Niaa, Echo, Echo Bubble, Zing, Amplify, METS, Calendar Pro, Pixi, One View Lead Profile, Mutually Exclusive Impact (MEI), Lead Strength, Enrollment Cloud, Meritto Secure, and "Education CRM" used as a product name. So do their screenshots, copy and templates. `/replica-brand` sweeps for these before launch.
+- This is not legal advice. Before you sell the product, a lawyer should read their terms against your plans.
 
 ## Sources
 
 | # | type | URL | what it gave us |
 | --- | --- | --- | --- |
-| 1 | marketing site | https://www.meritto.com/education-crm/ | product overview: modules, verticals, suite map |
+| 1 | marketing site | https://www.meritto.com/education-crm/ | product overview: modules, verticals, suite map (read directly) |
 | 2 | marketing site | https://www.meritto.com/education-crm/lead-management-system/ | capture sources, dedupe, PST attribution, verification, score, filters, allocation |
-| 3 | marketing site | https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/ | campaign dashboard, channels, exclusive-impact metric, cost KPIs, publisher throttle |
+| 3 | marketing site | https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/ | campaign dashboard, channels, sole-source metric, cost KPIs, publisher throttle |
 | 4 | marketing site | https://www.meritto.com/education-crm/admission-marketing-publisher-panel/ | external publisher dashboards |
 | 5 | marketing site | https://www.meritto.com/education-crm/admission-remarketing-tools-integration/ | Google/Meta audience sync |
 | 6 | marketing site | https://www.meritto.com/education-crm-for-enrollment-marketing-team/ | marketing-team overview |
@@ -84,51 +84,53 @@ Public sources only. Nobody signed in, signed up, submitted a form or asked for 
 | 64 | public API docs | https://developer.nopaperforms.com/ | auth, error format, status codes |
 | 65 | public API docs | https://documenter.getpostman.com/view/10228290/2s8YRqmAkK | full public API: leads, opportunities, activities, forms, payments, users, teams, tickets |
 | 66 | app store | https://apps.apple.com/in/app/meritto-attract-engage-enroll/id1551119550 | iOS listing, release notes, 4.4 stars / 29 ratings |
-| 67 | app store | https://play.google.com/store/apps/details?id=com.nopaperforms.mobile | Android listing, 50K+ installs, 4.2 stars / 413 reviews (IN locale) |
-| 68 | marketing site | https://www.meritto.com/developer-portal/ | API families: lead, opportunity, payments, master data |
-| 69 | legal | https://www.meritto.com/terms-and-conditions/ | terms of service: customer acceptable-use clauses |
+| 67 | app store | https://play.google.com/store/apps/details?id=com.nopaperforms.mobile&hl=en_IN&gl=IN | Android listing, 50K+ installs, 4.2 stars / 413 reviews (India locale; the default-locale page showed no rating) |
+| 68 | marketing site | https://www.meritto.com/developer-portal/ | API families: lead, opportunity, payments, master data (read directly) |
+| 69 | legal | https://www.meritto.com/terms-and-conditions/ | terms of service: customer acceptable-use clauses (read directly) |
 | 70 | video | https://www.youtube.com/@merittoofficial/videos | did not render; no walkthroughs captured |
 
-Not available: the YouTube channel ([70]) did not render, so no walkthrough videos were watched. No public pricing page was found; the site's calls to action are "Schedule a demo" and "Get a Callback" ([1], [68]).
+Not available: the YouTube channel ([70]) did not render, so no walkthrough videos were watched. Pricing was not researched in depth: the product page links to no pricing page, and its calls to action ask for a demo or a callback ([1], [68]).
 
 ## Core loop
 
-An institution captures every enquiry with its source attached, routes it automatically to the right counsellor, and the counsellor, helped by automated WhatsApp/SMS/email, moves the student from enquiry to a paid application or token fee. Leadership sees which campaigns and which counsellors produce enrolments.
+An institution records each enquiry with its source, assigns it to a counsellor by rule, and the counsellor, helped by automated WhatsApp, SMS and email, moves the student from enquiry to a paid application or token fee. Managers see which campaigns and which counsellors lead to enrolments.
 
-The suite map on the product page puts the CRM's chain as: enquiry, lead management, counselling, campaign attribution, fee collection ([1], [32]).
+The suite map puts the CRM's chain as: enquiry, lead management, counselling, campaign attribution, fee collection ([1]; [32] calls the last step basic fee collection).
+
+Where the journey milestones get their data while the application product is out of scope: verified comes from contact verification; application started and submitted come from the API, an inbound webhook or a counsellor's update; payment approved comes from the application-fee payment; token fee paid (enrolled) comes from the token-fee payment.
 
 ## Screens
 
-Routes are proposals for our build. "How reached" describes the original where it is known.
+Routes are proposals for our build. "How reached" describes the original where it is known. In the states column, a state with a citation was seen in the original, and a state without one is our design.
 
 ### Public (student-facing)
 
-| ID | screen | route / how to reach | purpose | key components | states seen |
+| ID | screen | route / how to reach | purpose | key components | states |
 | --- | --- | --- | --- | --- | --- |
-| S01 | Enquiry form (embeddable) | `/f/:formId`, embedded by script or iframe on the institution's site | Turn a visitor into a lead, with the attribution attached | Name, email (with verify action), mobile with country code, dropdowns, multi-selects with a max count, hidden UTM/gclid/fbclid/referrer/landing-URL fields, submit [2] | empty, field error, multi-select limit reached, submitting, success, duplicate (silently merged into existing lead) [2], [49] |
+| S01 | Enquiry form (embeddable) | `/f/:formId`, embedded by script or iframe on the institution's site | Turn a visitor into a lead, with the attribution attached | Name, email (with verify action), mobile with country code, dropdowns, multi-selects with a max count, hidden UTM/gclid/fbclid/referrer/landing-URL fields, submit. As seen on the original's own demo-request widget [2], [12] | empty, field error, multi-select limit reached [2], submitting, success, email already known (existing lead updated: new source, alternate mobile, attempts +1) [49] |
 | S02 | Payment checkout | `/pay/:linkId`, opened from a payment link sent by WhatsApp/SMS/email | Student pays an application or token fee | Fee summary, amount, payment methods from the gateway (UPI, cards, net banking, wallets) [31], [36] | pending, paid, failed, expired link, already paid |
 
 ### Staff web app
 
-| ID | screen | route / how to reach | purpose | key components | states seen |
+| ID | screen | route / how to reach | purpose | key components | states |
 | --- | --- | --- | --- | --- | --- |
 | S03 | Sign in | `/login` | Staff sign-in | Email + password, 2FA code step, SSO button [43], [9] | error, 2FA required, IP not allowed [9], account inactive |
 | S04 | My day (home) | `/` after sign-in | Counsellor's work queue | Follow-ups overdue and upcoming (a due-today group is our design), untouched leads, recent alerts, check-in toggle; manager variant with team tiles [13], [16], [10] | empty (no work), filled, checked out (no new leads) [55] |
 | S05 | Lead list | `/leads`; main nav "Leads" (original: Lead Manager) [44] | Find, filter and act on leads in bulk | Table newest first; search with key picker (email, mobile, name, user ID, lead ID); quick-filter bar with manage; advanced-filter button; column chooser; import; bulk-action menu; rows per page 10–100; untouched marker; merged rows greyed [44] | empty (no leads yet), loading, filled, filter returns nothing, rows selected (bulk menu active), masked contacts for restricted roles [9] |
 | S06 | Advanced filter panel | Panel on S05 (also on S26, S16) | Build AND/OR conditions on any field and save them | Condition rows (field, operator, value), AND/OR switch, call-activity filters, save-as, saved-filter list [44], [2] | no conditions, invalid condition, saved |
 | S07 | Add lead / Import leads | S05 → Add, S05 → Import [44] | Add one walk-in or upload a sheet | Single form; file upload → column mapping → preview → run → result report (created, updated, failed with reasons) | mapping error, partial failure, duplicates updated not created [49] |
-| S08 | Lead profile | `/leads/:id`; click a row in S05 [46] | Everything about one student, plus every action | Header: name, stage, verified email/phone, created and last-engaged times, score and percentile, emails/SMS/WhatsApp sent counts, call status, next follow-up, source, owner. Journey bar: unverified → verified → application started → payment approved → application submitted → enrolled. Tabs: details, timeline, follow-ups, notes, messages, calls, documents, tickets, opportunities, payments. Actions: change stage, add follow-up, add note, message, WhatsApp chat, reassign, payment link, call [46] | loading, contacts masked [9], merged secondary (read-only) [49], stage locked by rule [50], no permission |
+| S08 | Lead profile | `/leads/:id`; click a row in S05 [46] | Everything about one student, plus every action | Header: name, stage, verified email/phone, created and last-engaged times, score and percentile, emails/SMS/WhatsApp sent counts, call status, next follow-up, source, owner. Journey bar: unverified → verified → application started → payment approved → application submitted → token fee paid (enrolled). Tabs: details, timeline, follow-ups, notes, messages, calls, documents, tickets [46], plus opportunities and payments (ours, from [8], [65]). Actions: change stage, add follow-up, add note, message, WhatsApp chat, reassign, payment link [46], call (ours, from [10], [58]) | loading, contacts masked [9], merged secondary (read-only) [49], stage locked by rule [50], no permission |
 | S09 | Change stage | Modal from S08 [46] | Record the outcome of a conversation | Stage, sub-stage, owner, follow-up date, remark [46] | sub-stage required, follow-up required, remark required, stage locked or "can't move back" [50] |
 | S10 | Compose message | Modal from S08 or S05 bulk [46], [44] | Send email, SMS or WhatsApp to one or many leads | Channel tabs, template picker, merge-token insert, preview, attachments (email), recipient count [52] | template not approved (WhatsApp) [18], recipients opted out (skipped), blocked by stage rule [50], sending, sent |
-| S11 | Add follow-up | Modal from S08 [46] | Schedule the next touch | Event type, date and time, time zone, owner, reminder settings, custom fields per event type [13] | time in the past, clash warning |
+| S11 | Add follow-up | Modal from S08 [46] | Schedule the next touch | Event type, date and time, time zone, owner, reminder settings, custom fields per event type [13] | time in the past, clash warning (both ours) |
 | S12 | Calendar | `/calendar` [13] | See and work follow-ups and events | Day/week/month switch, overdue and upcoming counts, event cards [13] | empty, overdue, completed, cancelled, reopened [13] |
-| S13 | Bulk reassign | S05 bulk menu → Reassign [44], [2] | Move many leads to other counsellors | Target counsellors, round-robin toggle, add or replace owners, confirm, progress [2], [47] | running, finished with counts, partial failure |
+| S13 | Bulk reassign | S05 bulk menu → Reassign [44], [2] | Move many leads to other counsellors | Target counsellors, round-robin toggle, add or replace owners [2], [47], unassign [62], confirm, progress | running, finished with counts, partial failure |
 | S14 | Merge leads | S08 → Merge (original: offered on telephony duplicates) [49] | Fold a duplicate into the main record | Pick primary, field-by-field preview, confirm [49] | conflict on email, done (secondary read-only) |
-| S15 | WhatsApp inbox | `/inbox` [19] | Live one-to-one WhatsApp chats | Conversation list by status, chat thread, lead side panel, quick replies, save attachment to field, pick and resolve [19] | queued, picked, resolved, reopened [19], 24-hour window closed (template only), no number connected |
-| S16 | Broadcast | `/broadcasts/new` and `/broadcasts/:id` [18] | Send one template to a filtered audience | Channel, approved template, audience (saved filter), buttons, schedule, retry settings; report: sent, delivered, replies, failed, contribution to applications and enrolments [18] | draft, scheduled, sending, done, failed, held by sender limit (retrying) [18] |
+| S15 | WhatsApp inbox | `/inbox` [19] | Live one-to-one WhatsApp chats | Conversation list by status, chat thread, lead side panel, quick replies, save attachment to field, pick and resolve [19] | queued, picked, resolved, reopened [19]; 24-hour window closed (template only) and no number connected are ours |
+| S16 | Broadcast | `/broadcasts/new` and `/broadcasts/:id` [18] | Send one template to a filtered audience | Channel, approved template, audience (saved filter), buttons, retry settings [18], schedule (ours); report: sent, delivered, replies, failed, contribution to applications and enrolments [18] | undelivered, retrying [18]; draft, scheduled, sending, done, failed are ours |
 | S17 | Automations | `/automations` [48] | List of workflows | Name, trigger, on/off, last run, counts [48] | empty, active, paused |
-| S18 | Automation builder | `/automations/:id` [48], [17] | Build trigger → condition → action flows | Trigger picker (created, updated, stage change, field change, date, interval, activity), condition block (all/any), if/else, wait, actions (assign counsellor, send message, update field, change stage, notify user, webhook), per-step counts [48], [17], [55], [56] | draft, invalid (e.g. trigger on a field that is empty at creation leaves leads unassigned) [62], active, paused |
-| S19 | Templates | `/templates` [52] | Write and manage message templates | List by channel; email editor (drag-and-drop and HTML), SMS editor with character count, WhatsApp template form with category, buttons, approval status and quality rating [52], [18], [57] | draft, WhatsApp pending/approved/rejected, quality high/medium/low [57] |
+| S18 | Automation builder | `/automations/:id` [48], [17] | Build trigger → condition → action flows | Trigger picker (created, updated, stage change, field change, date, interval, activity), condition block (all/any), if/else, wait, actions (assign counsellor, send message, update field, change stage, notify user, webhook) [48], [17], [55], [56], plus unassign [62], create follow-up and assign to team (ours); per-step counts are our design (the original has communication-node reporting, title only [48], and channel drill-down [17]) | draft, invalid (e.g. trigger on a field that is empty at creation leaves leads unassigned) [62], active, paused |
+| S19 | Templates | `/templates` [52] | Write and manage message templates | List by channel; email editor (drag-and-drop and HTML), SMS editor with character count, WhatsApp template form with category, buttons, approval status and quality rating [52], [18], [57] | draft; WhatsApp approval status shown [18] (values pending/approved/rejected are Meta's, our labels); quality high/medium/low [57] |
 | S20 | Attribution dashboard | `/reports/attribution` [3] | Which channels, sources and campaigns produce enrolments | Channel summary → source → campaign drill-down; leads, verified, applications, paid, enrolled; first vs later source; cost per verified lead; period compare [3], [27] | no data yet, filtered, drilled |
 | S21 | Dashboards | `/reports` [22] | Preset and custom dashboards made of widgets | Widget library by category (leads, enrolments, payments, campuses), funnel widget, team presets [22] | empty, loading, filled |
 | S22 | Report builder | `/reports/new` [22] | Pivot reports on any field, custom fields included | Metric picker, multi-level group-by, filters, table/chart toggle [22]; save and CSV export are our design | no metrics, too many groups, saved |
@@ -138,22 +140,23 @@ Routes are proposals for our build. "How reached" describes the original where i
 | S26 | Opportunities | `/opportunities` [8] | Several interests per student (programmes, campuses, services) | Opportunity-list switcher, table, saved views, owner per row [8] | empty, filled |
 | S27 | Opportunity profile | `/opportunities/:id` [8], [57] | One interest with its own stage and owner | Details, stage, timeline, linked opportunities, custom tabs [8], [57] | duplicate on key fields blocked [65] |
 | S28 | Settings › Lead fields | `/settings/fields` [51] | Add custom fields | Field list; create: label, type (text, dropdown, paragraph, email, mobile, date, upload), section, validation, required, hidden, quick-add visibility, sensitive flag [51] | field limit reached [51], no permission |
-| S29 | Settings › Stages | `/settings/stages` [50] | Stages, sub-stages and stage rules | Stage rows: name, follow-up required, sub-stage required, score −10..+10, enable, drag to reorder; rule builder: if stage is X then (lock, only these users, no moving back, lock follow-up, remark required, no messages) [50] | saved, disabled stage still shown in reports [50] |
-| S30 | Settings › Lead rules | `/settings/lead-rules` [49], [40] | Duplicate and verification behaviour | Unique-mobile toggle, OTP verification on/off, offline source tags, UTM buckets [49], [40], [62] | — |
+| S29 | Settings › Stages | `/settings/stages` [50] | Stages, sub-stages and stage rules | Stage rows: name, follow-up required, sub-stage required, score −10..+10, enable, drag to reorder; rule builder: if stage is X then (lock, only these users, no moving back, lock follow-up, no remarks allowed, remark required, no messages), optionally limited to chosen users [50] | saved, disabled stage still shown in reports [50] |
+| S30 | Settings › Lead rules | `/settings/lead-rules` [49], [40] | Duplicate and verification behaviour | Unique-mobile toggle [49], lead verification on/off (ours; the original's lead-flow settings are known only from a help title [50]), offline source tags [50], UTM buckets [62] | — |
 | S31 | Settings › Enquiry forms | `/settings/forms` [39], [41] | Build and embed S01 | Field picker, hidden tracking fields, success message/redirect, embed code, active toggle [2], [44] | inactive form |
 | S32 | Settings › Users | `/settings/users` [53] | Invite and manage staff | List, invite (email, role, team, programmes), attributes, quota, active/inactive [53], [65], [10] | invited, active, inactive [65] |
 | S33 | Settings › Roles | `/settings/roles` [53] | What each role may do and see | Permission matrix (view, edit, download, manage per module) [53], [9], masking of phone/email [9]; data scope (own/team/all) is our design, the original shows hierarchy-based visibility and a 'show data' permission [9], [43] | — |
 | S34 | Settings › Teams | `/settings/teams` [53] | Team tree and managers | Tree, members, reporting manager [53], [65] | — |
 | S35 | Settings › Channels | `/settings/channels` [18], [40] | Connect messaging and calling | WhatsApp number sign-up, email sending domain, SMS sender and DLT templates, telephony provider [18], [40], [24] | not connected, pending verification, connected |
-| S36 | Settings › Payments | `/settings/payments` [24], [65] | Gateway and fee products | Gateway keys, payment products (name, amount) [65] | not connected, connected |
+| S36 | Settings › Payments | `/settings/payments` [24], [65] | Gateway and fee products | Gateway keys, payment products (name [65]; amount is our design) | not connected, connected |
 | S37 | Settings › Integrations & API | `/settings/integrations` [24], [64] | API keys, webhooks, lead-ad sources, audiences | Key pair, webhook endpoints and events, Google/Meta lead-ad connections [64], [44], [40] | — |
 | S38 | Audit log | `/settings/audit` [9] | Who did what and when | Filter by user, action, date; before and after values [9] | — |
 | S39 | Publisher portal (external) | `/partner` [4] | Agencies see their own lead quality | Leads, campaigns, duplicates sent, geography; personal data masked [4] | institution hid applications section [4] |
 | S40 | Query tickets | `/tickets` [37], [65] | Student questions as tickets | Category/sub-category, owner, thread, status [65] | open, in progress, closed [65] |
+| S41 | Settings › Publishers | `/settings/publishers` [3], [4] | Register agencies and portals that send leads | Publisher list, own API credential and tracking link per publisher, daily cap, cost inputs, partner-portal access (our design; the original onboards publishers who push by API or redirect traffic [3]) | active, paused, over daily cap |
 
 ### Mobile app (phase 2)
 
-| ID | screen | route / how to reach | purpose | key components | states seen |
+| ID | screen | route / how to reach | purpose | key components | states |
 | --- | --- | --- | --- | --- | --- |
 | M01 | Home | app launch [66] | Today's numbers and tasks | KPI tiles, follow-ups [66] | — |
 | M02 | Lead list | tab [66] | Filtered leads | Filters by stage and movement, search [66] | masked contacts [66] |
@@ -162,23 +165,24 @@ Routes are proposals for our build. "How reached" describes the original where i
 | M05 | Check-in / field day | header toggle [15], [66] | Attendance, route, meetings | Check in/out, map, distance, meetings [15], [66] | checked in, checked out, auto check-out [55] |
 | M06 | Dashboards | tab [66] | Web dashboards on the phone | Favourites, share, switch [15] | — |
 
-Counts: 2 public screens, 38 staff web screens, 6 mobile screens.
+Counts: 2 public screens, 39 staff web screens, 6 mobile screens.
 
 ## Flows
 
 Click counts are for the original where known, otherwise our target. They become the numbers to beat.
 
 ```
-F01 Student enquires and is assigned within seconds
+F01 Student enquires and is auto-assigned (our target: under a minute)
     S01 enquiry form -> (system) dedupe + attribution + verification -> (automation) assign -> S24 alert to counsellor -> S08
     happy path: student fills 3-5 fields + submit; counsellor 1 click from alert to profile
     edge: email already exists (update, new source, attempts +1) [49]; new email but known mobile [49];
-          nobody checked in or everyone at quota (behaviour undocumented in original) [10][62];
+          nobody checked in -> lead stays unassigned in the original [62][55]; everyone at quota -> undocumented [10];
           trigger set on a field empty at creation leaves the lead unassigned [62]
 
 F02 Repeat enquiry from a new source does not create a duplicate
     (system) match on email -> keep first source locked -> add second/third source -> latest source always updated -> attempts +1
-    edge: same email + new mobile -> alternate mobile [49]; unique-mobile setting on -> mobile stored blank [49];
+    -> if opportunity rules match, add a new opportunity on the existing lead instead [8]
+    edge: same email + new mobile -> alternate mobile [49]; unique-mobile setting on -> mobile recorded as 'NA' [49];
           caller with different mobile, same email -> manual merge S14 [49]
 
 F03 Counsellor works a new lead
@@ -203,7 +207,7 @@ F06 Admin sets up auto-assignment
     edge: wrong dial code or missing sources leave leads unassigned [62]; "only checked-in owners" with nobody checked in [62]
 
 F07 Nurture journey runs on its own
-    (automation) lead created and not verified -> wait 1 h -> WhatsApp template -> wait 3 days -> if no application started then SMS + task for counsellor
+    (automation) lead created and not verified -> wait 1 h -> WhatsApp template -> wait 3 days -> if no application started then SMS + create follow-up for the owner
     edge: re-entry rules and duplicate sends are undocumented in the original [17] -> we must decide; opt-outs honoured
 
 F08 Collect an application or token fee
@@ -218,7 +222,7 @@ F09 Inbound WhatsApp chat
 
 F10 WhatsApp broadcast
     S19 approved template -> S16 audience from saved filter -> buttons -> send now or schedule -> replies update leads -> report
-    edge: sender limit holds messages -> retry up to 5 times, 8-48 h apart [18]; low-quality template warning [57]
+    edge: undelivered messages retried up to 5 times, 8-48 h apart [18] (the original does not say why delivery fails); low-quality template warning [57]
 
 F11 Marketing head checks which campaigns convert
     S20 channel summary -> drill to source -> drill to campaign -> compare first-source vs later-source credit -> compare with last period
@@ -275,8 +279,8 @@ F14 Admin builds a pivot report
 Every table also gets `id`, `org_id` (tenant), `created_at` and `updated_at`. Confidence: **high** means a help article or the API shows it, **medium** means it appears on marketing pages, **guess** means we inferred it.
 
 ```
-Organization  name, plan, settings (unique_mobile, otp_verification, timezone)
-              evidence: [49] settings; multi-tenant is our requirement
+Organization  name, plan, settings (unique_mobile, lead_verification, timezone)
+              evidence: [49] unique-mobile setting; lead_verification and multi-tenancy are our design
               confidence: guess (structure ours)
 
 Campus        name, city, parent_campus_id (head office sees all)
@@ -300,7 +304,7 @@ Lead          lead_id (public 32-char id), short user_id (5-6 digits), name, ema
               country_dial_code, alt_mobiles[], state, city, course/programme (picklist), campus_id,
               stage_id, sub_stage_id, first_stage_id, previous_stage_id, stage_change_count, remark,
               follow_up_at, owner_ids[] (one or more), first_owner_id, previous_owner_id, reassigned_by, reassigned_at,
-              email_verified, mobile_verified, verified_at, score, strength_percentile, untouched (bool),
+              email_verified, mobile_verified, verified_at, score, score_percentile, untouched (bool),
               registration_attempts, last_attempt_at, merged_into_id, custom (jsonb)
               evidence: [45] field glossary, [46] profile, [49] duplicates, [65] lead API
               confidence: high
@@ -309,12 +313,13 @@ SourceTouch   lead_id, position (first | second | third | latest), origin (offli
               channel (direct | publisher | social | organic | referral | other | telephony | offline | paid_ads | chat),
               source, medium, campaign, utm_* (campaignid, adgroupid, creativeid, keyword, matchtype, network, device, placement),
               gclid, fbclid, fb_lead_id, referrer, landing_url, publisher_id, registered_at
-              evidence: [45] PST + latest, [2] locked sources, [1] hidden fields on live form
-              confidence: high (first three locked; latest overwritten)
+              evidence: [45] PST + latest, [2] locked sources and live widget hidden fields, [12] live widget, [1]
+              confidence: high (first three locked; latest overwritten). The cap is not certain: the glossary shows three plus latest, one marketing page says 'and beyond' [2]
 
 Stage         name, sort, enabled, follow_up_required, sub_stage_required, score (-10..10), is_default (Untouched)
 SubStage      stage_id, name
-StageRule     stage_ids[], effect (lock | only_users | no_move_down | lock_follow_up | remark_required | no_messages), user_ids[]
+StageRule     stage_ids[], effect (lock | only_users | no_move_down | lock_follow_up | no_remarks | remark_required | no_messages),
+              user_ids[] ("performed by": optionally limits any effect to these users)
               evidence: [50]
               confidence: high
 
@@ -338,11 +343,12 @@ ActivityType  code, name, category, custom_fields (for institution-defined activ
               confidence: high
 
 Note          lead_id, author_id, body
-FollowUp      lead_id, event_type_id, owner_id, organiser_id, starts_at, timezone, status (upcoming | done | cancelled),
+FollowUp      lead_id, event_type_id, owner_id, organiser_id, starts_at, timezone, status (upcoming | done | cancelled;
+              overdue is derived from starts_at; reopen sets it back to upcoming),
               reminder_minutes, remind_email, custom (jsonb)
 EventType     name, form_fields, allowed_role_ids
               evidence: [46], [13]
-              confidence: high (notes, follow-ups), medium (event types)
+              confidence: high (notes), medium (follow-up fields and event types come from [13], a marketing page)
 
 Message       lead_id, channel (email | sms | whatsapp), direction (out | in), template_id, body, status
               (queued | sent | delivered | failed | bounced; 'read' is our addition), opened_at, clicked_at, provider_id, broadcast_id, automation_run_id
@@ -350,10 +356,11 @@ Message       lead_id, channel (email | sms | whatsapp), direction (out | in), t
               confidence: high
 
 Template      channel, name, nature (transactional | promotional), applies_to (lead | payment | ...), subject, body, tokens,
-              attachments, allowed_user_ids, wa_category (Meta's own categories: marketing | utility | authentication; the original's page lists marketing, utility, service [18]), wa_status (pending | approved | rejected),
-              wa_quality (high | medium | low), dlt_template_id
+              attachments, allowed_user_ids, wa_category (Meta's own categories: marketing | utility | authentication; the original's page lists marketing, utility, service [18]), wa_status (pending | approved | rejected: Meta's values,
+              our labels; the original shows an approval status [18]), wa_quality (high | medium | low), dlt_template_id,
+              encoding (plain | unicode; ours)
               evidence: [52], [18], [57], [40] DLT
-              confidence: high
+              confidence: high (fields from [52]), medium ([18], [57]), guess (wa_status values, encoding)
 
 ChannelAccount  type (whatsapp | email | sms | telephony), provider, credentials (encrypted), status, wa_phone_number_id
               evidence: [18], [24], [40]
@@ -365,11 +372,11 @@ Consent       lead_id, channel, status (opted_in | opted_out), source, at
 
 Conversation  lead_id, channel_account_id, status (queued | picked | resolved), assignee_id, reopened_count, last_inbound_at
               evidence: [19]
-              confidence: high
+              confidence: medium
 
-Broadcast     channel, template_id, saved_filter_id, scheduled_at, status, retry_max (<=5), retry_interval_h (8..48), counts
+Broadcast     channel, template_id, saved_filter_id, status, retry_max (<=5), retry_interval_h (8..48), counts, scheduled_at (ours)
               evidence: [18]
-              confidence: high
+              confidence: medium
 
 Automation    name, trigger (lead_created | lead_updated | stage_changed | field_changed | date | interval | activity),
               graph (nodes: condition, if_else, wait, assign, send, update_field, change_stage, notify, webhook), active
@@ -381,12 +388,12 @@ Call          lead_id, user_id, direction, status (connected | missed), duration
               evidence: [46], [65], [66]
               confidence: medium
 
-PaymentProduct  name (application fee, token fee), amount, currency, form/programme link
-PaymentLink   lead_id, product_id, amount, expires_at, short_code, sent_via
+PaymentProduct  name (application fee, token fee), form/programme link, amount and currency (ours)
+PaymentLink   lead_id, product_id, amount, expires_at, short_code, sent_via (all ours; [46] names only the action)
 Payment       lead_id, product_id, link_id, gateway, order_id, transaction_id, method, status
               (initiated | pending | approved | failed | refunded; original API: Payment Pending / Payment Approved / Refund), amount, discount, offline_mode, approved_by
               evidence: [65] payments API, [31] statuses, [46] payment link
-              confidence: high
+              confidence: high (Payment fields, product name), guess (PaymentProduct amount/currency, all PaymentLink fields)
 
 SavedFilter   owner_id, entity, name, conditions (jsonb), shared
               evidence: [2], [8]
@@ -396,13 +403,13 @@ Notification  user_id, event, lead_id, channel, acted_at
               evidence: [12]
               confidence: medium
 
-AuditLog      user_id, action (login | download | message | change), entity, entity_id, before, after, ip, at
-              evidence: [9]
-              confidence: high
+AuditLog      user_id, action (login | download | message | change), entity, entity_id, before, after, at, ip (ours)
+              evidence: [9], [43] title only
+              confidence: medium
 
 ImportJob / BulkJob  type, status (in_process | completed), totals, errors
               evidence: [65] async delete jobs
-              confidence: high
+              confidence: high (BulkJob for deletes), guess (ImportJob shape is ours)
 
 Publisher     name, api_key, daily_cap, min_verification_rate, cost_inputs
               evidence: [3], [4]
@@ -417,11 +424,11 @@ Relationships: Organization 1-n everything. Campus 1-n Lead, User. Team 1-n User
 
 ## Feature matrix
 
-See `features.csv` (213 rows; the `evidence` column gives the source URL for each). Must: 68, should: 63, could: 68, skip: 14.
+See `features.csv` (228 rows; the `evidence` column gives the source URL for each). Priority: must 74, should 65, could 89. 14 of the could rows are marked `clone=skip` as not cloneable, so the parity score counts 214 rows.
 
 ## Out of scope (cannot or should not be cloned)
 
-- **Their names and assets.** Meritto, NoPaperForms, Collexo, Mio AI, Niaa, Echo, Zing, Amplify, METS, Calendar Pro, Pixi; their screenshots, icons, copy, form templates and email image library. Their branded metric name for exclusive impact too. We build the same capability under our own name.
+- **Their names and assets.** Meritto, NoPaperForms (NPF), Collexo, Mio AI, Niaa, Echo, Echo Bubble, Zing, Amplify, METS, Calendar Pro, Pixi, One View Lead Profile, Mutually Exclusive Impact (MEI), Lead Strength, Enrollment Cloud, Meritto Secure, and "Education CRM" used as a product name; their screenshots, icons, copy, form templates and email image library. We build the same capability under our own names.
 - **Partner networks and approvals.** Meta tech-partner status, Google Ads/Meta app approvals, lead-portal partnerships (Shiksha, Collegedunia and others), exam vendors, telephony carriers. We integrate through official APIs with each institution's own accounts.
 - **Regulated services.** Aadhaar authentication and DigiLocker (government approvals). Payment processing, EMI, eNACH and split settlement (licensed partners).
 - **Their data.** Industry-wide benchmarks across many institutions would need data a new product does not have. Ranking an institution's own publishers against each other is cloneable and is in the matrix.
@@ -433,12 +440,12 @@ See `features.csv` (213 rows; the `evidence` column gives the source URL for eac
 1. **Scope and who it is for**, the two proposals at the top. Selling it (multi-tenant) or using it yourselves?
 2. **Payment gateway**: Razorpay (India) is the default assumption. Stripe if you also take international students.
 3. **WhatsApp**: will each institution bring its own Meta WhatsApp Business account (embedded sign-up), or will we resell through a BSP?
-4. Behaviours the original does not document, which we must decide: what happens when every counsellor is full or checked out; lead-score formula; exclusive-impact formula; automation re-entry and duplicate-send rules; 24-hour WhatsApp window handling in the inbox.
-5. **No reference screenshots were saved.** The skill normally keeps them in `replica/screens/`, but Meritto's marketing screenshots are their copyright, and a Meritto account must not be used. `/replica-design` will design the look from this map rather than measuring theirs, which also keeps the clone clear of their trade dress.
+4. Behaviours the original does not document, which we must decide: what happens when every counsellor is at quota (when nobody is checked in, the original leaves the lead unassigned [62]; we may add a fallback queue); lead-score formula; sole-source metric formula; automation re-entry and duplicate-send rules; 24-hour WhatsApp window handling in the inbox.
+5. **No reference screenshots were saved.** The skill normally keeps them in `replica/screens/`, but Meritto's marketing screenshots are their copyright, and a Meritto account must not be used. `/replica-design` will design the look from this map rather than measuring theirs, which lowers the risk of copying their trade dress; the final design should still be reviewed before launch.
 
 ## Size
 
-Screens: 40 web (2 public + 38 staff) plus 6 mobile. Flows: 14. Entities: about 35.
+Screens: 41 web (2 public + 39 staff) plus 6 mobile. Flows: 14. Entities: about 35.
 
 Hard parts:
 1. **Duplicate handling and attribution must be right from day one.** The first three sources are locked and the latest is overwritten. Every capture path (form, API, import, WhatsApp, calls) has to go through one upsert.
