@@ -1,7 +1,9 @@
 # Recon map: Meritto Education CRM (web app, plus counsellor mobile app)
 
-Scope: **proposed, needs a yes.** The Education CRM's core loop, from first enquiry to paid enrolment: capture and attribution, lead list and profile, stages, assignment, follow-ups, email/SMS/WhatsApp, automation, payment links for application and token fees, and the funnel, attribution and counsellor reports. Not in scope: Meritto's separate Application product (form builder, student portal), Post-Application (interviews, merit lists, offers), the full fee-management product (Collexo), the AI agents (Mio AI), and voice broadcast. The mobile app is phase 2.
-For: **proposed, needs a yes.** A multi-tenant CRM sold to Indian education institutions (colleges and universities, coaching institutes, K-12 schools, study-abroad consultants). If it is instead for one institution's own use, drop multi-tenancy and the publisher features.
+Scope: **confirmed by the owner on 2026-10-05.** The Education CRM's core loop, from first enquiry to paid enrolment: capture and attribution, lead list and profile, stages, assignment, follow-ups, email/SMS/WhatsApp, automation, payment links for application and token fees, and the funnel, attribution and counsellor reports. Not in scope: Meritto's separate Application product (form builder, student portal), Post-Application (interviews, merit lists, offers), the full fee-management product (Collexo), the AI agents (Mio AI), and voice broadcast. The mobile app is phase 2.
+For: **confirmed.** A multi-tenant CRM sold to many Indian education institutions (colleges and universities, coaching institutes, K-12 schools, study-abroad consultants).
+Payments: **confirmed.** Each institution keeps the payment gateway it already uses; we integrate several gateways behind one adapter.
+WhatsApp: **confirmed.** Official Meta WhatsApp Business Platform (Cloud API). Each institution connects its own WhatsApp Business account through our app (Embedded Signup).
 Platform: web first. Meritto also has Android and iOS apps ([66], [67]).
 Date: 2026-10-05
 
@@ -437,9 +439,9 @@ See `features.csv` (228 rows; the `evidence` column gives the source URL for eac
 
 ## Open questions
 
-1. **Scope and who it is for**, the two proposals at the top. Selling it (multi-tenant) or using it yourselves?
-2. **Payment gateway**: Razorpay (India) is the default assumption. Stripe if you also take international students.
-3. **WhatsApp**: will each institution bring its own Meta WhatsApp Business account (embedded sign-up), or will we resell through a BSP?
+1. ~~Scope and who it is for~~: answered (multi-tenant, sold to Indian institutions).
+2. ~~Payment gateway~~: answered (whatever each institution already uses; multi-gateway adapters).
+3. ~~WhatsApp~~: answered (official Meta Cloud API; each institution's own account via Embedded Signup).
 4. Behaviours the original does not document, which we must decide: what happens when every counsellor is at quota (when nobody is checked in, the original leaves the lead unassigned [62]; we may add a fallback queue); lead-score formula; sole-source metric formula; automation re-entry and duplicate-send rules; 24-hour WhatsApp window handling in the inbox.
 5. **No reference screenshots were saved.** The skill normally keeps them in `replica/screens/`, but Meritto's marketing screenshots are their copyright, and a Meritto account must not be used. `/replica-design` will design the look from this map rather than measuring theirs, which lowers the risk of copying their trade dress; the final design should still be reviewed before launch.
 
