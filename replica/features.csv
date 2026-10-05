@@ -1,0 +1,214 @@
+feature,area,priority,original,clone,notes,evidence
+Embeddable enquiry form with configurable fields,capture,must,yes,no,"S01/S31. Text, email, phone with country code, dropdown, multi-select",https://www.meritto.com/education-crm/lead-management-system/ https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+"Hidden capture of UTM params, gclid/fbclid, referrer and landing URL on form submit",capture,must,yes,no,Stored on the lead's source record,https://www.meritto.com/education-crm/lead-management-system/ https://help.meritto.com/portal/en/kb/articles/untitled
+Add a single lead by hand,capture,must,yes,no,S07,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk import leads from CSV/Excel with column mapping and a result report,capture,must,yes,no,S07. Mapping UI not shown publicly; design our own,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://www.meritto.com/education-crm/lead-management-system/
+Create lead through public REST API with account API keys,capture,must,yes,no,Email or mobile required,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK https://developer.nopaperforms.com/
+"Create-or-update lead through API, matched on email or mobile",capture,must,yes,no,Upsert; no duplicate,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+Bulk create-or-update leads through API with per-record results,capture,should,yes,no,Original caps at 25 records per call,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+"Lead origin tag: offline, online, API, telephony, form widget, chat",capture,must,yes,no,"Set by system, not editable",https://help.meritto.com/portal/en/kb/articles/untitled
+"Traffic channel tag: direct, publisher, social, organic, referral, other, telephony, offline, paid ads, chat",capture,must,yes,no,Referral is the fallback when there is no UTM,https://help.meritto.com/portal/en/kb/articles/untitled
+Google Ads lead form and Meta lead ads intake,capture,should,yes,no,Via webhook/official APIs with the institution's own accounts,https://help.meritto.com/portal/en/kb/getting-started https://www.meritto.com/extensions-and-integrations/
+"Offline source tags for fairs, walk-ins and seminars",capture,should,yes,no,,https://help.meritto.com/portal/en/kb/getting-started https://www.meritto.com/education-crm/lead-management-system/
+Hosted landing page builder,capture,could,yes,no,Only named on the marketing page; no detail,https://www.meritto.com/education-crm-for-enrollment-marketing-team/
+Email is the unique key: a repeat enquiry updates the existing lead,dedupe-attribution,must,yes,no,No second record,https://help.meritto.com/portal/en/kb/articles/all-scenarios-of-re-registration-on-widget-enquiry-form
+Repeat enquiry with a new mobile saves it as an alternate mobile,dedupe-attribution,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-scenarios-of-re-registration-on-widget-enquiry-form
+Registration attempts counter and last attempt date,dedupe-attribution,must,yes,no,Filterable (attempts > 1 = re-enquired),https://help.meritto.com/portal/en/kb/articles/all-scenarios-of-re-registration-on-widget-enquiry-form https://help.meritto.com/portal/en/kb/articles/faqs-lead-manager
+"First, second, third and latest source kept per lead; first three locked",dedupe-attribution,must,yes,no,Our own naming for the multi-touch model,https://help.meritto.com/portal/en/kb/articles/untitled https://www.meritto.com/education-crm/lead-management-system/
+Setting: one mobile number may belong to only one lead,dedupe-attribution,should,yes,no,"When on, a second lead with the same mobile stores it as blank",https://help.meritto.com/portal/en/kb/articles/all-scenarios-of-re-registration-on-widget-enquiry-form
+Merge two leads; secondary becomes read-only and greyed out,dedupe-attribution,should,yes,no,S14,https://help.meritto.com/portal/en/kb/articles/all-scenarios-of-re-registration-on-widget-enquiry-form
+Email and mobile verification (OTP/link) with verified/unverified status,dedupe-attribution,should,yes,no,Mechanism not shown publicly,https://www.meritto.com/education-crm/lead-management-system/ https://help.meritto.com/portal/en/kb/getting-started/setting-up-your-workspace
+Untouched marker on leads nobody has acted on yet,lead-manager,must,yes,no,Red marker in list; also a default stage,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://www.meritto.com/education-crm/lead-management-system/
+"Lead list, newest first, 10 to 100 rows per page",lead-manager,must,yes,no,S05,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+"Search leads by email, mobile, name, short user ID or lead ID",lead-manager,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Quick filter bar that each user can edit,lead-manager,must,yes,no,"e.g. registration date, stage, owner, source",https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Advanced filters with AND/OR conditions on any field,lead-manager,must,yes,no,S06,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://www.meritto.com/education-crm/lead-management-system/
+Save a filter and reopen it in one click,lead-manager,should,yes,no,,https://www.meritto.com/education-crm/lead-management-system/
+"Call activity filters: call status, inbound/outbound, missed",lead-manager,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Choose and reorder list columns,lead-manager,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk export selected leads with chosen columns,lead-manager,must,yes,no,Export is logged in the audit log,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://www.meritto.com/education-crm/user-management/
+Bulk send a message to selected leads,lead-manager,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk reassign owners: add owners or replace them,lead-manager,must,yes,no,S13,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://www.meritto.com/education-crm/lead-management-system/
+Bulk change lead stage,lead-manager,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk update a field value,lead-manager,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk delete leads as a background job,lead-manager,should,yes,no,API returns a job id to poll,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+Bulk push selected leads to a webhook,lead-manager,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk send selected leads to a Google or Meta audience,lead-manager,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://www.meritto.com/education-crm/admission-remarketing-tools-integration/
+Bulk add selected leads to a dialer campaign,lead-manager,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+Bulk update campaign data on leads,lead-manager,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview
+"Profile header: stage, verified contacts, created and last-engaged times, score, owner, source, next follow-up, message counts",lead-profile,must,yes,no,S08,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+"Journey milestones: unverified, verified, application started, payment approved, application submitted, enrolled",lead-profile,must,yes,no,Milestones configurable in original,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+"Details tab, editable by the owner except email and mobile",lead-profile,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+"Timeline of every action on the lead, with actor and time",lead-profile,must,yes,no,Activity codes in API,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+Notes on a lead,lead-profile,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+Communication log with delivery and engagement status per message,lead-profile,must,yes,no,"Email open/click/bounce, SMS delivered, WhatsApp delivered/read",https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+"Call log tab with direction, status and duration",lead-profile,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+Extra profile tabs configured per team or user,lead-profile,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://help.meritto.com/portal/en/kb/getting-started/setting-up-your-workspace
+Tickets tab on the lead,lead-profile,could,yes,no,Needs S40,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+Documents tab on the lead,lead-profile,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+"Masked phone and email for restricted users, who can still call and message",lead-profile,should,yes,no,,https://www.meritto.com/education-crm/user-management/ https://www.meritto.com/mobile-app/
+Configurable lead stages with sub-stages,stages-fields,must,yes,no,S29,https://help.meritto.com/portal/en/kb/articles/configuring-lead-stages
+"Per stage: follow-up required, sub-stage required",stages-fields,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/configuring-lead-stages
+Per stage score from -10 to +10 applied on entry,stages-fields,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/configuring-lead-stages
+"Enable, disable and reorder stages",stages-fields,must,yes,no,Disabled stages stay in reports,https://help.meritto.com/portal/en/kb/articles/configuring-lead-stages
+"Stage rules: lock stage, only some users may change, no moving back, lock follow-up, remark required, block messages",stages-fields,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/configuring-lead-stages
+"Change-stage dialog sets sub-stage, owner, follow-up date and remark in one step",stages-fields,must,yes,no,S09,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+"Stage and owner history fields: first, previous, change count, reassigned by/on",stages-fields,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/untitled
+"Custom lead fields: text, dropdown, paragraph, email, mobile, date, file upload, with validation",stages-fields,must,yes,no,S28,https://help.meritto.com/portal/en/kb/articles/create-a-custom-lead-fields
+Field limits per type and plan,stages-fields,could,yes,no,Original caps fields by subscription,https://help.meritto.com/portal/en/kb/articles/create-a-custom-lead-fields
+Hierarchical picklists (e.g. course > programme > specialisation),stages-fields,should,yes,no,Master data API,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK https://www.meritto.com/developer-portal/
+Tag fields as personal/sensitive to control who sees them,stages-fields,could,yes,no,Added Oct 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-october-2025-product-updates
+"Lead score from activities and stage, plus percentile rank",stages-fields,should,yes,no,Formula not published; design our own,https://www.meritto.com/education-crm/lead-management-system/ https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://www.meritto.com/education-crm/lead-nurturing/
+Assign or reassign a lead from its profile,assignment,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://help.meritto.com/portal/en/kb/articles/lead-allocation-in-meritto-crm-11-3-2025
+Round-robin auto-assignment across chosen counsellors,assignment,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-allocation-in-meritto-crm-11-3-2025 https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+"Rule-based auto-assignment on source, location, course, score and other fields",assignment,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-allocation-in-meritto-crm-11-3-2025 https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation https://www.meritto.com/education-crm/lead-nurturing/
+Add a second owner instead of replacing the first,assignment,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-allocation-in-meritto-crm-11-3-2025 https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+Automation can skip leads someone assigned by hand,assignment,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation https://help.meritto.com/portal/en/kb/articles/troubleshooting-unassigned-leads-in-meritto
+Counsellor check-in/check-out; only checked-in users get new leads,assignment,should,yes,no,,https://www.meritto.com/crm-software-for-sales-counseling-teams/ https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-october-2025-product-updates https://help.meritto.com/portal/en/kb/articles/troubleshooting-unassigned-leads-in-meritto
+Automatic check-out at a set time or midnight,assignment,could,yes,no,Added Oct 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-october-2025-product-updates
+Daily or weekly lead quota per counsellor,assignment,should,yes,no,Behaviour when everyone is full is not documented,https://www.meritto.com/crm-software-for-sales-counseling-teams/
+Notify the counsellor when a lead is assigned,assignment,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-allocation-in-meritto-crm-11-3-2025 https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+"Group UTM sources into buckets, with a 'not mapped' fallback",assignment,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/troubleshooting-unassigned-leads-in-meritto
+Different owner per application or opportunity,assignment,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation https://www.meritto.com/education-crm/opportunity-manager/
+Schedule a follow-up (date and time) from the lead profile,follow-ups,must,yes,no,S11,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://www.meritto.com/calendar-pro/
+My follow-ups due today and overdue,follow-ups,must,yes,no,S04,https://www.meritto.com/calendar-pro/ https://www.meritto.com/education-crm/lead-nurturing/
+"Calendar with day, week and month views",follow-ups,should,yes,no,S12,https://www.meritto.com/calendar-pro/
+Event types with their own custom form,follow-ups,could,yes,no,"e.g. campus visit, open day",https://www.meritto.com/calendar-pro/
+Reminders before an event: on-screen and email,follow-ups,should,yes,no,,https://www.meritto.com/calendar-pro/
+"Mark an event done, reopen it, or cancel it",follow-ups,should,yes,no,,https://www.meritto.com/calendar-pro/
+Time zone per event,follow-ups,could,yes,no,,https://www.meritto.com/calendar-pro/
+Email to organiser and owner when an event is booked,follow-ups,could,yes,no,,https://www.meritto.com/calendar-pro/
+Send an email from the lead profile,communication,must,yes,no,S10,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+Send an SMS from the lead profile,communication,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+Send a WhatsApp template message from the lead profile,communication,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+Template manager per channel with merge tokens and preview,communication,must,yes,no,S19,https://help.meritto.com/portal/en/kb/articles/how-to-create-communication-templates
+Transactional vs promotional flag on templates,communication,should,yes,no,Promotional needed for marketing sends,https://help.meritto.com/portal/en/kb/articles/how-to-create-communication-templates
+Drag-and-drop email builder,communication,should,yes,no,,https://www.meritto.com/education-crm/lead-nurturing/ https://help.meritto.com/portal/en/kb/articles/how-to-create-communication-templates
+HTML source editing for email templates,communication,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/how-to-create-communication-templates
+Restrict which users can use a template,communication,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/how-to-create-communication-templates
+Email attachments up to 5 MB,communication,could,yes,no,,https://help.meritto.com/portal/en/kb/articles/how-to-create-communication-templates
+Bulk send with per-recipient merge tokens,communication,must,yes,no,,https://www.meritto.com/education-crm/lead-nurturing/
+Opt-out and unsubscribe handling per channel,communication,must,yes,no,Original: WhatsApp opt-in/opt-out settings,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+India SMS DLT template and sender registration support,communication,should,yes,no,Help titles cover DLT chain binding and CTA whitelisting,https://help.meritto.com/portal/en/kb/getting-started https://help.meritto.com/portal/en/kb/how-to-s
+Email and SMS usage counters,communication,could,yes,no,How-to title: check email and SMS consumption,https://help.meritto.com/portal/en/kb/how-to-s
+Connect a WhatsApp Business API number (embedded sign-up),whatsapp,must,yes,no,Institution's own Meta account; S35,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/ https://help.meritto.com/portal/en/kb/how-to-s
+WhatsApp templates with category and Meta approval status,whatsapp,must,yes,no,"Marketing, utility, service",https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+Show Meta's quality rating on each WhatsApp template,whatsapp,could,yes,no,Added Aug 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-august-s-2025-product-updates
+"WhatsApp broadcast to a filtered audience, with buttons",whatsapp,should,yes,no,S16,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+"Retry undelivered broadcast messages (up to 5 times, 8 to 48 hours apart)",whatsapp,could,yes,no,,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+Inbound WhatsApp replies create or update leads,whatsapp,should,yes,no,,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/ https://www.meritto.com/whatsapp-live-chat-for-education-organizations/
+"Shared WhatsApp inbox with queued, picked and resolved states",whatsapp,should,yes,no,S15,https://www.meritto.com/whatsapp-live-chat-for-education-organizations/
+Quick-reply snippets in the inbox,whatsapp,should,yes,no,,https://www.meritto.com/whatsapp-live-chat-for-education-organizations/
+Save a document sent in chat to a lead field,whatsapp,could,yes,no,,https://www.meritto.com/whatsapp-live-chat-for-education-organizations/
+WhatsApp chat history on the lead profile,whatsapp,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/faq-waba https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025
+Floating chat windows that stay open across screens,whatsapp,could,yes,no,,https://www.meritto.com/whatsapp-live-chat-for-education-organizations/
+"Inbox metrics: response time, turnaround, reopen rate",whatsapp,could,yes,no,,https://www.meritto.com/whatsapp-live-chat-for-education-organizations/
+In-chat WhatsApp forms that write answers to the lead,whatsapp,could,yes,no,Meta WhatsApp Flows,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/ https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-august-s-2025-product-updates
+Several WhatsApp numbers per institution,whatsapp,could,yes,no,,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+"Workflow builder: trigger, conditions, actions",automation,must,yes,no,S18,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/
+"Triggers: lead created, lead updated, stage changed, field changed",automation,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation https://help.meritto.com/portal/en/kb/articles/troubleshooting-unassigned-leads-in-meritto https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/
+Triggers: date-based and time-interval,automation,should,yes,no,,https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/
+Trigger: custom activity recorded,automation,could,yes,no,Added Sep 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-september-2025-product-updates-6-11-2025 https://www.meritto.com/dynamic-activity/
+"Condition matching all or any, with if/else branches",automation,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation https://help.meritto.com/portal/en/kb/articles/troubleshooting-unassigned-leads-in-meritto
+Wait/delay step,automation,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+"Action: send email, SMS or WhatsApp",automation,must,yes,no,,https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/
+"Action: assign counsellor (round robin, replace or add)",automation,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+Action: update a field,automation,should,yes,no,Added Oct 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-october-2025-product-updates https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/
+Action: change lead or opportunity stage,automation,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-september-2025-product-updates-6-11-2025
+Action: notify a user,automation,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+Action: call a webhook,automation,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+Automation list with on/off status,automation,must,yes,no,S17,https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+Per-step sent and delivered counts for automations,automation,should,yes,no,,https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/ https://help.meritto.com/portal/en/kb/articles/all-about-counsellor-allocation-automation
+"Custom activity types with their own fields, logged to the timeline",automation,could,yes,no,,https://www.meritto.com/dynamic-activity/ https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-september-2025-product-updates-6-11-2025
+"Click-to-call through the counsellor's own phone, logged to the timeline",telephony,should,yes,no,Original calls this App Telephony,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto https://www.meritto.com/crm-software-for-sales-counseling-teams/
+Cloud telephony provider integration with recordings and masked numbers,telephony,should,yes,no,Provider contract is the institution's,https://www.meritto.com/extensions-and-integrations/ https://www.meritto.com/crm-software-for-sales-counseling-teams/
+Incoming call shows the matching lead (caller ID),telephony,could,yes,no,,https://www.meritto.com/mobile-app/ https://www.meritto.com/crm-software-for-sales-counseling-teams/
+Choose a virtual number before an outbound call,telephony,could,yes,no,,https://apps.apple.com/in/app/meritto-attract-engage-enroll/id1551119550
+Create a lead from a phone call,telephony,should,yes,no,,https://www.meritto.com/education-crm/lead-management-system/ https://help.meritto.com/portal/en/kb/articles/untitled
+Payment products such as application fee and token fee,payments,must,yes,no,S36,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK https://www.meritto.com/application-management-software/admission-form-payment-manager/
+"Generate a payment link from the lead profile and send it by WhatsApp, SMS or email",payments,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://www.collexo.com/payment-cloud/fee-collection/
+Hosted checkout through the institution's payment gateway,payments,must,yes,no,Razorpay or Stripe with own keys,https://www.meritto.com/extensions-and-integrations/ https://www.meritto.com/application-management-software/admission-form-payment-manager/
+"Payment statuses: initiated, success, failed, pending, refunded",payments,must,yes,no,,https://www.collexo.com/payment-cloud/fee-collection/ https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+A successful payment updates the lead journey and can start automations,payments,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/one-view-lead-profile-27-2-2025 https://www.meritto.com/education-crm/marketing-automation-for-educational-institutions/
+Reminders for failed or pending payments,payments,should,yes,no,,https://www.collexo.com/payment-cloud/fee-management/
+Payments list with filters and CSV export,payments,should,yes,no,S25,https://www.meritto.com/application-management-software/admission-form-payment-manager/ https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+"Record and approve an offline payment (cash, cheque, DD)",payments,should,yes,no,,https://www.meritto.com/application-management-software/admission-form-payment-manager/ https://help.meritto.com/portal/en/kb/solutioning-business-cases
+Single-use and multi-use discount codes,payments,could,yes,no,,https://www.meritto.com/application-management-software/admission-form-payment-manager/ https://www.meritto.com/education-payment-platform-for-finance-teams/
+Payment receipts,payments,should,yes,no,,https://www.collexo.com/payment-cloud/fee-management/ https://www.meritto.com/application-management-software/admission-form-payment-manager/
+Gateway fallback when one gateway fails,payments,could,yes,skip,Needs contracts with several live gateways,https://www.meritto.com/application-management-software/admission-form-payment-manager/ https://www.meritto.com/education-payment-platform-for-finance-teams/
+Enquiry-to-enrolment funnel,reports,must,yes,no,S21,https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/ https://www.meritto.com/education-crm-for-management-teams/
+"Attribution dashboard: channel to source to campaign, with funnel counts",reports,must,yes,no,S20,https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/ https://www.meritto.com/education-crm-for-management-teams/
+Compare credit by first source vs later sources,reports,should,yes,no,,https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/ https://www.meritto.com/education-crm-for-management-teams/
+Exclusive-impact count per source (leads only that source brought),reports,could,yes,no,Formula not published; design our own and name it ourselves,https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/ https://www.meritto.com/education-crm/admission-marketing-publisher-panel/
+Cost per verified lead per source (manual cost input),reports,could,yes,no,How cost is entered is not shown,https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/
+"Counsellor productivity: calls, follow-ups, stage moves, conversions",reports,must,yes,no,S23,https://www.meritto.com/crm-software-for-sales-counseling-teams/ https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/ https://www.meritto.com/education-crm-for-management-teams/
+"Dashboards built from widgets, preset per team",reports,should,yes,no,,https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/
+"Pivot-style report builder over any field, including custom fields",reports,should,yes,no,S22,https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/
+Compare a period with earlier periods,reports,could,yes,no,,https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/ https://www.meritto.com/education-crm-for-management-teams/
+Roll-up and per-campus reports for multi-campus groups,reports,should,yes,no,,https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/
+Export reports to CSV,reports,should,yes,no,,https://www.meritto.com/application-management-software/admission-form-payment-manager/ https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/
+"Real-time alerts on student actions (email opened, payment started, WhatsApp received, stage change)",notifications,should,yes,no,S24,https://www.meritto.com/real-time-sales-enrollment-notification-alert-zing/
+In-app and email notification channels,notifications,should,yes,no,,https://www.meritto.com/real-time-sales-enrollment-notification-alert-zing/
+Browser and mobile push notifications,notifications,could,yes,no,,https://www.meritto.com/real-time-sales-enrollment-notification-alert-zing/ https://www.meritto.com/mobile-app/
+Each user picks which events alert them,notifications,could,yes,no,,https://www.meritto.com/real-time-sales-enrollment-notification-alert-zing/
+Notification history including ones nobody acted on,notifications,could,yes,no,,https://www.meritto.com/real-time-sales-enrollment-notification-alert-zing/
+Invite users with role and team; set active or inactive,users-access,must,yes,no,S32,https://help.meritto.com/portal/en/kb/articles/user-management-and-team-hierarchy https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+"Built-in roles: admin, manager, counsellor, support staff",users-access,must,yes,no,,https://help.meritto.com/portal/en/kb/articles/user-management-and-team-hierarchy
+"Custom roles with per-module view, edit, download and manage rights",users-access,should,yes,no,S33,https://help.meritto.com/portal/en/kb/articles/user-management-and-team-hierarchy https://www.meritto.com/education-crm/user-management/
+Teams with a reporting hierarchy; managers see their reports' work,users-access,must,yes,no,S34,https://help.meritto.com/portal/en/kb/articles/user-management-and-team-hierarchy https://www.meritto.com/education-crm/user-management/
+"Data visibility scope: own, team, everything",users-access,must,yes,no,Original has a 'show data' permission,https://help.meritto.com/portal/en/kb/getting-started/setting-up-your-workspace https://www.meritto.com/education-crm/user-management/
+Mask phone and email by role,users-access,should,yes,no,,https://www.meritto.com/education-crm/user-management/ https://www.meritto.com/security/
+Two-factor authentication,users-access,should,yes,no,,https://help.meritto.com/portal/en/kb/getting-started/setting-up-your-workspace https://www.meritto.com/security/
+"Single sign-on with Okta, Azure AD or JumpCloud",users-access,could,yes,no,Protocol not stated; use OIDC/SAML,https://www.meritto.com/education-crm/user-management/
+Restrict sign-in to allowed IP addresses,users-access,could,yes,no,,https://www.meritto.com/education-crm/user-management/ https://www.meritto.com/security/
+"Audit log of logins, downloads, messages and field changes with old and new values",users-access,should,yes,no,S38,https://www.meritto.com/education-crm/user-management/
+"User attributes (programme, region, language) used for routing",users-access,could,yes,no,,https://www.meritto.com/education-crm/user-management/
+Limit a user to certain programmes or forms,users-access,could,yes,no,,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+"Campuses and branches, with a head office that sees all of them",users-access,should,yes,no,,https://www.meritto.com/education-crm/lead-management-system/ https://www.meritto.com/enquiry-to-enrolment-reports-analytics-for-education-industry/
+"Multi-tenant accounts, one per institution",platform,must,yes,no,Needed to sell it. Original is SaaS,https://www.meritto.com/education-crm/ https://www.meritto.com/terms-and-conditions/
+"Business hours, shifts and holiday calendar",platform,could,yes,no,Help title only,https://help.meritto.com/portal/en/kb/getting-started
+"REST API for leads, activities, users, teams and picklists, with token pagination",integrations,should,yes,no,,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK https://www.meritto.com/developer-portal/
+Outbound webhooks on lead and activity events,integrations,should,yes,no,,https://help.meritto.com/portal/en/kb/articles/lead-manager-an-overview https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-october-2025-product-updates
+Sync Google and Meta custom audiences on a schedule,integrations,could,yes,no,Needs our own Google Ads and Meta app approvals,https://www.meritto.com/education-crm/admission-remarketing-tools-integration/ https://www.meritto.com/extensions-and-integrations/
+"Lead intake from education portals (Shiksha, Collegedunia and others)",integrations,could,yes,no,Through our generic API; partnerships not included,https://www.meritto.com/extensions-and-integrations/
+Push enrolled students to an ERP/SIS with field mapping,integrations,could,yes,no,,https://www.meritto.com/education-crm-for-it-teams/
+Pull final enrolment back from the ERP for source reporting,integrations,could,yes,no,,https://www.meritto.com/education-crm-for-it-teams/
+Zapier app,integrations,could,yes,no,,https://www.meritto.com/extensions-and-integrations/
+"Video meeting links (Zoom, Meet, Teams) on events",integrations,could,yes,no,,https://www.meritto.com/extensions-and-integrations/
+Outlook email connector,integrations,could,yes,no,,https://www.meritto.com/extensions-and-integrations/
+Import from Salesforce or Zoho CRM,integrations,could,yes,no,,https://www.meritto.com/extensions-and-integrations/
+"LMS activity sync (Canvas, Moodle)",integrations,could,yes,no,,https://www.meritto.com/extensions-and-integrations/
+"Several opportunities (programmes, campuses, services) under one lead",opportunities,should,yes,no,S26/S27,https://www.meritto.com/education-crm/opportunity-manager/ https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+Opportunity duplicate check on chosen key fields,opportunities,should,yes,no,,https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+Own owner and stage per opportunity,opportunities,should,yes,no,,https://www.meritto.com/education-crm/opportunity-manager/
+Opportunity profile with stage and timeline,opportunities,should,yes,no,,https://www.meritto.com/education-crm/opportunity-manager/ https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-august-s-2025-product-updates
+Copy opportunity changes back to the lead,opportunities,could,yes,no,Added Aug 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-august-s-2025-product-updates
+Bulk upload and update opportunities,opportunities,could,yes,no,Added Aug 2025,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-august-s-2025-product-updates
+"Student query tickets with category, owner and open/in-progress/closed status",queries,could,yes,no,S40,https://www.meritto.com/application-management-software/student-query-management-system/ https://documenter.getpostman.com/view/10228290/2s8YRqmAkK
+"Mobile app: lead list and profile with call, message, note, follow-up and stage change",mobile,should,yes,no,Phase 2,https://apps.apple.com/in/app/meritto-attract-engage-enroll/id1551119550 https://www.meritto.com/mobile-app/
+Mobile quick-add lead and QR self-registration,mobile,could,yes,no,,https://www.meritto.com/education-crm/lead-management-system/ https://www.meritto.com/mobile-app/
+"Field staff check-in/out with location, route and distance",mobile,could,yes,no,,https://www.meritto.com/mobile-app/ https://apps.apple.com/in/app/meritto-attract-engage-enroll/id1551119550
+Mobile dashboards,mobile,could,yes,no,,https://apps.apple.com/in/app/meritto-attract-engage-enroll/id1551119550
+"Mobile voice notes, voice search and swipe actions",mobile,could,yes,no,,https://www.meritto.com/mobile-app/
+Mobile PIN and biometric unlock,mobile,could,yes,no,,https://apps.apple.com/in/app/meritto-attract-engage-enroll/id1551119550
+External publisher login with masked lead data and their own dashboards,publishers,could,yes,no,S39,https://www.meritto.com/education-crm/admission-marketing-publisher-panel/
+Daily API lead cap per publisher tied to its verification rate,publishers,could,yes,no,Formula not published,https://www.meritto.com/education-crm/campaign-management-system-for-higher-education/
+"Channel-partner mode: student interests sent to universities, commission tracking",publishers,could,yes,no,,https://www.meritto.com/university-channel-partner-crm/
+Benchmark a publisher against other publishers,publishers,could,yes,skip,Needs data across customers that a new product will not have,https://www.meritto.com/education-crm/admission-marketing-publisher-panel/
+AI summary of a lead with risk and next best action,ai,could,yes,no,Build generically; no brand names,https://www.getmio.ai/
+AI chat agent for website and WhatsApp that captures leads,ai,could,yes,no,,https://www.meritto.com/chatbot-for-education/ https://www.getmio.ai/
+AI outbound calling campaigns that write outcomes to the lead,ai,could,yes,no,Needs telephony plus voice AI,https://www.getmio.ai/
+Application form builder and multi-step forms,application,could,yes,skip,Separate Application product; outside the CRM slice,https://www.meritto.com/application-management-software/ https://www.meritto.com/application-management-software/advanced-online-form-builder/
+Student application portal,application,could,yes,skip,Outside the CRM slice,https://www.meritto.com/application-management-software/student-admission-portal/
+Document collection and verification,application,could,yes,skip,Outside the CRM slice,https://www.meritto.com/application-management-software/ https://www.meritto.com/post-application-automation/
+"Interview/GD-PI scheduling, merit lists, offer letters",post-application,could,yes,skip,Post-application product; outside the CRM slice,https://www.meritto.com/post-application-automation/
+"Full fee management: instalments, GST invoices, late fees, refunds, multi-account routing",payments,could,yes,skip,Separate payments product; outside the CRM slice,https://www.collexo.com/payment-cloud/fee-management/ https://www.meritto.com/education-payment-platform-for-finance-teams/
+"AutoDebit mandates, EMI financing and dynamic QR at counters",payments,could,yes,skip,Needs licensed payment and lending partners,https://www.collexo.com/payment-cloud/fee-collection/
+"Split settlement between institution, vendor and gateway",payments,could,yes,skip,Needs gateway split-settlement agreements,https://www.meritto.com/application-management-software/admission-form-payment-manager/
+Voice broadcast with press-1 lead capture,telephony,could,yes,skip,Needs a telephony carrier contract; outside the slice,https://www.meritto.com/amplify-voice-broadcast-solution-for-education-organizations/
+Prepaid credit wallet across channels,platform,could,yes,skip,"A billing model, not a feature; meter usage our own way",https://www.meritto.com/meritto-engagement-and-transactional-system/ https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto
+Student ID cards with QR status,post-application,could,yes,skip,Separate product with card printing and hardware,https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-october-2025-product-updates https://help.meritto.com/portal/en/kb/articles/see-what-s-new-at-meritto-august-s-2025-product-updates
+Aadhaar verification and DigiLocker document fetch,integrations,could,yes,skip,Regulated services needing government approvals,https://www.meritto.com/extensions-and-integrations/ https://www.meritto.com/application-management-software/advanced-online-form-builder/
+"Exam vendor SSO (Mettl, Pearson VUE, Wheebox)",integrations,could,yes,skip,Commercial partner agreements,https://www.meritto.com/extensions-and-integrations/
+Fast WhatsApp onboarding through Meta partner status,whatsapp,could,yes,skip,Commercial partnership with Meta; use embedded sign-up as a tech provider or a BSP,https://www.meritto.com/education-crm/whatsapp-business-api-for-education/
+Built-in library of email images and 100+ form templates,communication,could,yes,skip,Their owned content; write our own,https://www.meritto.com/education-crm/lead-nurturing/ https://www.meritto.com/application-management-software/advanced-online-form-builder/
