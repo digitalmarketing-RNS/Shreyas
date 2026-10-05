@@ -113,7 +113,7 @@ Routes are proposals for our build. "How reached" describes the original where i
 | ID | screen | route / how to reach | purpose | key components | states seen |
 | --- | --- | --- | --- | --- | --- |
 | S03 | Sign in | `/login` | Staff sign-in | Email + password, 2FA code step, SSO button [43], [9] | error, 2FA required, IP not allowed [9], account inactive |
-| S04 | My day (home) | `/` after sign-in | Counsellor's work queue | Follow-ups due today and overdue, untouched leads, recent alerts, check-in toggle; manager variant with team tiles [13], [16], [10] | empty (no work), filled, checked out (no new leads) [55] |
+| S04 | My day (home) | `/` after sign-in | Counsellor's work queue | Follow-ups overdue and upcoming (a due-today group is our design), untouched leads, recent alerts, check-in toggle; manager variant with team tiles [13], [16], [10] | empty (no work), filled, checked out (no new leads) [55] |
 | S05 | Lead list | `/leads`; main nav "Leads" (original: Lead Manager) [44] | Find, filter and act on leads in bulk | Table newest first; search with key picker (email, mobile, name, user ID, lead ID); quick-filter bar with manage; advanced-filter button; column chooser; import; bulk-action menu; rows per page 10–100; untouched marker; merged rows greyed [44] | empty (no leads yet), loading, filled, filter returns nothing, rows selected (bulk menu active), masked contacts for restricted roles [9] |
 | S06 | Advanced filter panel | Panel on S05 (also on S26, S16) | Build AND/OR conditions on any field and save them | Condition rows (field, operator, value), AND/OR switch, call-activity filters, save-as, saved-filter list [44], [2] | no conditions, invalid condition, saved |
 | S07 | Add lead / Import leads | S05 → Add, S05 → Import [44] | Add one walk-in or upload a sheet | Single form; file upload → column mapping → preview → run → result report (created, updated, failed with reasons) | mapping error, partial failure, duplicates updated not created [49] |
@@ -125,16 +125,16 @@ Routes are proposals for our build. "How reached" describes the original where i
 | S13 | Bulk reassign | S05 bulk menu → Reassign [44], [2] | Move many leads to other counsellors | Target counsellors, round-robin toggle, add or replace owners, confirm, progress [2], [47] | running, finished with counts, partial failure |
 | S14 | Merge leads | S08 → Merge (original: offered on telephony duplicates) [49] | Fold a duplicate into the main record | Pick primary, field-by-field preview, confirm [49] | conflict on email, done (secondary read-only) |
 | S15 | WhatsApp inbox | `/inbox` [19] | Live one-to-one WhatsApp chats | Conversation list by status, chat thread, lead side panel, quick replies, save attachment to field, pick and resolve [19] | queued, picked, resolved, reopened [19], 24-hour window closed (template only), no number connected |
-| S16 | Broadcast | `/broadcasts/new` and `/broadcasts/:id` [18] | Send one template to a filtered audience | Channel, approved template, audience (saved filter), buttons, schedule, retry settings; report: sent, delivered, read, replied, failed [18] | draft, scheduled, sending, done, failed, held by sender limit (retrying) [18] |
+| S16 | Broadcast | `/broadcasts/new` and `/broadcasts/:id` [18] | Send one template to a filtered audience | Channel, approved template, audience (saved filter), buttons, schedule, retry settings; report: sent, delivered, replies, failed, contribution to applications and enrolments [18] | draft, scheduled, sending, done, failed, held by sender limit (retrying) [18] |
 | S17 | Automations | `/automations` [48] | List of workflows | Name, trigger, on/off, last run, counts [48] | empty, active, paused |
 | S18 | Automation builder | `/automations/:id` [48], [17] | Build trigger → condition → action flows | Trigger picker (created, updated, stage change, field change, date, interval, activity), condition block (all/any), if/else, wait, actions (assign counsellor, send message, update field, change stage, notify user, webhook), per-step counts [48], [17], [55], [56] | draft, invalid (e.g. trigger on a field that is empty at creation leaves leads unassigned) [62], active, paused |
 | S19 | Templates | `/templates` [52] | Write and manage message templates | List by channel; email editor (drag-and-drop and HTML), SMS editor with character count, WhatsApp template form with category, buttons, approval status and quality rating [52], [18], [57] | draft, WhatsApp pending/approved/rejected, quality high/medium/low [57] |
 | S20 | Attribution dashboard | `/reports/attribution` [3] | Which channels, sources and campaigns produce enrolments | Channel summary → source → campaign drill-down; leads, verified, applications, paid, enrolled; first vs later source; cost per verified lead; period compare [3], [27] | no data yet, filtered, drilled |
 | S21 | Dashboards | `/reports` [22] | Preset and custom dashboards made of widgets | Widget library by category (leads, enrolments, payments, campuses), funnel widget, team presets [22] | empty, loading, filled |
-| S22 | Report builder | `/reports/new` [22] | Pivot reports on any field, custom fields included | Metric picker, multi-level group-by, filters, table/chart toggle, save, export CSV [22] | no metrics, too many groups, saved |
-| S23 | Counsellor productivity | `/reports/team` [10], [22] | How each counsellor and team performs | Calls made and connected, follow-ups done and overdue, stage moves, conversions, by person and team [10] | empty, filled |
+| S22 | Report builder | `/reports/new` [22] | Pivot reports on any field, custom fields included | Metric picker, multi-level group-by, filters, table/chart toggle [22]; save and CSV export are our design | no metrics, too many groups, saved |
+| S23 | Counsellor productivity | `/reports/team` [10], [22] | How each counsellor and team performs | Calls, follow-ups, assigned and engaged leads, by person and team [10], [22], [67]; stage moves and conversions are our additions | empty, filled |
 | S24 | Notifications | Bell icon and `/notifications` [12] | Real-time alerts on student actions | Feed, unread/acted marker, link to lead, preferences per event and channel [12] | none, unread, missed (not acted on) [12] |
-| S25 | Payments | `/payments` [36], [65] | All fee transactions | Filters (status, product, date), list, mark offline payment approved, export CSV [36] | empty, success, failed, pending, refunded |
+| S25 | Payments | `/payments` [36], [65] | All fee transactions | Filters (status, product, date), list, mark offline payment approved, export CSV [36] | empty, pending, approved, failed, refunded [65] |
 | S26 | Opportunities | `/opportunities` [8] | Several interests per student (programmes, campuses, services) | Opportunity-list switcher, table, saved views, owner per row [8] | empty, filled |
 | S27 | Opportunity profile | `/opportunities/:id` [8], [57] | One interest with its own stage and owner | Details, stage, timeline, linked opportunities, custom tabs [8], [57] | duplicate on key fields blocked [65] |
 | S28 | Settings › Lead fields | `/settings/fields` [51] | Add custom fields | Field list; create: label, type (text, dropdown, paragraph, email, mobile, date, upload), section, validation, required, hidden, quick-add visibility, sensitive flag [51] | field limit reached [51], no permission |
@@ -142,7 +142,7 @@ Routes are proposals for our build. "How reached" describes the original where i
 | S30 | Settings › Lead rules | `/settings/lead-rules` [49], [40] | Duplicate and verification behaviour | Unique-mobile toggle, OTP verification on/off, offline source tags, UTM buckets [49], [40], [62] | — |
 | S31 | Settings › Enquiry forms | `/settings/forms` [39], [41] | Build and embed S01 | Field picker, hidden tracking fields, success message/redirect, embed code, active toggle [2], [44] | inactive form |
 | S32 | Settings › Users | `/settings/users` [53] | Invite and manage staff | List, invite (email, role, team, programmes), attributes, quota, active/inactive [53], [65], [10] | invited, active, inactive [65] |
-| S33 | Settings › Roles | `/settings/roles` [53] | What each role may do and see | Permission matrix (view, edit, download, manage per module), data scope (own/team/all), masking of phone/email [53], [9] | — |
+| S33 | Settings › Roles | `/settings/roles` [53] | What each role may do and see | Permission matrix (view, edit, download, manage per module) [53], [9], masking of phone/email [9]; data scope (own/team/all) is our design, the original shows hierarchy-based visibility and a 'show data' permission [9], [43] | — |
 | S34 | Settings › Teams | `/settings/teams` [53] | Team tree and managers | Tree, members, reporting manager [53], [65] | — |
 | S35 | Settings › Channels | `/settings/channels` [18], [40] | Connect messaging and calling | WhatsApp number sign-up, email sending domain, SMS sender and DLT templates, telephony provider [18], [40], [24] | not connected, pending verification, connected |
 | S36 | Settings › Payments | `/settings/payments` [24], [65] | Gateway and fee products | Gateway keys, payment products (name, amount) [65] | not connected, connected |
@@ -190,7 +190,7 @@ F03 Counsellor works a new lead
 F04 Counsellor clears today's follow-ups
     S04 due/overdue -> S08 -> log outcome in S09 -> mark follow-up done (S12) or reschedule (S11)
     happy path clicks: 4 per follow-up
-    edge: overdue items carry over; reopen a completed event [13]
+    edge: overdue items carry over (original shows overdue and upcoming counts [13]); reopen a completed event [13]
 
 F05 Manager reassigns a batch of leads
     S05 -> S06 filter (e.g. stage=Hot, owner=X) -> select all -> bulk menu -> S13 add/replace + round robin -> confirm
@@ -290,7 +290,7 @@ User          name, email, mobile, role_id, permission_group, team_ids, status (
 
 Role          name, permissions (module x view/edit/download/manage), data_scope (own | team | all), mask_contacts
               evidence: [53], [9], [65] role list
-              confidence: high
+              confidence: high (roles, permissions), guess (data_scope tiers are our design)
 
 Team          name, parent_team_id, manager_user_id
               evidence: [65] team list has team_parent_id, [53]
@@ -345,7 +345,7 @@ EventType     name, form_fields, allowed_role_ids
               confidence: high (notes, follow-ups), medium (event types)
 
 Message       lead_id, channel (email | sms | whatsapp), direction (out | in), template_id, body, status
-              (queued | sent | delivered | read | failed | bounced), opened_at, clicked_at, provider_id, broadcast_id, automation_run_id
+              (queued | sent | delivered | failed | bounced; 'read' is our addition), opened_at, clicked_at, provider_id, broadcast_id, automation_run_id
               evidence: [46] communication logs, [18], [19]
               confidence: high
 
@@ -384,7 +384,7 @@ Call          lead_id, user_id, direction, status (connected | missed), duration
 PaymentProduct  name (application fee, token fee), amount, currency, form/programme link
 PaymentLink   lead_id, product_id, amount, expires_at, short_code, sent_via
 Payment       lead_id, product_id, link_id, gateway, order_id, transaction_id, method, status
-              (initiated | success | failed | pending | refunded), amount, discount, offline_mode, approved_by
+              (initiated | pending | approved | failed | refunded; original API: Payment Pending / Payment Approved / Refund), amount, discount, offline_mode, approved_by
               evidence: [65] payments API, [31] statuses, [46] payment link
               confidence: high
 
@@ -417,14 +417,14 @@ Relationships: Organization 1-n everything. Campus 1-n Lead, User. Team 1-n User
 
 ## Feature matrix
 
-See `features.csv` (213 rows; the `evidence` column gives the source URL for each). Must: 68, should: 63, could: 66, skip: 16.
+See `features.csv` (213 rows; the `evidence` column gives the source URL for each). Must: 68, should: 63, could: 68, skip: 14.
 
 ## Out of scope (cannot or should not be cloned)
 
 - **Their names and assets.** Meritto, NoPaperForms, Collexo, Mio AI, Niaa, Echo, Zing, Amplify, METS, Calendar Pro, Pixi; their screenshots, icons, copy, form templates and email image library. Their branded metric name for exclusive impact too. We build the same capability under our own name.
 - **Partner networks and approvals.** Meta tech-partner status, Google Ads/Meta app approvals, lead-portal partnerships (Shiksha, Collegedunia and others), exam vendors, telephony carriers. We integrate through official APIs with each institution's own accounts.
 - **Regulated services.** Aadhaar authentication and DigiLocker (government approvals). Payment processing, EMI, eNACH and split settlement (licensed partners).
-- **Their data.** Cross-customer benchmarking of publishers needs data from many institutions, which a new product does not have.
+- **Their data.** Industry-wide benchmarks across many institutions would need data a new product does not have. Ranking an institution's own publishers against each other is cloneable and is in the matrix.
 - **Their certifications.** SOC 2, ISO 27001 and similar are earned by audit, not copied. They can be roadmap items.
 - **Separate products in the suite** (not cloneable *in this slice*): the Application platform, Post-Application, full fee management, voice broadcast, AI agents, ID cards. These are `skip` or `could` rows.
 
