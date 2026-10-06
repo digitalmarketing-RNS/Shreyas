@@ -426,7 +426,7 @@ Relationships: Organization 1-n everything. Campus 1-n Lead, User. Team 1-n User
 
 ## Feature matrix
 
-See `features.csv` (228 rows; the `evidence` column gives the source URL for each). Priority: must 74, should 65, could 89. 14 of the could rows are marked `clone=skip` as not cloneable, so the parity score counts 214 rows.
+See `features.csv` (241 rows; the `evidence` column gives the source URL for each). 228 rows describe the original product; 13 are our own compliance and safety rows, marked `original=no`, which the parity score ignores. Priority: must 83, should 69, could 89. 14 of the could rows are marked `clone=skip` as not cloneable, so the parity score counts 214 rows, 74 of them must-haves.
 
 ## Out of scope (cannot or should not be cloned)
 
