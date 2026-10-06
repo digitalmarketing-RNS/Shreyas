@@ -1,0 +1,282 @@
+Contrast report: design tokens, light and dark
+Date: 2026-10-06 (UTC). Checker: .claude/skills/replica-design/contrast.py (WCAG 2.2: text 4.5:1, large text 3:1, ui 3:1).
+Pairs come from the "pairs" list in each file. Both files use the same 105 pairs.
+
+== python3 .claude/skills/replica-design/contrast.py replica/design/tokens.json
+  AAA   15.86:1  text                     on bg                   
+  AAA   17.49:1  text                     on surface              
+  AAA   16.74:1  text                     on surface-subtle       
+  AAA   17.49:1  text                     on surface-raised       
+  AAA   14.35:1  text                     on surface-sunken       
+  AAA   15.15:1  text                     on surface-hover        
+  AAA   14.88:1  text                     on accent-subtle        
+  AA     5.43:1  text-muted               on bg                   
+  AA     5.99:1  text-muted               on surface              
+  AA     5.73:1  text-muted               on surface-subtle       
+  AA     5.99:1  text-muted               on surface-raised       
+  AA     4.92:1  text-muted               on surface-sunken       
+  AA     5.19:1  text-muted               on surface-hover        
+  AA     5.10:1  text-muted               on accent-subtle        
+  AAA    9.47:1  accent                   on bg                   
+  AAA   10.45:1  accent                   on surface              
+  AAA   10.00:1  accent                   on surface-subtle       
+  AAA   10.45:1  accent                   on surface-raised       
+  AAA    8.57:1  accent                   on surface-sunken       
+  AAA    9.05:1  accent                   on surface-hover        
+  AAA    8.89:1  accent                   on accent-subtle        
+  AAA   12.38:1  accent-hover             on bg                   
+  AAA   13.66:1  accent-hover             on surface              
+  AAA   10.45:1  on-accent                on accent               
+  AAA   13.66:1  on-accent                on accent-hover         
+  AA     5.62:1  danger                   on danger-subtle        
+  AA     6.44:1  on-danger                on danger               
+  AA     5.84:1  danger                   on bg                   
+  AA     6.44:1  danger                   on surface              
+  AA     6.44:1  danger                   on surface-raised       
+  AA     5.26:1  success                  on success-subtle       
+  AA     5.95:1  on-success               on success              
+  AA     5.39:1  success                  on bg                   
+  AA     5.95:1  success                  on surface              
+  AA     5.95:1  success                  on surface-raised       
+  AA     5.38:1  warning                  on warning-subtle       
+  AA     6.03:1  on-warning               on warning              
+  AA     5.47:1  warning                  on bg                   
+  AA     6.03:1  warning                  on surface              
+  AA     6.03:1  warning                  on surface-raised       
+  AA     5.56:1  info                     on info-subtle          
+  AA     6.31:1  on-info                  on info                 
+  AA     5.72:1  info                     on bg                   
+  AA     6.31:1  info                     on surface              
+  AA     6.31:1  info                     on surface-raised       
+  AA     5.57:1  danger                   on surface-hover        
+  AAA   15.26:1  text                     on danger-subtle        
+  AA     5.23:1  text-muted               on danger-subtle        
+  AAA    9.12:1  accent                   on danger-subtle        
+  AAA   15.46:1  text                     on success-subtle       
+  AA     5.30:1  text-muted               on success-subtle       
+  AAA    9.23:1  accent                   on success-subtle       
+  AAA   15.61:1  text                     on warning-subtle       
+  AA     5.35:1  text-muted               on warning-subtle       
+  AAA    9.32:1  accent                   on warning-subtle       
+  AAA   15.41:1  text                     on info-subtle          
+  AA     5.28:1  text-muted               on info-subtle          
+  AAA    9.20:1  accent                   on info-subtle          
+  AAA   14.65:1  on-inverse               on inverse              
+  PASS   3.57:1  border-input             on bg                   ui
+  PASS   3.93:1  border-input             on surface              ui
+  PASS   3.76:1  border-input             on surface-subtle       ui
+  PASS   3.93:1  border-input             on surface-raised       ui
+  PASS   3.23:1  border-input             on surface-sunken       ui
+  PASS   3.41:1  border-input             on surface-hover        ui
+  PASS   3.35:1  border-input             on accent-subtle        ui
+  PASS   7.74:1  focus-ring               on bg                   ui
+  PASS   8.54:1  focus-ring               on surface              ui
+  PASS   8.17:1  focus-ring               on surface-subtle       ui
+  PASS   8.54:1  focus-ring               on surface-raised       ui
+  PASS   7.01:1  focus-ring               on surface-sunken       ui
+  PASS   7.40:1  focus-ring               on surface-hover        ui
+  PASS   7.27:1  focus-ring               on accent-subtle        ui
+  PASS   7.45:1  focus-ring               on danger-subtle        ui
+  PASS   7.55:1  focus-ring               on success-subtle       ui
+  PASS   7.62:1  focus-ring               on warning-subtle       ui
+  PASS   7.52:1  focus-ring               on info-subtle          ui
+  PASS   4.00:1  chart-1                  on bg                   ui
+  PASS   4.42:1  chart-1                  on chart-surface        ui
+  PASS   3.28:1  chart-2                  on bg                   ui
+  PASS   3.62:1  chart-2                  on chart-surface        ui
+  PASS   3.23:1  chart-3                  on bg                   ui
+  PASS   3.56:1  chart-3                  on chart-surface        ui
+  PASS   4.69:1  chart-4                  on bg                   ui
+  PASS   5.17:1  chart-4                  on chart-surface        ui
+  PASS   3.14:1  chart-5                  on bg                   ui
+  PASS   3.47:1  chart-5                  on chart-surface        ui
+  PASS   4.48:1  chart-6                  on bg                   ui
+  PASS   4.95:1  chart-6                  on chart-surface        ui
+  PASS   7.76:1  chart-7                  on bg                   ui
+  PASS   8.56:1  chart-7                  on chart-surface        ui
+  PASS   3.58:1  chart-8                  on bg                   ui
+  PASS   3.95:1  chart-8                  on chart-surface        ui
+  PASS   3.26:1  chart-ordinal-1          on bg                   ui
+  PASS   3.59:1  chart-ordinal-1          on chart-surface        ui
+  PASS   4.23:1  chart-ordinal-2          on bg                   ui
+  PASS   4.67:1  chart-ordinal-2          on chart-surface        ui
+  PASS   5.60:1  chart-ordinal-3          on bg                   ui
+  PASS   6.18:1  chart-ordinal-3          on chart-surface        ui
+  PASS   7.37:1  chart-ordinal-4          on bg                   ui
+  PASS   8.13:1  chart-ordinal-4          on chart-surface        ui
+  PASS   9.64:1  chart-ordinal-5          on bg                   ui
+  PASS  10.64:1  chart-ordinal-5          on chart-surface        ui
+  PASS  12.30:1  chart-ordinal-6          on bg                   ui
+  PASS  13.57:1  chart-ordinal-6          on chart-surface        ui
+
+  105 pairs, 0 failing AA
+exit code: 0
+
+== python3 .claude/skills/replica-design/contrast.py replica/design/tokens.dark.json
+  AAA   15.41:1  text                     on bg                   
+  AAA   14.39:1  text                     on surface              
+  AAA   14.91:1  text                     on surface-subtle       
+  AAA   13.18:1  text                     on surface-raised       
+  AAA   15.85:1  text                     on surface-sunken       
+  AAA   12.22:1  text                     on surface-hover        
+  AAA   10.94:1  text                     on accent-subtle        
+  AAA    7.80:1  text-muted               on bg                   
+  AAA    7.29:1  text-muted               on surface              
+  AAA    7.55:1  text-muted               on surface-subtle       
+  AA     6.67:1  text-muted               on surface-raised       
+  AAA    8.03:1  text-muted               on surface-sunken       
+  AA     6.19:1  text-muted               on surface-hover        
+  AA     5.54:1  text-muted               on accent-subtle        
+  AAA   10.88:1  accent                   on bg                   
+  AAA   10.16:1  accent                   on surface              
+  AAA   10.53:1  accent                   on surface-subtle       
+  AAA    9.31:1  accent                   on surface-raised       
+  AAA   11.19:1  accent                   on surface-sunken       
+  AAA    8.63:1  accent                   on surface-hover        
+  AAA    7.72:1  accent                   on accent-subtle        
+  AAA   13.20:1  accent-hover             on bg                   
+  AAA   12.33:1  accent-hover             on surface              
+  AAA   10.88:1  on-accent                on accent               
+  AAA   13.20:1  on-accent                on accent-hover         
+  AA     5.85:1  danger                   on danger-subtle        
+  AAA    7.99:1  on-danger                on danger               
+  AAA    7.94:1  danger                   on bg                   
+  AAA    7.41:1  danger                   on surface              
+  AA     6.79:1  danger                   on surface-raised       
+  AAA    7.03:1  success                  on success-subtle       
+  AAA    9.73:1  on-success               on success              
+  AAA    9.76:1  success                  on bg                   
+  AAA    9.11:1  success                  on surface              
+  AAA    8.34:1  success                  on surface-raised       
+  AAA    7.40:1  warning                  on warning-subtle       
+  AAA   10.36:1  on-warning               on warning              
+  AAA   10.41:1  warning                  on bg                   
+  AAA    9.72:1  warning                  on surface              
+  AAA    8.91:1  warning                  on surface-raised       
+  AA     6.59:1  info                     on info-subtle          
+  AAA    9.15:1  on-info                  on info                 
+  AAA    9.14:1  info                     on bg                   
+  AAA    8.53:1  info                     on surface              
+  AAA    7.82:1  info                     on surface-raised       
+  AA     6.30:1  danger                   on surface-hover        
+  AAA   11.36:1  text                     on danger-subtle        
+  AA     5.75:1  text-muted               on danger-subtle        
+  AAA    8.02:1  accent                   on danger-subtle        
+  AAA   11.10:1  text                     on success-subtle       
+  AA     5.62:1  text-muted               on success-subtle       
+  AAA    7.84:1  accent                   on success-subtle       
+  AAA   10.95:1  text                     on warning-subtle       
+  AA     5.55:1  text-muted               on warning-subtle       
+  AAA    7.73:1  accent                   on warning-subtle       
+  AAA   11.10:1  text                     on info-subtle          
+  AA     5.62:1  text-muted               on info-subtle          
+  AAA    7.84:1  accent                   on info-subtle          
+  AAA   14.35:1  on-inverse               on inverse              
+  PASS   4.61:1  border-input             on bg                   ui
+  PASS   4.31:1  border-input             on surface              ui
+  PASS   4.46:1  border-input             on surface-subtle       ui
+  PASS   3.95:1  border-input             on surface-raised       ui
+  PASS   4.75:1  border-input             on surface-sunken       ui
+  PASS   3.66:1  border-input             on surface-hover        ui
+  PASS   3.27:1  border-input             on accent-subtle        ui
+  PASS   9.45:1  focus-ring               on bg                   ui
+  PASS   8.82:1  focus-ring               on surface              ui
+  PASS   9.14:1  focus-ring               on surface-subtle       ui
+  PASS   8.08:1  focus-ring               on surface-raised       ui
+  PASS   9.72:1  focus-ring               on surface-sunken       ui
+  PASS   7.49:1  focus-ring               on surface-hover        ui
+  PASS   6.70:1  focus-ring               on accent-subtle        ui
+  PASS   6.96:1  focus-ring               on danger-subtle        ui
+  PASS   6.80:1  focus-ring               on success-subtle       ui
+  PASS   6.71:1  focus-ring               on warning-subtle       ui
+  PASS   6.81:1  focus-ring               on info-subtle          ui
+  PASS   5.20:1  chart-1                  on bg                   ui
+  PASS   4.86:1  chart-1                  on chart-surface        ui
+  PASS   4.88:1  chart-2                  on bg                   ui
+  PASS   4.55:1  chart-2                  on chart-surface        ui
+  PASS   5.56:1  chart-3                  on bg                   ui
+  PASS   5.19:1  chart-3                  on chart-surface        ui
+  PASS   6.17:1  chart-4                  on bg                   ui
+  PASS   5.76:1  chart-4                  on chart-surface        ui
+  PASS   4.80:1  chart-5                  on bg                   ui
+  PASS   4.48:1  chart-5                  on chart-surface        ui
+  PASS   3.83:1  chart-6                  on bg                   ui
+  PASS   3.58:1  chart-6                  on chart-surface        ui
+  PASS   6.06:1  chart-7                  on bg                   ui
+  PASS   5.66:1  chart-7                  on chart-surface        ui
+  PASS   5.86:1  chart-8                  on bg                   ui
+  PASS   5.47:1  chart-8                  on chart-surface        ui
+  PASS   3.55:1  chart-ordinal-1          on bg                   ui
+  PASS   3.32:1  chart-ordinal-1          on chart-surface        ui
+  PASS   4.66:1  chart-ordinal-2          on bg                   ui
+  PASS   4.35:1  chart-ordinal-2          on chart-surface        ui
+  PASS   6.03:1  chart-ordinal-3          on bg                   ui
+  PASS   5.63:1  chart-ordinal-3          on chart-surface        ui
+  PASS   7.67:1  chart-ordinal-4          on bg                   ui
+  PASS   7.16:1  chart-ordinal-4          on chart-surface        ui
+  PASS   9.65:1  chart-ordinal-5          on bg                   ui
+  PASS   9.01:1  chart-ordinal-5          on chart-surface        ui
+  PASS  12.03:1  chart-ordinal-6          on bg                   ui
+  PASS  11.23:1  chart-ordinal-6          on chart-surface        ui
+
+  105 pairs, 0 failing AA
+exit code: 0
+
+== Supplement: chart palettes, checked with the dataviz skill's validate_palette.py (decisions.md section 7).
+   Light is checked on bg (#f2f4f5), the stricter of bg and chart-surface. Dark is checked on chart-surface (#15191c), the stricter of the two.
+
+-- light categorical, adjacent pairs
+  [PASS] Lightness band         all 8 inside L 0.43–0.77
+  [PASS] Chroma floor           all 8 >= 0.1
+  [PASS] CVD separation         worst adjacent #009b6a↔#e05e29 ΔE 10.0 (protan) · tritan 12.6
+  [PASS] Normal-vision floor    worst adjacent #956300↔#009b6a ΔE 18.5 (normal)
+  [PASS] Contrast vs surface    all 8 >= 3:1
+  → ALL CHECKS PASS  (CVD in the 6–8 floor band is legal ONLY with secondary encoding: direct labels, gaps, or texture)
+exit code: 0
+
+-- light categorical, first three slots, all pairs (scatter, maps)
+  [PASS] Lightness band         all 3 inside L 0.43–0.77
+  [PASS] Chroma floor           all 3 >= 0.1
+  [PASS] CVD separation         worst all-pairs #009b6a↔#e05e29 ΔE 10.0 (protan) · tritan 4.9
+  [PASS] Normal-vision floor    worst all-pairs #009b6a↔#2a78d6 ΔE 21.9 (normal)
+  [PASS] Contrast vs surface    all 3 >= 3:1
+  → ALL CHECKS PASS  (CVD in the 6–8 floor band is legal ONLY with secondary encoding: direct labels, gaps, or texture)
+exit code: 0
+
+-- dark categorical, adjacent pairs
+  [PASS] Lightness band         all 8 inside L 0.48–0.67
+  [PASS] Chroma floor           all 8 >= 0.1
+  [PASS] CVD separation         worst adjacent #c98500↔#199e70 ΔE 8.4 (protan) · tritan 8.7
+  [PASS] Normal-vision floor    worst adjacent #d55181↔#c98500 ΔE 19.3 (normal)
+  [PASS] Contrast vs surface    all 8 >= 3:1
+  → ALL CHECKS PASS  (CVD in the 6–8 floor band is legal ONLY with secondary encoding: direct labels, gaps, or texture)
+exit code: 0
+
+-- dark categorical, first three slots, all pairs
+  [PASS] Lightness band         all 3 inside L 0.48–0.67
+  [PASS] Chroma floor           all 3 >= 0.1
+  [PASS] CVD separation         worst all-pairs #199e70↔#d95926 ΔE 9.4 (deutan) · tritan 4.0
+  [PASS] Normal-vision floor    worst all-pairs #199e70↔#3987e5 ΔE 20.9 (normal)
+  [PASS] Contrast vs surface    all 3 >= 3:1
+  → ALL CHECKS PASS  (CVD in the 6–8 floor band is legal ONLY with secondary encoding: direct labels, gaps, or texture)
+exit code: 0
+
+-- light ordinal ramp (funnel)
+  [PASS] Lightness monotone     steps read light→dark
+  [PASS] Adjacent ΔL            all gaps >= 0.06
+  [PASS] Light-end contrast     #3c88e5 at 3.26:1 vs surface
+  [PASS] Single hue             hue spread 1°
+  → ALL CHECKS PASS  (ordinal: one hue, monotone L, visible step gaps, light end clears surface)
+exit code: 0
+
+-- dark ordinal ramp (funnel)
+  [PASS] Lightness monotone     steps read light→dark
+  [PASS] Adjacent ΔL            all gaps >= 0.06
+  [PASS] Light-end contrast     #246bc0 at 3.32:1 vs surface
+  [PASS] Single hue             hue spread 1°
+  → ALL CHECKS PASS  (ordinal: one hue, monotone L, visible step gaps, light end clears surface)
+exit code: 0
+
+== Drift check: python3 replica/design/build_tokens.py --check
+46 colour roles, 105 pairs per theme
+exit code: 0
