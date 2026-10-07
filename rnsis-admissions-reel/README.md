@@ -24,7 +24,7 @@ Parents don't buy a building; they buy who their child will become. The hook ope
 | 18–20 s | Nursery girl → high-schooler | ONE CAMPUS · EVERY STAGE / NURSERY TO GRADE 10 | "Nursery to Grade 10." | |
 | 20–24 s | 4 one-second flashes | SCIENCE LABS · LIBRARY · COMPUTER LAB · SPORTS | "World-class labs, library, and sports." | Snare/riser build |
 | 24–28 s | Kids stepping off the school bus, school front | ADMISSIONS **OPEN 2027–28** / Give your child the start they deserve. | "Give your child the start they deserve." (admissions year is on screen only) | Biggest lift: horns, choir, string octaves |
-| 28–35 s | End card: crest, offer, CTA, phone, website, tagline | BOOK A CAMPUS VISIT · 99004 55135 · rnsischool.edu.in | "Book your campus visit today." … "RNS International School." on the final hit | Calm cadence, final hit at 32 s |
+| 28–35 s | End card: crest, offer, CTA, phone, website, tagline | BOOK A CAMPUS VISIT · 99004 55135 · rnsischool.edu.in · *Educating Minds. Enriching Values.* | "Book your campus visit today." … "RNS International School." on the final hit | Calm cadence, final hit at 32 s |
 
 An "ADMISSIONS OPEN · 2027–28" badge stays on screen through the montage, so anyone who scrolls away early still sees the offer. All key copy sits inside the Reels safe area (y 290–1250 px); only the decorative tagline sits lower. The ad works with the sound off.
 

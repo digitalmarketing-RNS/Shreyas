@@ -336,9 +336,9 @@ export const EndCard: React.FC<{finalHit: number}> = ({finalHit}) => {
   const shine = interpolate(hit, [0, 18], [-60, 160], clamp);
   const btnPulse = 1 + 0.035 * Math.max(0, Math.sin(((frame - 24) / 30) * Math.PI * 2));
   const bgZoom = interpolate(frame, [0, 210], [1.12, 1.0], clamp);
-  const tagWords = ['Inspiring', 'to', 'learn.', 'Empowering', 'to', 'excel.'];
+  const tagWords = ['Educating', 'Minds.', 'Enriching', 'Values.'];
   // Tagline builds word by word after the call to action (text only).
-  const tagStart = [66, 72, 78, 90, 96, 102];
+  const tagStart = [66, 74, 88, 96];
 
   return (
     <AbsoluteFill style={{transform: `translateY(${wipe}%)`}}>
