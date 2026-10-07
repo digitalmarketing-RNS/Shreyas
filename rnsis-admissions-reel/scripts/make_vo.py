@@ -5,7 +5,7 @@ leading/trailing silence and written to <out_dir>/<id>.wav (24 kHz mono), plus
 vo_lines.json with durations and Whisper word timings for syncing on-screen text.
 
 Usage:
-    python make_vo.py <out_dir>
+    python make_vo.py <out_dir> [line_id ...]
 Requires: kokoro>=0.9.4, espeak-ng, faster-whisper (for the timing check).
 """
 
@@ -38,6 +38,7 @@ LINES = [
     ("start", "Give your child the start they deserve.", 0.97),
     ("cta", "Book your campus visit today.", 0.97),
     ("name", "R N S International School.", 0.95),
+    ("tagline", "Educating minds. Enriching values.", 0.95),
 ]
 
 
@@ -50,15 +51,21 @@ def trim(y, thresh_db=-42, pad=0.03):
     return y[a:b]
 
 
-def main(out_dir):
+def main(out_dir, only=()):
     from kokoro import KPipeline
     from faster_whisper import WhisperModel
 
     os.makedirs(out_dir, exist_ok=True)
     pipe = KPipeline(lang_code="a")
     whisper = WhisperModel("small", device="cpu", compute_type="int8")
+    manifest_path = os.path.join(out_dir, "vo_lines.json")
     manifest = []
+    if only and os.path.exists(manifest_path):
+        with open(manifest_path) as f:
+            manifest = [m for m in json.load(f) if m["id"] not in only]
     for line_id, text, speed in LINES:
+        if only and line_id not in only:
+            continue
         audio = np.concatenate([r.audio.numpy() for r in pipe(text, voice=VOICE, speed=speed)])
         audio = trim(audio)
         path = os.path.join(out_dir, f"{line_id}.wav")
@@ -67,9 +74,12 @@ def main(out_dir):
         words = [(w.word.strip(), round(w.start, 2), round(w.end, 2)) for s in segs for w in s.words]
         manifest.append({"id": line_id, "text": text, "duration": round(len(audio) / SR, 3), "words": words})
         print(f"{line_id:13s} {len(audio) / SR:5.2f}s  {' '.join(w for w, _, _ in words)}")
-    with open(os.path.join(out_dir, "vo_lines.json"), "w") as f:
+    order = [line_id for line_id, _, _ in LINES]
+    manifest.sort(key=lambda m: order.index(m["id"]))
+    with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=1)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "vo")
+    # make_vo.py <out_dir> [line_id ...]   (line ids regenerate just those lines)
+    main(sys.argv[1] if len(sys.argv) > 1 else "vo", tuple(sys.argv[2:]))

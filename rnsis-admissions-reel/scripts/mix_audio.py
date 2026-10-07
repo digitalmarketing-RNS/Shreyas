@@ -18,7 +18,7 @@ import soundfile as sf
 from scipy.signal import butter, resample_poly, sosfilt
 
 SR = 44100
-LENGTH = 35.0
+LENGTH = 37.5
 N = int(SR * LENGTH)
 
 # (line id, target start in seconds). Lines land on their edit point; if the previous
@@ -41,6 +41,7 @@ VO_PLACEMENT = [
     ("start", 24.35),               # 24-28  Give your child the start they deserve.
     ("cta", 28.35),                 # 28-32  Book your campus visit today.
     ("name", 32.05),                # 32     RNS International School. (final hit)
+    ("tagline", 34.45),             # 34.5   Educating minds. Enriching values.
 ]
 
 

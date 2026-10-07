@@ -1,7 +1,7 @@
 // Edit decision list. 30 fps, 120 BPM music => one beat every 15 frames, and every
 // section boundary below is a downbeat in scripts/compose_music.py.
 export const FPS = 30;
-export const DURATION = 1050; // 35 s
+export const DURATION = 1125; // 37.5 s
 
 export const T = {
   hook: 0, // "Every child holds A UNIVERSE OF POSSIBILITIES"
@@ -14,6 +14,7 @@ export const T = {
   offer: 720, // ADMISSIONS OPEN 2027-28 (on screen only, not in the VO)
   end: 840, // end card
   finalHit: 960, // crest + "RNS International School" VO
+  tagline: 1033, // VO "Educating minds. Enriching values." (34.45 s)
 } as const;
 
 export type Shot = {

@@ -335,10 +335,10 @@ export const EndCard: React.FC<{finalHit: number}> = ({finalHit}) => {
   const hitPulse = hit >= 0 ? 1 + 0.12 * Math.exp(-hit / 6) * Math.cos(hit / 2.2) : 1;
   const shine = interpolate(hit, [0, 18], [-60, 160], clamp);
   const btnPulse = 1 + 0.035 * Math.max(0, Math.sin(((frame - 24) / 30) * Math.PI * 2));
-  const bgZoom = interpolate(frame, [0, 210], [1.12, 1.0], clamp);
+  const bgZoom = interpolate(frame, [0, 285], [1.12, 1.0], clamp);
   const tagWords = ['Educating', 'Minds.', 'Enriching', 'Values.'];
-  // Tagline builds word by word after the call to action (text only).
-  const tagStart = [66, 74, 88, 96];
+  // Tagline pops word by word with the closing VO line (starts 34.45 s = frame 193 of the end card).
+  const tagStart = [191, 211, 237, 254];
 
   return (
     <AbsoluteFill style={{transform: `translateY(${wipe}%)`}}>

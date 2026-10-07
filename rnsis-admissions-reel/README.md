@@ -1,6 +1,6 @@
 # RNS International School: "Admissions Open 2027–28" Instagram Reel ad
 
-A 35-second 9:16 reel ad (1080×1920, 30 fps). It is cut from the school's 4K brand film "Rnsis Film v3", with a voiceover that runs the whole length and an original score written for this edit.
+A 37.5-second 9:16 reel ad (1080×1920, 30 fps). It is cut from the school's 4K brand film "Rnsis Film v3", with a voiceover that runs the whole length and an original score written for this edit.
 
 | File | Use |
 |---|---|
@@ -24,7 +24,7 @@ Parents don't buy a building; they buy who their child will become. The hook ope
 | 18–20 s | Nursery girl → high-schooler | ONE CAMPUS · EVERY STAGE / NURSERY TO GRADE 10 | "Nursery to Grade 10." | |
 | 20–24 s | 4 one-second flashes | SCIENCE LABS · LIBRARY · COMPUTER LAB · SPORTS | "World-class labs, library, and sports." | Snare/riser build |
 | 24–28 s | Kids stepping off the school bus, school front | ADMISSIONS **OPEN 2027–28** / Give your child the start they deserve. | "Give your child the start they deserve." (admissions year is on screen only) | Biggest lift: horns, choir, string octaves |
-| 28–35 s | End card: crest, offer, CTA, phone, website, tagline | BOOK A CAMPUS VISIT · 99004 55135 · rnsischool.edu.in · *Educating Minds. Enriching Values.* | "Book your campus visit today." … "RNS International School." on the final hit | Calm cadence, final hit at 32 s |
+| 28–37.5 s | End card: crest, offer, CTA, phone, website, tagline | BOOK A CAMPUS VISIT · 99004 55135 · rnsischool.edu.in · *Educating Minds. Enriching Values.* (pops in with the VO) | "Book your campus visit today." … "RNS International School." on the final hit … "Educating minds, enriching values." | Calm cadence, final hit at 32 s, chord holds under the tagline and fades |
 
 An "ADMISSIONS OPEN · 2027–28" badge stays on screen through the montage, so anyone who scrolls away early still sees the offer. All key copy sits inside the Reels safe area (y 290–1250 px); only the decorative tagline sits lower. The ad works with the sound off.
 

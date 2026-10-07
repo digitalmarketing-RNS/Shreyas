@@ -1,4 +1,4 @@
-"""Compose the original 35 s score for the RNSIS Admissions 2027-28 reel.
+"""Compose the original 37.5 s score for the RNSIS Admissions 2027-28 reel.
 
 120 BPM, D major, written as a bed for a voiceover that runs the whole length:
   0-4   hook      "Every child holds a universe of possibilities": celesta twinkles,
@@ -9,7 +9,8 @@
   16-24 proof     lighter groove, then a snare/riser build
   24-28 lift      biggest section: horns, choir, string octaves, motif
   28-32 end card  half-time, calm cadence under the call to action
-  32    final hit on the school name, ring-out to 35 s
+  32    final hit on the school name; the chord holds softly under the closing
+        tagline and fades out by 37.5 s
 Every section boundary is a downbeat and an edit point in src/timeline.ts.
 
 Pitched parts are MIDI rendered with FluidSynth + the MuseScore General soundfont (MIT).
@@ -31,7 +32,7 @@ import soundfile as sf
 from scipy.signal import butter, fftconvolve, sosfilt
 
 SR = 44100
-LENGTH = 35.0
+LENGTH = 37.5
 N = int(SR * LENGTH)
 SOUNDFONT = "/usr/share/sounds/sf2/MuseScore_General_Full.sf2"
 rng = np.random.default_rng(2027)
@@ -60,7 +61,7 @@ PROGRESSION = [
     (16, 18, "D"), (18, 20, "A"), (20, 22, "Bm"), (22, 23, "G"), (23, 23.5, "Asus4"), (23.5, 24, "A"),
     (24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"),
     (28, 30, "Em7"), (30, 31, "G"), (31, 32, "A"),
-    (32, 35, "D"),
+    (32, 37.5, "D"),
 ]
 
 
@@ -145,7 +146,7 @@ def piano_part():
     for s, e, c in [(28, 30, "Em7"), (30, 31, "G"), (31, 32, "A")]:
         ch = CHORDS[c]
         notes += [(s, e - s - 0.05, p, 64) for p in [ch["bass"] + 12] + ch["v"]]
-    notes += [(32.0, 2.8, p, 98) for p in [38, 50, 57, 62, 66, 69, 74, 78]]
+    notes += [(32.0, 4.8, p, 98) for p in [38, 50, 57, 62, 66, 69, 74, 78]]
     return notes
 
 
@@ -175,6 +176,7 @@ def strings_part():
     ccs += [(4.0, 11, 92)] + ramp(9.0, 10.95, 92, 120) + [(11.0, 11, 40)]
     ccs += [(12.0, 11, 122), (16.0, 11, 90)] + ramp(21.0, 23.95, 90, 127)
     ccs += [(24.0, 11, 127), (28.0, 11, 96)] + ramp(30.0, 31.95, 96, 124) + [(32.0, 11, 127)]
+    ccs += ramp(33.0, 36.5, 127, 62)  # settle under the closing tagline
     return notes, ccs
 
 
@@ -194,21 +196,21 @@ def choir_part():
     notes = [(0.0, 2.0, p, 70) for p in (62, 66, 69, 76)]
     notes += [(2.0, 1.0, p, 76) for p in (62, 67, 71, 74)]
     notes += [(3.0, 0.95, p, 84) for p in (61, 64, 69, 76)]
-    for s, e, c in [(24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"), (32, 34.8, "D")]:
+    for s, e, c in [(24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"), (32, 37.2, "D")]:
         notes += [(s, e - s, p, 92) for p in CHORDS[c]["v"]]
-    ccs = [(0.0, 11, 40)] + ramp(0.1, 3.9, 40, 120) + [(24.0, 11, 110), (32.0, 11, 120)]
+    ccs = [(0.0, 11, 40)] + ramp(0.1, 3.9, 40, 120) + [(24.0, 11, 110), (32.0, 11, 120)] + ramp(33.0, 36.5, 120, 60)
     return notes, ccs
 
 
 def horns_part():
     """French horns give the lift and the final chord their size."""
     notes = []
-    for s, e, c in [(24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"), (32, 34.8, "D")]:
+    for s, e, c in [(24, 25, "D"), (25, 26, "A"), (26, 27, "Bm"), (27, 28, "G"), (32, 36.6, "D")]:
         ch = CHORDS[c]
         notes += [(s, e - s - 0.04, p, 100) for p in (ch["bass"] + 24, ch["v"][1] - 12, ch["v"][2] - 12)]
     # Horn swell under "ALL OF IT".
     notes += [(12.0, 3.95, p, 82) for p in (50, 57, 62)]
-    return notes, ramp(12.0, 13.5, 60, 110) + [(16.0, 11, 100)]
+    return notes, ramp(12.0, 13.5, 60, 110) + [(16.0, 11, 100), (24.0, 11, 110)] + ramp(33.0, 36.4, 110, 50)
 
 
 MOTIF = [(0.0, 0.75, 81), (0.75, 0.25, 78), (1.0, 0.5, 76), (1.5, 0.5, 81),
@@ -493,7 +495,7 @@ def bass_bus():
             place(bass, bass_note(p, 0.24), t, 0.9)
     for s, e, c in [(28, 30, "Em7"), (30, 31, "G"), (31, 32, "A")]:
         place(bass, bass_note(CHORDS[c]["bass"], e - s - 0.04, decay=2.0), s, 0.7)
-    place(bass, bass_note(38, 2.8, decay=1.6), FINAL, 1.0)
+    place(bass, bass_note(38, 4.8, decay=2.2), FINAL, 1.0)
     place(bass, bass_note(33, 0.95, decay=0.8), 3.0, 0.6)  # pickup under the build
     return bass
 
