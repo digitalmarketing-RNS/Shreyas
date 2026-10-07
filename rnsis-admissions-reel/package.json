@@ -1,0 +1,23 @@
+{
+  "name": "rnsis-admissions-reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RNS International School - Admissions Open 2027-28 Instagram Reel ad (Remotion)",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts AdmissionsReel out/RNSIS-Admissions-2027-28-Reel.mp4",
+    "render:music": "remotion render src/index.ts AdmissionsReelMusicOnly out/RNSIS-Admissions-2027-28-Reel-music-only.mp4"
+  },
+  "dependencies": {
+    "@fontsource/raleway": "^5.3.0",
+    "@remotion/cli": "^4.0.532",
+    "@remotion/fonts": "^4.0.532",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.532"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
