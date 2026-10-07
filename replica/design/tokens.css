@@ -3,6 +3,14 @@
    Do not edit by hand. Change the JSON, run contrast.py on both files, then run
    python3 replica/design/build_tokens.py.
 
+   accent, accent-hover, accent-subtle, focus-ring and chart-* are placeholders
+   until /replica-brand sets our palette. The accent family is pure grey for now,
+   so no hue from the original product is carried over.
+
+   Fonts: Inter and Noto (SIL OFL 1.1). Icons: lucide-react (ISC; Feather-derived
+   icons MIT, Cole Bemis). Licence texts ship in THIRD_PARTY_LICENSES with the
+   vendored files.
+
    Light values and every theme-independent token sit on :root. Dark values
    appear twice: for people who chose System while their OS is dark, and for
    people who chose Dark. Public pages render <html data-theme="light"> and
@@ -23,12 +31,13 @@
   --border-input: #7b8188;
   --text: #151a20;
   --text-muted: #5d646c;
-  --accent: #354053;
-  --accent-hover: #242e3f;
-  --accent-subtle: #e8edf5;
+  --accent: #404040;
+  --accent-hover: #2b2b2b;
+  --accent-subtle: #e8e8e8;
   --on-accent: #ffffff;
-  --focus-ring: #304d78;
+  --focus-ring: #404040;
   --danger: #b32926;
+  --danger-hover: #8f1f1d;
   --danger-subtle: #ffebea;
   --on-danger: #ffffff;
   --success: #1d723e;
@@ -44,7 +53,7 @@
   --on-inverse: #f7f9fa;
   --overlay: rgba(12, 15, 20, 0.5);
   --chart-surface: #ffffff;
-  --chart-1: #2a78d6;
+  --chart-1: #0179a3;
   --chart-2: #e05e29;
   --chart-3: #009b6a;
   --chart-4: #956300;
@@ -52,12 +61,12 @@
   --chart-6: #008300;
   --chart-7: #4a3aa7;
   --chart-8: #e34948;
-  --chart-ordinal-1: #3c88e5;
-  --chart-ordinal-2: #2774d0;
-  --chart-ordinal-3: #0c60ba;
-  --chart-ordinal-4: #004e9e;
-  --chart-ordinal-5: #003d7f;
-  --chart-ordinal-6: #002d61;
+  --chart-ordinal-1: #008cbc;
+  --chart-ordinal-2: #0077a2;
+  --chart-ordinal-3: #006488;
+  --chart-ordinal-4: #00516f;
+  --chart-ordinal-5: #003f57;
+  --chart-ordinal-6: #002d40;
 
   /* elevation (box-shadow) */
   --elevation-card: 0 1px 2px 0 rgba(16, 20, 28, 0.06), 0 1px 3px 0 rgba(16, 20, 28, 0.08);
@@ -225,12 +234,13 @@
     --border-input: #787e84;
     --text: #e5e8ec;
     --text-muted: #a1a7ae;
-    --accent: #bac5d8;
-    --accent-hover: #cfd8e8;
-    --accent-subtle: #272f3e;
+    --accent: #c4c4c4;
+    --accent-hover: #d9d9d9;
+    --accent-subtle: #2e2e2e;
     --on-accent: #0e1114;
-    --focus-ring: #98b9eb;
+    --focus-ring: #c4c4c4;
     --danger: #f48a82;
+    --danger-hover: #f9b3ad;
     --danger-subtle: #47211e;
     --on-danger: #180d0c;
     --success: #77cc8f;
@@ -246,7 +256,7 @@
     --on-inverse: #13161a;
     --overlay: rgba(0, 0, 0, 0.6);
     --chart-surface: #15191c;
-    --chart-1: #3987e5;
+    --chart-1: #179fd4;
     --chart-2: #d95926;
     --chart-3: #199e70;
     --chart-4: #c98500;
@@ -254,12 +264,12 @@
     --chart-6: #008300;
     --chart-7: #9085e9;
     --chart-8: #e66767;
-    --chart-ordinal-1: #246bc0;
-    --chart-ordinal-2: #397fd5;
-    --chart-ordinal-3: #4d93eb;
-    --chart-ordinal-4: #63a7ff;
-    --chart-ordinal-5: #89bcff;
-    --chart-ordinal-6: #add1ff;
+    --chart-ordinal-1: #00769f;
+    --chart-ordinal-2: #008aba;
+    --chart-ordinal-3: #169ed3;
+    --chart-ordinal-4: #38b3e8;
+    --chart-ordinal-5: #52c7fe;
+    --chart-ordinal-6: #8fd9ff;
 
     /* elevation (box-shadow) */
     --elevation-card: 0 1px 2px 0 rgba(0, 0, 0, 0.40), 0 1px 3px 0 rgba(0, 0, 0, 0.30);
@@ -285,12 +295,13 @@
   --border-input: #787e84;
   --text: #e5e8ec;
   --text-muted: #a1a7ae;
-  --accent: #bac5d8;
-  --accent-hover: #cfd8e8;
-  --accent-subtle: #272f3e;
+  --accent: #c4c4c4;
+  --accent-hover: #d9d9d9;
+  --accent-subtle: #2e2e2e;
   --on-accent: #0e1114;
-  --focus-ring: #98b9eb;
+  --focus-ring: #c4c4c4;
   --danger: #f48a82;
+  --danger-hover: #f9b3ad;
   --danger-subtle: #47211e;
   --on-danger: #180d0c;
   --success: #77cc8f;
@@ -306,7 +317,7 @@
   --on-inverse: #13161a;
   --overlay: rgba(0, 0, 0, 0.6);
   --chart-surface: #15191c;
-  --chart-1: #3987e5;
+  --chart-1: #179fd4;
   --chart-2: #d95926;
   --chart-3: #199e70;
   --chart-4: #c98500;
@@ -314,12 +325,12 @@
   --chart-6: #008300;
   --chart-7: #9085e9;
   --chart-8: #e66767;
-  --chart-ordinal-1: #246bc0;
-  --chart-ordinal-2: #397fd5;
-  --chart-ordinal-3: #4d93eb;
-  --chart-ordinal-4: #63a7ff;
-  --chart-ordinal-5: #89bcff;
-  --chart-ordinal-6: #add1ff;
+  --chart-ordinal-1: #00769f;
+  --chart-ordinal-2: #008aba;
+  --chart-ordinal-3: #169ed3;
+  --chart-ordinal-4: #38b3e8;
+  --chart-ordinal-5: #52c7fe;
+  --chart-ordinal-6: #8fd9ff;
 
   /* elevation (box-shadow) */
   --elevation-card: 0 1px 2px 0 rgba(0, 0, 0, 0.40), 0 1px 3px 0 rgba(0, 0, 0, 0.30);

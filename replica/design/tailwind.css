@@ -3,6 +3,14 @@
    Do not edit by hand. Change the JSON, run contrast.py on both files, then run
    python3 replica/design/build_tokens.py.
 
+   accent, accent-hover, accent-subtle, focus-ring and chart-* are placeholders
+   until /replica-brand sets our palette. The accent family is pure grey for now,
+   so no hue from the original product is carried over.
+
+   Fonts: Inter and Noto (SIL OFL 1.1). Icons: lucide-react (ISC; Feather-derived
+   icons MIT, Cole Bemis). Licence texts ship in THIRD_PARTY_LICENSES with the
+   vendored files.
+
    Tailwind CSS v4 mapping. @theme inline points each utility at a custom
    property from tokens.css, so a theme switch changes values, not classes.
    Components never write raw hex and never use dark: for colour. Tailwind's
@@ -12,13 +20,18 @@
    Utility names
    - Fills:    bg-bg bg-surface bg-surface-subtle bg-surface-raised bg-surface-sunken bg-surface-hover bg-chart-surface
                bg-accent bg-accent-hover bg-accent-subtle bg-inverse bg-overlay
-               bg-danger bg-danger-subtle bg-success bg-success-subtle bg-warning bg-warning-subtle bg-info bg-info-subtle
+               bg-danger bg-danger-subtle bg-success bg-success-subtle bg-warning bg-warning-subtle bg-info bg-info-subtle bg-danger-hover
    - Text:     text-fg text-muted text-accent text-on-accent text-on-inverse
                text-danger text-on-danger text-success text-on-success text-warning text-on-warning text-info text-on-info
    - Borders:  border (defaults to the border role) border-border border-strong border-input
                border-accent border-danger (invalid field)
    - Focus:    automatic on :focus-visible (outline, focus-ring colour, 2px, offset 2px).
                Add focus-inset inside rows, menu items and listbox options.
+               On an accent or danger fill add focus-visible:outline-on-accent
+               (or focus-visible:outline-on-danger): the ring colour is low contrast there.
+               Never put outline-none or outline-hidden on a focusable element unless a
+               wrapper redraws the ring (has-[...:focus-visible]:outline-2 or
+               peer-focus-visible:outline-2).
    - Charts:   fill-chart-1 fill-chart-2 ... (also stroke-, bg-, text-)
    - Type:     text-xs text-table text-sm text-base text-md text-lg text-xl text-display
                (each sets size, line height and a default weight)
@@ -29,6 +42,8 @@
    - Shadow:   shadow-card shadow-bar shadow-pop shadow-modal
    - Motion:   duration-fast duration-base duration-slow ease-standard ease-exit
                motion-safe: and motion-reduce: follow the OS setting and data-motion="reduce".
+   - Animate:  animate-fade-in animate-fade-out animate-rise-in animate-pop-in animate-slide-in-right animate-slide-out-right animate-slide-in-left animate-slide-out-left animate-indeterminate
+               (plus Tailwind's animate-spin and animate-pulse)
    - Sizes:    h-control-xs h-control-sm h-control-md h-control-lg
                h-row h-row-compact h-row-header h-table-footer h-menu-item h-chip h-kv-row
                size-checkbox min-h-hit min-w-hit min-h-hit-public min-w-hit-public
@@ -91,6 +106,7 @@
   --color-on-accent: var(--on-accent);
   --color-focus-ring: var(--focus-ring);
   --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
   --color-danger-subtle: var(--danger-subtle);
   --color-on-danger: var(--on-danger);
   --color-success: var(--success);
@@ -219,6 +235,31 @@
   --container-drawer-sm: var(--layout-drawer-sm);
   --container-drawer-md: var(--layout-drawer-md);
   --container-drawer-lg: var(--layout-drawer-lg);
+}
+
+/* Enter and exit animations. Not inline: the keyframes are emitted only when a
+   page uses the utility. Durations come from the motion tokens, so reduced
+   motion (tokens.css) collapses them. */
+@theme {
+  --animate-fade-in: fade-in var(--motion-slow) var(--easing-standard) both;
+  --animate-fade-out: fade-out var(--motion-base) var(--easing-exit) both;
+  --animate-rise-in: rise-in var(--motion-slow) var(--easing-standard) both;
+  --animate-pop-in: pop-in var(--motion-base) var(--easing-standard) both;
+  --animate-slide-in-right: slide-in-right var(--motion-slow) var(--easing-standard) both;
+  --animate-slide-out-right: slide-out-right var(--motion-base) var(--easing-exit) both;
+  --animate-slide-in-left: slide-in-left var(--motion-slow) var(--easing-standard) both;
+  --animate-slide-out-left: slide-out-left var(--motion-base) var(--easing-exit) both;
+  --animate-indeterminate: indeterminate 1.2s linear infinite;
+
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: none; } }
+  @keyframes slide-out-right { from { transform: none; } to { transform: translateX(100%); } }
+  @keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: none; } }
+  @keyframes slide-out-left { from { transform: none; } to { transform: translateX(-100%); } }
+  @keyframes indeterminate { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
 }
 
 /* dark: is rarely needed (components use role utilities). When it is, it
