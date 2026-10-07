@@ -4,3 +4,7 @@ client_secret*.json
 oauth-token.json
 google-api.json
 .env
+
+# python bytecode
+__pycache__/
+*.pyc
