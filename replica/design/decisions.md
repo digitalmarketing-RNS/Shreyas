@@ -3,7 +3,7 @@
 Date: 2026-10-06. Step: replica-design.
 Inputs: `replica/recon.md` (Screens, Flows, Components), `replica/architecture.md` (Stack), the replica-design skill rules, and `replica/design/measurements.md` (the original's measured system).
 
-This file decides the parts of the design system that come from context: law, users, devices, languages and networks. It does not pick colour values. `/replica-brand` picks our palette later; until then the original's brand colour exists only as the role `accent`, with the neutral placeholder recorded in `measurements.md`.
+This file decides the parts of the design system that come from context: law, users, devices, languages and networks. It does not pick colour values. `/replica-brand` picks our palette later; until then the original's brand colour exists only as the role `accent`, with the neutral placeholder set in `tokens.json`.
 
 Numbers marked "measured" were produced in this session on 2026-10-06. The method is at the end of the file.
 
@@ -34,8 +34,12 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
 - 2.4.13 costs one token and one CSS rule. Counsellors work through lists and dialogs by keyboard all day.
 
 **Rules for this app.**
-- **Focus (2.4.7, 2.4.13).** `:focus-visible` gets `outline: 2px solid var(--color-focus-ring); outline-offset: 2px`. In table rows, menu items and listbox options, where an outer ring would be clipped, use `outline-offset: -2px`. The `focus-ring` token must reach 3:1 against every surface it can sit on, in both themes; add these as `ui` pairs in `tokens.json`. Use `outline`, never `box-shadow` alone, because forced-colors mode removes box-shadow. A background highlight alone does not count as a focus indicator. Focus rings appear at once, with no transition.
-- **Focus not obscured (2.4.11).** The app shell has a sticky header, tables have sticky header rows, and S05 has a bulk-action bar at the bottom. Each scroll container sets `scroll-padding-top` and `scroll-padding-bottom` to the heights of those bars (technique C43). Toasts sit bottom-right. They never cover the bulk bar or the focused element, and Esc dismisses them. Public pages set no non-essential cookies, so they need no cookie banner.
+- **Focus (2.4.7, 2.4.13).** `:focus-visible` gets `outline: 2px solid var(--color-focus-ring); outline-offset: 2px`. In table rows, menu items and listbox options, where an outer ring would be clipped, use `outline-offset: -2px`. An inset ring on an accent or danger fill never uses the `focus-ring` colour, which is too close to those fills (today it equals `accent`, and it is at most 1.6:1 on `danger`); there it takes the `on-accent` or `on-danger` colour. Never put `outline-none` or `outline-hidden` on a focusable element unless a wrapper draws its ring: in Tailwind v4 it also cancels `focus-visible:outline-2` on the same element. The `focus-ring` token must reach 3:1 against every surface it can sit on, in both themes; add these as `ui` pairs in `tokens.json`. Use `outline`, never `box-shadow` alone, because forced-colors mode removes box-shadow. A background highlight alone does not count as a focus indicator. Focus rings appear at once, with no transition.
+- **Focus not obscured (2.4.11).** Fixed and sticky layers never hide the focused element. Scroll padding (technique C43) keeps it clear:
+  - Top: the app header, sticky table header rows and sticky page bars (the compact profile bar, the builder bar). Each sticky layer under the header sets `--sticky-extra` on `<html>` while it shows. `scroll-padding-top` is the header height plus `--sticky-extra`.
+  - Bottom: every fixed or sticky bottom layer adds its height to `--bottom-bar` on `<html>`: the sticky form footer, the S05 bulk-action bar and the background-task tray (its measured height). `scroll-padding-bottom` is `--bottom-bar`, and `main` pads its bottom by the same amount, so the last content can scroll clear.
+  - Toasts and the task tray sit bottom-right, above `--bottom-bar`. When focus lands on an element they would cover, they move to the top right until focus leaves it. The tray shrinks to one line when it is not hovered or focused. Esc dismisses a toast.
+  - Public pages set no non-essential cookies, so they need no cookie banner.
 - **Dragging (2.5.7).** Every drag has a click-or-tap alternative. Keyboard support alone does not satisfy 2.5.7.
 
   | where | drag | single-pointer alternative |
@@ -44,10 +48,11 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
   | S18 workflow canvas | place nodes, connect, pan | automatic layout, so nodes never need placing by hand; a "+" button on each connector adds a step; "Move step…" picks a new slot; zoom and pan buttons; scrollbars |
   | S34 team tree; S28 picklist tree | move a node | a "Move to…" dialog that picks the new parent; Move up and Move down among siblings; expand and collapse buttons |
   | S12 calendar | drag an event to a new time | "Reschedule" opens the follow-up form (S11) |
-  | S21 dashboards | move and resize widgets | widget menu: move left, right, up or down; size S, M or L |
+  | S21 dashboards (DashboardGrid) | move and resize widgets (pointer only) | each widget's menu: Move left, Move right, Move up, Move down, and Size (Small, Medium, Large); a polite status names the new position, for example "moved to position 3 of 8"; focus stays on the menu trigger |
   | S07 import; file fields | drop a file | "Choose file" button |
   | S29 stage score −10 to +10 | slider | number input or select; no slider-only control |
 
+- **Timing (2.2.1).** Staff sessions either have an idle limit of 20 hours or more, or warn before they end. The warning opens 2 minutes before the limit, with focus on "Stay signed in", which extends the session in one step. It states the sign-out time as static text, not a live countdown. Activity in any tab of the app also extends the session. After a sign-out, what the person typed is kept. No page refreshes or redirects itself on a timer (no meta refresh, failure F41): the S02 return page checks the payment status with JavaScript, and without JavaScript it shows a "Check again" button. Toast timing is in section 8.
 - **Target size (2.5.8).** Every pointer target in the staff app has a hit area of at least 24 × 24 CSS px. That includes row checkboxes (16 px box, 24 px hit area; the original uses 13 px native boxes, per `measurements.md`), chip remove buttons, pagination, calendar days, menu items (32 px tall) and icon buttons (32 px by default, 24 px only in dense toolbars). On public pages the minimum is 44 × 44 (2.5.5), and inputs and buttons are 48 px tall.
 - **Redundant entry (3.3.7).** Within one process, never ask for the same thing twice.
   - Change stage (S09) records the follow-up date it collects; it does not open a second follow-up form.
@@ -59,6 +64,7 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
   - Browser autofill alone does not satisfy 3.3.7; the app must supply the values.
 - **Accessible authentication (3.3.8).**
   - Sign-in (S03) uses `autocomplete="username"` and `autocomplete="current-password"`, allows paste and password managers, and has a show-password button.
+  - Setting a password (invitation) or resetting one uses one field with `autocomplete="new-password"`, allows paste, has a show-password button, and shows the rules as a hint before typing. No "confirm password" field.
   - TOTP and every OTP use a single text field with `inputmode="numeric"` and `autocomplete="one-time-code"`. Never one box per digit. Paste always works.
   - Magic link and SSO are alternatives (the architecture uses Supabase Auth for both).
   - No CAPTCHA puzzles. Abuse is handled by rate limits (architecture) or a non-interactive check.
@@ -66,7 +72,7 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
 - **Input purpose (1.3.5).** Every personal-data field carries an `autocomplete` token (table in section 4).
 - **Reflow and resize (1.4.10, 1.4.4).** Public pages work at 320 CSS px. Staff screens reflow too. The exceptions are data tables, the workflow canvas and the calendar, which scroll inside their own container; WCAG allows this for content that needs two dimensions. Never set `maximum-scale` or `user-scalable=no`.
 - **Text spacing (1.4.12).** No fixed heights on boxes that hold text.
-- **Colour (1.4.1).** Status and errors always pair colour with text, an icon or both. Each error sits under its field, linked by `aria-describedby`. On submit, a summary appears at the top of the form.
+- **Colour (1.4.1).** Status and errors always pair colour with text, an icon or both. Selected, current and pressed states never show by fill alone: they add a 2 px accent edge, an accent border or a check (1.4.11 needs 3:1 for the state cue). Each error sits under its field, linked by `aria-describedby`. On submit, a summary appears at the top of the form.
 
 **How we check.** axe-core runs in Playwright on every screen in both themes. Each screen also gets a keyboard pass. Screen-reader passes: NVDA with Chrome (staff screens), TalkBack with Chrome on Android and VoiceOver with Safari on iOS (public pages). Before the first government institution signs, we publish an accessibility statement and an ACR against WCAG 2.2 AA that also maps to IS 17802.
 
@@ -75,6 +81,7 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
 - What is new in 2.2 (and 4.1.1 removed): https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
 - 2.4.11: https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html
 - 2.4.13: https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html
+- 2.2.1: https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html ; failure F41 (meta refresh): https://www.w3.org/WAI/WCAG22/Techniques/failures/F41
 - 2.5.7: https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html
 - 2.5.8: https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html
 - 2.5.5: https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html
@@ -100,7 +107,7 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
 - **Where files live.** All font files are vendored in the app with their `OFL.txt` and loaded through `next/font/local`. Nothing is fetched from Google, either at build time or by the browser. Builds stay reproducible, and we control every `unicode-range`.
 - **Staff font stack:** `Inter, "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gurmukhi", "Noto Sans Gujarati", "Noto Sans Oriya", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Naskh Arabic", system-ui, sans-serif`. In code these are the CSS variables that `next/font` generates.
 - **Public pages (S01, S02, consent, privacy): no web fonts.** Stack: `system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif`. Android ships Roboto and Noto fonts, including the Indic ones. Indic coverage on iOS, macOS and Windows still has to be confirmed on the test devices.
-- **Monospace: no web font.** Lead IDs and receipt numbers use Inter with `font-variant-numeric: tabular-nums slashed-zero`. API keys and webhook payloads (S37) use `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`.
+- **Monospace: no web font.** Lead numbers and receipt numbers use Inter with `font-variant-numeric: tabular-nums slashed-zero`. API keys and webhook payloads (S37) use `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`.
 
 **Why a custom Inter subset.** Google's Inter "latin" file has no ₹; the glyph is in "latin-ext" (U+20AD–20C4). Every Noto Indic file also claims U+20B9 in its `unicode-range`. With stock Inter, a page showing "₹2,50,000" would download Inter latin-ext (83 KiB) for one glyph. If latin-ext were not declared, the browser would fall through to the first Noto Indic face in the stack instead and download Devanagari (118 KiB). Our subset puts ₹ in the preloaded file, which is about the size of Google's latin file. Inter's licence names no Reserved Font Name, so the subset may keep the name. The licence file ships with the font.
 
@@ -137,7 +144,8 @@ Numbers marked "measured" were produced in this session on 2026-10-06. The metho
 **Acceptance test.** On a Latin-only page that contains ₹ and an emoji sequence, the network log must show only the Inter file. Inter has no glyphs for U+200C and U+200D (the zero-width non-joiner and joiner), and the Noto Indic ranges include both. An emoji joined with U+200D could therefore trigger an Indic download. If it does, narrow the Noto `unicode-range` declarations to the script blocks, then re-check that Indic shaping still works.
 
 **Sources.**
-- Inter repository and licence (OFL 1.1, no Reserved Font Name): https://github.com/rsms/inter , licence file read at https://cdn.jsdelivr.net/gh/rsms/inter@v4.1/LICENSE.txt
+- Inter repository and licence: SIL OFL 1.1, "Copyright (c) 2016 The Inter Project Authors", no Reserved Font Name, so our subset may keep the name. https://github.com/rsms/inter , licence file read at https://cdn.jsdelivr.net/gh/rsms/inter@v4.1/LICENSE.txt
+- Noto Sans Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada and Malayalam, and Noto Naskh Arabic: SIL OFL 1.1, "Copyright 2022 The Noto Project Authors" (the Bengali font file says 2025), no Reserved Font Name. Licence text for each family: https://github.com/notofonts/<repo>/blob/main/OFL.txt, where `<repo>` is devanagari, bengali, gurmukhi, gujarati, oriya, tamil, telugu, kannada, malayalam, or arabic for Noto Naskh Arabic. Copyright lines read from the downloaded files' name tables; all ten OFL.txt files checked on 2026-10-07.
 - `next/font` (self-hosting, `preload`, `display` default `swap`, `adjustFontFallback`, `declarations`): https://nextjs.org/docs/app/api-reference/components/font
 - `unicode-range` (a face downloads only when its characters are used): https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/unicode-range
 - `font-display` (swap and optional): https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display
@@ -243,6 +251,7 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
 - Light theme only (`color-scheme: light`), because these pages live inside institution websites.
 - Consent checkboxes are never pre-ticked.
 - The institution's contact details sit in the footer of every public page (3.2.6).
+- **Language (3.1.1, 3.1.2).** Each form stores its language as a BCP 47 tag (default `en-IN`), and S01 renders `<html lang>` from it. A label, option or message written in another language stores its own tag, rendered as `lang` on its `<label>`, `<option>` or `<p>`. The consent block puts the recorded notice language as `lang` on its fieldset.
 
 **Field table.**
 
@@ -256,6 +265,7 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
 | date of birth | 3 × text in a fieldset | `numeric` | `bday-day`, `bday-month`, `bday-year` | also accept month names such as "jan" |
 | PIN code | text | `numeric` | `postal-code` | `maxlength="6"` |
 | city, state | text, select | — | `address-level2`, `address-level1` | |
+| guardian's name and mobile (S01, under-18 mode) | text, tel | — | `off` | not the person's own details, so autofill must not fill the student's |
 | course, campus | native select or checkboxes | — | `off` | with a choice limit, show "2 of 3 chosen" |
 
 - OTP SMS end with the origin-bound line `@<host> #<code>`, so Android (WebOTP) and iOS can offer the code. That line must be part of the template registered on DLT (TRAI rules, see the architecture).
@@ -270,6 +280,7 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
 - `inputmode`: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/inputmode
 - SMS OTP form and WebOTP: https://web.dev/articles/sms-otp-form
 - Date input for dates people know: https://design-system.service.gov.uk/components/date-input/
+- 3.1.1 and 3.1.2 (language of the page and of parts): https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html and https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts.html
 
 ---
 
@@ -283,6 +294,11 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
 - **Bundle.** Import each icon by name so unused icons are tree-shaken. No `DynamicIcon` and no lookup by string name. The package's base `Icon` component is marked `"use client"`, so even an icon inside a Server Component ships a small client runtime. On public pages it counts against the budget.
 - **Not taken.** No logos or icons from the original. Channels (WhatsApp, SMS, email) show as text with generic icons such as `MessageCircle`, `MessageSquare` and `Mail`. A third-party brand mark is used only from its owner's official assets, under the owner's rules.
 - **Our own icons** follow Lucide's grid: 24 × 24, 2 px stroke, round caps and joins, at least 1 px padding.
+- **Third-party licence file.** `THIRD_PARTY_LICENSES` ships with the app and holds:
+  - Inter: its `LICENSE.txt` (SIL OFL 1.1, Copyright (c) 2016 The Inter Project Authors);
+  - each of the ten Noto families: its `OFL.txt` (SIL OFL 1.1, Copyright 2022 The Noto Project Authors);
+  - lucide-react: its `LICENSE` file whole, which holds the ISC licence (Copyright (c) Lucide Icons and Contributors) and the MIT licence for the Feather-derived icons (Copyright (c) 2013-present Cole Bemis).
+  The vendored font files also keep their own `OFL.txt` next to them (section 2). The headers that `build_tokens.py` writes into `tokens.css` and `tailwind.css` point to this file.
 
 **Sources.**
 - Licence: https://lucide.dev/license
@@ -322,10 +338,10 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
   - Good or bad meaning: status tokens (success, warning, danger) with an icon and text. Status colours are never used as series colours.
 - **Never colour alone.**
   - A legend for two or more series.
-  - Direct labels at line ends or on bars when there are four series or fewer.
+  - With four series or fewer, direct labels name the series, not only the value: at line ends, and on each bar or stacked segment ("Paid ads 214").
   - Lines also differ by marker shape (circle, square, triangle, diamond; at least 8 px).
   - The "previous period" comparison in S20 is a dashed line.
-  - Stacked segments are separated by a 2 px gap in the surface colour, with a 45° or 135° hatch available as a second cue.
+  - Stacked segments are separated by a 2 px gap in the chart surface colour. From the fifth series on, slots 5 to 8 add an SVG pattern over the slot colour (45° hatch, 135° hatch, dots, cross-hatch; 1 px strokes in the chart surface colour), and the legend swatch shows the same pattern.
 - **Contrast.**
   - Every mark (bar, line, point, segment) is at least 3:1 against the chart surface, in both themes.
   - The one exception, which 1.4.11 allows: a mark may fall below 3:1 when the same values are printed as text on the chart.
@@ -337,7 +353,7 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
   - dark mode gets its own validated steps, not an inverted copy.
 
   These thresholds come from the data-visualisation method in this project's tooling (the bundled `dataviz` skill, `references/color-formula.md`). We adopt them as our rule.
-- **Every chart** has a title that states the takeaway, a data-table view (S22 already has a table toggle), tooltips that open on focus as well as on hover, and `role="img"` with a one-sentence summary. No dual y-axes. No entry animations.
+- **Every chart** has a title that states the takeaway, a data-table view (S22 already has a table toggle), tooltips that open on focus as well as on hover, and a one-sentence summary. A static chart is `role="img"` with that summary as its name. A chart whose points can be explored by keyboard is one tab stop: a wrapper with `role="application"`, `aria-roledescription="chart"` and a label that names the arrow keys; the SVG inside is `aria-hidden`, and the summary is the wrapper's description. The table view stays the full alternative. No dual y-axes. No entry animations.
 
 **Sources.**
 - 1.4.1 Use of Color (techniques G111 colour plus pattern, G14 information also in text): https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html
@@ -405,6 +421,6 @@ Routes: `/f/:publicKey` (S01), `/pay/:shortCode` and `/pay/return/:attemptRef` (
 1. Have the mandatory ICT accessibility rules ordered in Rajive Raturi been notified? Do they require an ACR from a SaaS vendor that sells to private institutions?
 2. Which WCAG version does the BIS text of IS 17802 cite? Our 2.1 AA mapping comes from secondary sources.
 3. Does WebOTP work when S01 is embedded as a cross-origin iframe on an institution's site? What permission policy and SMS format does it need? Check before relying on it.
-4. Do the pilot institutions need a Hindi or regional-language UI, not only Indic names? That brings UI text in Indic scripts, `lang` attributes, and maybe larger line heights for the UI itself.
+4. Do the pilot institutions need a Hindi or regional-language UI, not only Indic names? That brings UI text in Indic scripts, `lang` attributes, and maybe larger line heights for the UI itself. Institution-written text on public pages (form title, labels, options, the success message, the consent notice) can be in Hindi or a regional language even with an English UI. Section 4 already covers its `lang` attributes (3.1.1, 3.1.2); the open part is the UI's own text.
 5. Do iOS, macOS and Windows render all nine Indic scripts and Urdu on public pages, which use system fonts only? Confirm on the test devices.
 6. Should Urdu-medium institutions get Noto Nastaliq Urdu for long messages?
