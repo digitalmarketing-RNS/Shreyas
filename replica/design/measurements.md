@@ -4,12 +4,12 @@ Date: 2026-10-06. Step: replica-design, step 1 ("measure, do not guess").
 Inputs: `replica/recon.md` (Screens, Flows, Components), `replica/architecture.md` (stack), and the screenshots listed under Sources.
 Output use: the token step reads this file and fills `tokens.json`. It changes the values, not the roles.
 
-All values below are CSS pixels at a 1:1 scale unless a row says otherwise. Hex values are the original's own neutral and status colours. They are recorded so we know each role and its weight. We do not ship them. Their brand colour, its tints and shades, and their navy rail are described in words only, with their contrast numbers: the brand colour is recorded only as the role `accent`. Exact brand values are not kept in the repo; they can be re-read from the screenshots in the session scratchpad. Screen IDs (S05, S08 and so on) are the IDs from `recon.md`.
+All values below are CSS pixels at a 1:1 scale unless a row says otherwise. Hex values are the original's own neutral and status colours. They are recorded so we know each role and its weight. We do not ship them. Their brand colour, its tints and shades, and their navy rail are described in words only, with their contrast numbers: the brand colour is recorded only as the role `accent`. Exact brand values are not kept in the repo. Only the screenshots in the session scratchpad hold them, and those are deleted when `/replica-design` closes. Screen IDs (S05, S08 and so on) are the IDs from `recon.md`.
 
 ## How this was measured
 
 - **Pages.** Each of the 8 pages below was fetched once with curl. Every response was the same 25 KB client-rendered shell with no `<img>` tags, because the article body loads later through JavaScript. So the image URLs were read from the rendered page through Firecrawl, the tool the recon step already used for these pages. That was one call per page, and all eight came from Firecrawl's cache, so no new request reached their server. There was no crawling and no link was followed.
-- **Images.** 18 images came from pages P1 to P6, at most 6 per page. Twelve are listed under Sources. The other six are small crops of icons and one text link: the page fetch downloaded them, they were never used, and they are not listed. The help-centre logo and icons smaller than 26 px were skipped. Pages P7 and P8 showed no product screenshots when rendered, so nothing came from them. The images are stored only in the session scratchpad (`…/scratchpad/design/shots/`), outside the repo. No image was copied into the repo.
+- **Images.** 18 images came from pages P1 to P6, at most 6 per page. Twelve are listed under Sources. The other six are small crops of icons and one text link: the page fetch downloaded them, they were never used, they are not listed, and they have been deleted from the scratchpad. The help-centre logo and icons smaller than 26 px were skipped. Pages P7 and P8 showed no product screenshots when rendered, so nothing came from them. The images are stored only in the session scratchpad (`…/scratchpad/design/shots/`), outside the repo. No image was copied into the repo.
 - **Tools.** Pillow was used for run-length scans along lines, bounding boxes, corner luma grids, per-channel ink percentiles and flat-pixel grey clustering. Each image was also viewed directly. The scripts are in the scratchpad, `design/scripts/`.
 - **Text colour.** Every PNG capture uses Windows ClearType subpixel text, which adds colour fringes to stroke pixels. Text colours were therefore read as the 4th percentile of each channel over the stroke pixels. Fill colours were read only from solid areas.
 - **Font size.** Size = cap height ÷ 0.711, the cap-height ratio of the font category we saw. One string was cross-checked by summing standard advance widths.
@@ -29,7 +29,7 @@ All values below are CSS pixels at a 1:1 scale unless a row says otherwise. Hex 
 | p2-c | crop of the journey bar with all six steps | 1600 × 72 | 1.38 | Bar is 58 px here and 42 px in p2-b | medium |
 | p4-a (GIF, frame f304) | S28 field builder in a wide modal | 854 × 406 | ~0.70 | Rail is 31 px here, against 41–45 px elsewhere. Input heights agree | low |
 | p1-d, p1-e | crop of the filter bar (the two files are identical) | 1600 × 59 | ~1.07 | not used for measurements | — |
-| six small crops | icons and one text link, downloaded by the page fetch | ≤ 279 px | — | never used and not listed under Sources; to be deleted from the scratchpad (icons are not ours to take) | — |
+| six small icon crops | icons and one text link, downloaded by the page fetch | ≤ 279 px | — | never used, not listed under Sources, and deleted from the scratchpad (icons are not ours to take) | — |
 
 ## Measurement table
 

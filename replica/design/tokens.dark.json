@@ -32,6 +32,7 @@
     "chart-ordinal-1..6": "One-hue ramp for ordered stages (funnel). 1 = first stage, least contrast with the surface; 6 = last stage, most."
   },
   "_changes": [
+    "neutrals: bg and surface-sunken are within dE2000 0.2 and 1.4 of the original's measured canvas (#f1f3f4) and table header (#e0e3e7). Greys are not ownable, but /replica-brand should tint them toward our brand hue.",
     "accent placeholder: pure neutral grey (light #404040, dark #c4c4c4, OKLCH chroma 0), so no hue from the original is carried over. accent-hover, accent-subtle and focus-ring are greys too (focus-ring equals accent until /replica-brand). measurements.md's #4b5563 was dropped: it sits at the original's hue (OKLCH 257) and only 1.26:1 from text-muted. The earlier slate (#354053) was dropped for the same reason (OKLCH hue 261). Separation kept: accent is 1.73:1 from text-muted and 1.69:1 from text in light, 1.39:1 from text-muted in dark.",
     "text-subtle dropped: text-muted is close to the lightest grey that passes 4.5:1 on surface-sunken (4.92:1 light). A lighter third grey fails; a darker one duplicates text-muted.",
     "surface roles: measurements.md surface-strong becomes surface-sunken; surface-subtle is kept. surface-hover is added for row and menu highlight.",
