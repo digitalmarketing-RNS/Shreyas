@@ -1,0 +1,367 @@
+import {
+  Bell,
+  Building,
+  CalendarCheck,
+  CalendarClock,
+  CalendarDays,
+  ChartColumn,
+  CloudOff,
+  EyeOff,
+  FileText,
+  IndianRupee,
+  Layers,
+  LifeBuoy,
+  Lock,
+  type LucideIcon,
+  Megaphone,
+  MessageCircle,
+  MessageSquare,
+  MessagesSquare,
+  PencilLine,
+  Phone,
+  RotateCcwClock,
+  SearchX,
+  UserRoundX,
+  UsersRound,
+  Workflow,
+} from "lucide-react";
+import type { EmptyStateVariant } from "./empty-state";
+
+/**
+ * The empty-state copy for each place (components.md, EmptyState: "Empty-state copy"). Our own
+ * words. Pages read their copy from here so the same place always says the same thing.
+ */
+export type EmptyStateAction = {
+  label: string;
+  /** primary and secondary are Buttons; link is a text link. */
+  kind: "primary" | "secondary" | "link";
+  /** Shown only to admins (needs-setup states name who to ask instead). */
+  adminsOnly?: boolean;
+};
+
+export type EmptyStateCopy = {
+  place: string;
+  variant: EmptyStateVariant;
+  /** No icon in the compact size. */
+  icon: LucideIcon | null;
+  title: string;
+  body: string | null;
+  actions: readonly EmptyStateAction[];
+  reference?: string;
+};
+
+export const EMPTY_STATE_COPY = {
+  myDay: {
+    place: "S04 My day",
+    variant: "cleared",
+    icon: CalendarCheck,
+    title: "Nothing due right now",
+    body: "No follow-ups are due and no new leads are waiting. New work appears here as it arrives.",
+    actions: [{ label: "View all leads", kind: "secondary" }],
+  },
+  myDayCheckedOut: {
+    place: "S04 My day, checked out",
+    variant: "needs-setup",
+    icon: UserRoundX,
+    title: "You're checked out",
+    body: "New leads go to colleagues who are checked in.",
+    actions: [{ label: "Check in", kind: "primary" }],
+  },
+  leads: {
+    place: "S05 Leads",
+    variant: "first-use",
+    icon: UsersRound,
+    title: "No leads yet",
+    body: "Leads appear here when someone fills in your enquiry form, you import a file, or you add one by hand.",
+    actions: [
+      { label: "Add lead", kind: "primary" },
+      { label: "Import leads", kind: "secondary" },
+      { label: "Set up an enquiry form", kind: "link" },
+    ],
+  },
+  leadsCounsellor: {
+    place: "S05 Leads, counsellor",
+    variant: "first-use",
+    icon: UsersRound,
+    title: "No leads assigned to you yet",
+    body: "New leads appear here as soon as they're assigned to you.",
+    actions: [],
+  },
+  leadsFiltered: {
+    place: "S05 Leads, filtered",
+    variant: "no-results",
+    icon: SearchX,
+    title: "No leads match these filters",
+    body: "Remove a filter or widen the date range.",
+    actions: [{ label: "Clear filters", kind: "secondary" }],
+  },
+  leadsSearch: {
+    place: "S05 search",
+    variant: "no-results",
+    icon: SearchX,
+    title: 'No lead found for "98765"',
+    body: "Check the number, or search by email, name or lead number.",
+    actions: [{ label: "Clear search", kind: "secondary" }],
+  },
+  timeline: {
+    place: "S08 Timeline",
+    variant: "first-use",
+    icon: RotateCcwClock,
+    title: "No activity yet",
+    body: "Calls, messages, notes and stage changes for this lead will show here.",
+    actions: [],
+  },
+  followUps: {
+    place: "S08 Follow-ups",
+    variant: "first-use",
+    icon: CalendarClock,
+    title: "No follow-ups planned",
+    body: "Schedule the next call or meeting so it shows in your day.",
+    actions: [{ label: "Add follow-up", kind: "primary" }],
+  },
+  notes: {
+    place: "S08 Notes",
+    variant: "first-use",
+    icon: PencilLine,
+    title: "No notes",
+    body: "Write down what you learn from the student. Only staff can see notes.",
+    actions: [{ label: "Add note", kind: "primary" }],
+  },
+  messages: {
+    place: "S08 Messages",
+    variant: "first-use",
+    icon: MessageSquare,
+    title: "No messages yet",
+    body: "Emails, SMS and WhatsApp messages to this lead appear here with their delivery status.",
+    actions: [{ label: "Send message", kind: "primary" }],
+  },
+  calls: {
+    place: "S08 Calls",
+    variant: "first-use",
+    icon: Phone,
+    title: "No calls logged",
+    body: "Calls made through the app, and calls you log by hand, appear here.",
+    actions: [{ label: "Log a call", kind: "primary" }],
+  },
+  documents: {
+    place: "S08 Documents",
+    variant: "first-use",
+    icon: FileText,
+    title: "No documents",
+    body: "Files the student sends, or that you save from a chat, appear here.",
+    actions: [{ label: "Upload file", kind: "primary" }],
+  },
+  leadTickets: {
+    place: "S08 Tickets",
+    variant: "first-use",
+    icon: LifeBuoy,
+    title: "No questions from this student",
+    body: "When the student raises a question, it appears here.",
+    actions: [],
+  },
+  leadPayments: {
+    place: "S08 Payments",
+    variant: "first-use",
+    icon: IndianRupee,
+    title: "No payments yet",
+    body: "Send a payment link for an application or token fee.",
+    actions: [{ label: "Create payment link", kind: "primary" }],
+  },
+  leadOpportunities: {
+    place: "S08 Opportunities",
+    variant: "first-use",
+    icon: Layers,
+    title: "No other interests",
+    body: "Add one when the student is also interested in another programme or campus.",
+    actions: [{ label: "Add opportunity", kind: "primary" }],
+  },
+  calendar: {
+    place: "S12 Calendar",
+    variant: "cleared",
+    icon: CalendarDays,
+    title: "Nothing scheduled",
+    body: "Follow-ups you schedule from a lead appear here.",
+    actions: [],
+  },
+  inbox: {
+    place: "S15 Inbox",
+    variant: "cleared",
+    icon: MessagesSquare,
+    title: "No chats waiting",
+    body: "New WhatsApp messages from students arrive here.",
+    actions: [],
+  },
+  inboxNoNumber: {
+    place: "S15 Inbox, no number",
+    variant: "needs-setup",
+    icon: MessageCircle,
+    title: "WhatsApp isn't connected",
+    body: "Connect your institution's WhatsApp Business number to chat with students here. Ask an admin if you can't.",
+    actions: [{ label: "Connect WhatsApp", kind: "primary", adminsOnly: true }],
+  },
+  broadcasts: {
+    place: "S16 Broadcasts",
+    variant: "first-use",
+    icon: Megaphone,
+    title: "No broadcasts yet",
+    body: "Send one approved template to a saved list of leads, now or at a set time.",
+    actions: [{ label: "New broadcast", kind: "primary" }],
+  },
+  automations: {
+    place: "S17 Automations",
+    variant: "first-use",
+    icon: Workflow,
+    title: "No automations yet",
+    body: "Automations assign leads and send messages when something happens, such as a new enquiry.",
+    actions: [{ label: "Create automation", kind: "primary" }],
+  },
+  templates: {
+    place: "S19 Templates",
+    variant: "first-use",
+    icon: FileText,
+    title: "No templates for this channel",
+    body: "Write messages once and reuse them, with fields such as the student's name.",
+    actions: [{ label: "New template", kind: "primary" }],
+  },
+  attribution: {
+    place: "S20 Attribution",
+    variant: "no-results",
+    icon: ChartColumn,
+    title: "No enquiries in this period",
+    body: "Pick a longer date range, or check that your forms and ads pass UTM tags.",
+    actions: [{ label: "Change dates", kind: "secondary" }],
+  },
+  dashboard: {
+    place: "S21 Dashboard",
+    variant: "first-use",
+    icon: ChartColumn,
+    title: "This dashboard is empty",
+    body: "Add widgets for the numbers your team checks every day.",
+    actions: [{ label: "Add widget", kind: "primary" }],
+  },
+  reportBuilder: {
+    place: "S22 Report builder",
+    variant: "first-use",
+    icon: ChartColumn,
+    title: "Pick what to measure",
+    body: "Choose at least one metric, such as Leads or Payments, then group the results.",
+    actions: [],
+  },
+  productivity: {
+    place: "S23 Productivity",
+    variant: "no-results",
+    icon: UsersRound,
+    title: "No activity in this period",
+    body: "Numbers appear once calls, follow-ups or stage changes are recorded.",
+    actions: [{ label: "Change dates", kind: "secondary" }],
+  },
+  notificationsUnread: {
+    place: "S24 Notifications",
+    variant: "cleared",
+    icon: Bell,
+    title: "You're all caught up",
+    body: "No unread notifications.",
+    actions: [],
+  },
+  notificationsAll: {
+    place: "S24 Notifications, all",
+    variant: "first-use",
+    icon: Bell,
+    title: "No notifications yet",
+    body: "Alerts about your leads, such as new assignments and payments, appear here.",
+    actions: [{ label: "Notification settings", kind: "secondary" }],
+  },
+  notificationsMissed: {
+    place: "S24 Notifications, missed",
+    variant: "cleared",
+    icon: Bell,
+    title: "Nothing missed",
+    body: "Every alert has been opened.",
+    actions: [],
+  },
+  payments: {
+    place: "S25 Payments",
+    variant: "first-use",
+    icon: IndianRupee,
+    title: "No payments yet",
+    body: "Payments appear here when students pay a link, or when you record an offline payment.",
+    actions: [{ label: "Record offline payment", kind: "primary" }],
+  },
+  opportunities: {
+    place: "S26 Opportunities",
+    variant: "first-use",
+    icon: Layers,
+    title: "No opportunities in this list",
+    body: "They're added when a lead's interest matches this list, or when you add one.",
+    actions: [{ label: "Add opportunity", kind: "primary" }],
+  },
+  users: {
+    place: "S32 Users",
+    variant: "first-use",
+    icon: UsersRound,
+    title: "Only you so far",
+    body: "Invite counsellors and managers so leads can be assigned to them.",
+    actions: [{ label: "Invite people", kind: "primary" }],
+  },
+  auditLog: {
+    place: "S38 Audit log",
+    variant: "no-results",
+    icon: SearchX,
+    title: "No activity matches",
+    body: "Try a different person, action or date range.",
+    actions: [{ label: "Clear filters", kind: "secondary" }],
+  },
+  publisherApplications: {
+    place: "S39 Publisher portal, applications",
+    variant: "no-permission",
+    icon: EyeOff,
+    title: "Applications aren't shared",
+    body: "{Institution} hasn't shared application numbers with publishers.",
+    actions: [],
+  },
+  tickets: {
+    place: "S40 Tickets",
+    variant: "cleared",
+    icon: LifeBuoy,
+    title: "No open tickets",
+    body: "Student questions appear here when they're raised by email, form or a counsellor.",
+    actions: [],
+  },
+  publishers: {
+    place: "S41 Publishers",
+    variant: "first-use",
+    icon: Building,
+    title: "No publishers yet",
+    body: "Add the agencies and portals that send you leads, to track their quality and cost.",
+    actions: [{ label: "Add publisher", kind: "primary" }],
+  },
+  noPermission: {
+    place: "any page",
+    variant: "no-permission",
+    icon: Lock,
+    title: "You don't have access to this page",
+    body: "Ask an admin at {Institution} to give your role access.",
+    actions: [{ label: "Go to My day", kind: "link" }],
+  },
+  error: {
+    place: "any region",
+    variant: "error",
+    icon: CloudOff,
+    title: "Couldn't load this",
+    body: "Check your connection and try again. If it keeps happening, share the reference below with your admin.",
+    actions: [{ label: "Try again", kind: "primary" }],
+    reference: "7F3K-21",
+  },
+  popoverList: {
+    place: "popover list",
+    variant: "no-results",
+    icon: null,
+    title: "No matches",
+    body: null,
+    actions: [{ label: "Clear search", kind: "link" }],
+  },
+} as const satisfies Record<string, EmptyStateCopy>;
+
+export type EmptyStateCopyKey = keyof typeof EMPTY_STATE_COPY;
+
+export const EMPTY_STATE_COPY_KEYS = Object.keys(EMPTY_STATE_COPY) as EmptyStateCopyKey[];

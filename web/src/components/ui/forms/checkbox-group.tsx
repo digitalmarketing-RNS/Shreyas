@@ -113,8 +113,7 @@ export function CheckboxGroup({
     <div
       className={cn(
         "flex",
-        orientation === "horizontal" ? "flex-row flex-wrap gap-x-6 gap-y-1" : "flex-col",
-        orientation === "vertical" && (isPublic ? "gap-1" : "gap-1"),
+        orientation === "horizontal" ? "flex-row flex-wrap gap-x-6 gap-y-1" : "flex-col gap-1",
       )}
     >
       {rows.map((option) => {
@@ -131,7 +130,6 @@ export function CheckboxGroup({
               disabled={option.disabled}
               aria-disabled={blocked || undefined}
               aria-describedby={blocked ? limitNoteId : undefined}
-              required={required && chosen.length === 0 ? undefined : undefined}
               onClick={blockAtMax(option)}
               onChange={(event) => toggle(option, event.currentTarget.checked)}
             />
@@ -229,7 +227,7 @@ function FilterBox({
         autoComplete="off"
         className="max-w-80"
       />
-      <span role="status" className="sr-only">
+      <span role="status" className={cn("text-muted", isPublic ? "text-sm" : "text-xs")}>
         {value.trim() ? `${shown} of ${total} ${noun.other} shown.` : ""}
       </span>
     </div>
