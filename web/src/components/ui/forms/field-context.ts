@@ -42,7 +42,7 @@ export function joinIds(...ids: Array<string | false | null | undefined>): strin
 export type OwnControlProps = {
   id?: string;
   "aria-describedby"?: string;
-  "aria-invalid"?: boolean | "true" | "false";
+  "aria-invalid"?: boolean | "true" | "false" | "grammar" | "spelling";
   required?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
