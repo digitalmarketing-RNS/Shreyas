@@ -19,7 +19,8 @@
 
 import { extendTailwindMerge } from "tailwind-merge";
 
-export const twMerge = extendTailwindMerge({
+// focus-inset is our own class group, so it is named in the type parameter.
+export const twMerge = extendTailwindMerge<"focus-inset">({
   extend: {
     theme: {
       color: ["bg", "surface", "surface-subtle", "surface-raised", "surface-sunken", "surface-hover", "border", "strong", "input", "fg", "muted", "accent", "accent-hover", "accent-subtle", "on-accent", "focus-ring", "danger", "danger-hover", "danger-subtle", "on-danger", "success", "success-subtle", "on-success", "warning", "warning-subtle", "on-warning", "info", "info-subtle", "on-info", "inverse", "on-inverse", "overlay", "chart-surface", "chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6", "chart-7", "chart-8", "chart-ordinal-1", "chart-ordinal-2", "chart-ordinal-3", "chart-ordinal-4", "chart-ordinal-5", "chart-ordinal-6"],

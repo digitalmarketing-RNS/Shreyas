@@ -7,6 +7,10 @@ from the tokens.
 
     python3 replica/design/build_tokens.py           # write tokens.css, tailwind.css and tw-merge.ts
     python3 replica/design/build_tokens.py --check   # exit 1 if any of them is out of date
+    python3 replica/design/build_tokens.py --web     # also write the web app's copies (web/src/styles)
+
+The web app runs the same generator on its own copy: from web/, `npm run tokens`
+(--out src/styles) and `npm run tokens:check` (the same with --check).
 
 Before it writes anything, it checks that:
 - both JSON files have the same keys at every level;
@@ -27,6 +31,9 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+# The web app's copy of the generated files (written with --web, or by the
+# app's own `npm run tokens`, which passes --out src/styles).
+WEB_STYLES = os.path.normpath(os.path.join(HERE, "..", "..", "web", "src", "styles"))
 THEMED = {"color", "shadow", "_about", "_theme"}
 HEX = re.compile(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
 RGB = re.compile(r"^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*(0|1|0?\.\d+)\s*)?\)$")
@@ -509,7 +516,8 @@ def tw_merge_ts(t):
         "",
         'import { extendTailwindMerge } from "tailwind-merge";',
         "",
-        "export const twMerge = extendTailwindMerge({",
+        "// focus-inset is our own class group, so it is named in the type parameter.",
+        "export const twMerge = extendTailwindMerge<\"focus-inset\">({",
         "  extend: {",
         "    theme: {",
         "      color: %s," % arr(colors),
@@ -543,6 +551,8 @@ def main(argv=None):
     ap.add_argument("--dark", default=os.path.join(HERE, "tokens.dark.json"))
     ap.add_argument("--out", default=HERE, help="folder for tokens.css, tailwind.css and tw-merge.ts")
     ap.add_argument("--check", action="store_true", help="exit 1 if the CSS files are out of date")
+    ap.add_argument("--web", action="store_true",
+                    help="also write (or with --check, also check) the web app's copies in %s" % WEB_STYLES)
     a = ap.parse_args(argv)
     try:
         light, dark = load(a.light), load(a.dark)
@@ -555,22 +565,28 @@ def main(argv=None):
         "tailwind.css": tailwind_css(light),
         "tw-merge.ts": tw_merge_ts(light),
     }
+    folders = [a.out]
+    if a.web and os.path.normpath(os.path.abspath(a.out)) != WEB_STYLES:
+        folders.append(WEB_STYLES)
     stale = []
-    for name, text in outputs.items():
-        path = os.path.join(a.out, name)
-        try:
-            with open(path, encoding="utf-8") as fh:
-                current = fh.read()
-        except OSError:
-            current = None
-        if current == text:
-            continue
-        if a.check:
-            stale.append(name)
-            continue
-        with open(path, "w", encoding="utf-8") as fh:
-            fh.write(text)
-        print("wrote %s" % path)
+    for folder in folders:
+        if a.web and folder == WEB_STYLES and not a.check:
+            os.makedirs(folder, exist_ok=True)
+        for name, text in outputs.items():
+            path = os.path.join(folder, name)
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    current = fh.read()
+            except OSError:
+                current = None
+            if current == text:
+                continue
+            if a.check:
+                stale.append(path if len(folders) > 1 else name)
+                continue
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(text)
+            print("wrote %s" % path)
     if stale:
         print("build_tokens: out of date: %s. Run build_tokens.py." % ", ".join(stale), file=sys.stderr)
         return 1
