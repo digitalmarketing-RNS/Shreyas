@@ -8,6 +8,8 @@
  * - Noto Sans for nine Indic scripts and Noto Naskh Arabic for Urdu: never preloaded. Each face
  *   carries its script's unicode-range, so the browser downloads a file only when the page shows
  *   a character of that script.
+ * - The device's colour emoji font (./emoji.css, local() only, never downloaded), placed between
+ *   Inter and the Noto faces. See fontVariables below.
  *
  * Public pages (data-surface="public") use the system stack and load none of these files.
  *
@@ -213,6 +215,9 @@ function families(font: { style: { fontFamily: string } }): string[] {
 const [interMain, interFallback] = families(interLatin);
 const main = (font: { style: { fontFamily: string } }) => families(font)[0];
 
+/** The family ./emoji.css declares: the device's colour emoji font, emoji code points only. */
+const EMOJI_FAMILY = '"System Color Emoji"';
+
 /**
  * The CSS variables tokens.css reads in --family-sans:
  *   var(--font-inter), var(--font-noto-deva), ... var(--font-noto-arab), system-ui, sans-serif
@@ -223,9 +228,16 @@ const main = (font: { style: { fontFamily: string } }) => families(font)[0];
  * glyphs on Windows) would draw Urdu names and rare diacritics before our faces could. While
  * Inter is loading, Latin text still reaches the fallback, because every face in between has a
  * unicode-range that leaves Basic Latin out.
+ *
+ * The emoji face sits between Inter and the Noto faces. Every Noto range keeps U+200C-200D, as
+ * Google serves it: the joiners must stay inside the face's range for its shaping rules to see
+ * them (without them Malayalam chillus written with ZWJ, Devanagari eyelash ra and Telugu ర్‍య
+ * draw wrong). Inter has no glyph for U+200D, so an emoji ZWJ sequence (👩‍🎓, 🤷‍♀️) used to
+ * fall through to the Noto faces, and Chrome downloaded every one of them, each still unable to
+ * draw it. Placed first, the emoji face draws the sequence from a font already on the device.
  */
 export const fontVariables = {
-  "--font-inter": `${interMain}, ${main(interLatinExt)}`,
+  "--font-inter": `${interMain}, ${main(interLatinExt)}, ${EMOJI_FAMILY}`,
   "--font-noto-deva": main(notoDevanagari),
   "--font-noto-beng": main(notoBengali),
   "--font-noto-guru": main(notoGurmukhi),

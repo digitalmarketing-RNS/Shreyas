@@ -1,8 +1,8 @@
 "use client";
 
 import { useLayoutEffect } from "react";
-import { THEME_LOCK_ATTRIBUTE, readThemeCookie } from "@/lib/theme";
-import { applyTheme } from "./theme-store";
+import { THEME_LOCK_ATTRIBUTE } from "@/lib/theme";
+import { holdLightTheme } from "./theme-store";
 
 export type ForceLightThemeProps = {
   /** "public" also switches <html> to the public surface: system fonts and 16 px text. */
@@ -15,29 +15,14 @@ export type ForceLightThemeProps = {
  *
  * - First load: an inline script sets data-theme="light" while the HTML is parsed. Routes under
  *   PUBLIC_ROUTE_PREFIXES are also handled by the <head> script, so they never paint dark.
- * - Client navigation: a layout effect sets the same attributes before the browser paints.
- * - Leaving: the attributes are restored and the saved theme comes back.
+ * - Client navigation: a layout effect takes a hold (holdLightTheme) before the browser paints.
+ * - Leaving, whether the page unmounts or Activity hides it: the layout effect's cleanup releases
+ *   the hold. Once no ForceLightTheme is mounted, the lock comes off and the saved theme comes
+ *   back, including after a full load, where the inline script set the lock first.
  * While it is mounted, data-theme-lock on <html> stops ThemeSwitch from changing the page.
  */
 export function ForceLightTheme({ surface }: ForceLightThemeProps) {
-  useLayoutEffect(() => {
-    const root = document.documentElement;
-    const before = {
-      locked: root.hasAttribute(THEME_LOCK_ATTRIBUTE),
-      surface: root.getAttribute("data-surface"),
-    };
-    root.setAttribute("data-theme", "light");
-    root.setAttribute(THEME_LOCK_ATTRIBUTE, "");
-    if (surface) root.setAttribute("data-surface", surface);
-    return () => {
-      if (before.surface === null) root.removeAttribute("data-surface");
-      else root.setAttribute("data-surface", before.surface);
-      if (!before.locked) {
-        root.removeAttribute(THEME_LOCK_ATTRIBUTE);
-        applyTheme(readThemeCookie(document.cookie));
-      }
-    };
-  }, [surface]);
+  useLayoutEffect(() => holdLightTheme(surface), [surface]);
 
   const script =
     'var d=document.documentElement;d.setAttribute("data-theme","light");' +

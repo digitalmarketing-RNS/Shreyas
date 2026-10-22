@@ -1,0 +1,34 @@
+/* The device's own colour emoji font, declared as a face so the staff font stack can place it
+   between Inter and the Noto faces (see EMOJI_FAMILY in ./index.ts and ./README.md).
+
+   Why: every Noto face claims U+200C-200D, which its script needs for shaping (Malayalam chillus
+   written with ZWJ, Devanagari eyelash ra ...). An emoji ZWJ sequence such as 👩‍🎓 or 🤷‍♀️ carries
+   U+200D, so without this face Chrome tries the Noto faces for it one after another, and each
+   one downloads and still cannot draw it: all ten files for one emoji. This face draws the whole
+   sequence first, from a font already on the device, so no Noto file is fetched.
+
+   Nothing is downloaded: local() only. A device with none of these fonts skips the face.
+   The range is limited to emoji, so Latin, digits and Indic text never reach it:
+   - U+200D, U+FE0F: the joiner and the emoji presentation selector.
+   - U+1F000-1FAFF: the emoji blocks, skin tones and hair components included.
+   - U+E0020-E007F: tag characters (the flags of England, Scotland and Wales).
+   - The 15 BMP code points that occur in RGI ZWJ sequences (Unicode emoji-zwj-sequences.txt,
+     version 18.0): ↔ ↕ ☠ ♀ ♂ ⚕ ⚖ ⚧ ⛓ ⛹ ✈ ❄ ❤ ➡ ⬛. A face must cover every code point of a
+     sequence to draw it. As a side effect these 15 symbols, written alone, draw from the colour
+     emoji font rather than a monochrome symbol font.
+   font-weight spans 100-900 so bold text gets no synthetic bold emoji. */
+@font-face {
+  font-family: "System Color Emoji";
+  src:
+    local("Apple Color Emoji"),
+    local("AppleColorEmoji"),
+    local("Segoe UI Emoji"),
+    local("SegoeUIEmoji"),
+    local("Noto Color Emoji"),
+    local("NotoColorEmoji");
+  font-weight: 100 900;
+  font-style: normal;
+  unicode-range:
+    U+200D, U+FE0F, U+1F000-1FAFF, U+E0020-E007F, U+2194-2195, U+2620, U+2640, U+2642, U+2695-2696,
+    U+26A7, U+26D3, U+26F9, U+2708, U+2744, U+2764, U+27A1, U+2B1B;
+}

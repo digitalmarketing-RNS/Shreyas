@@ -53,6 +53,30 @@ and U+2212 (−, our minus sign) are in the subset too.
 ## How the faces stack
 
 `tokens.css` builds `--family-sans` from the variables `index.ts` puts on `<html>`:
-`Inter subset, Inter latin-ext, Noto Sans Devanagari … Noto Naskh Arabic, Inter's Arial fallback, system-ui, sans-serif`.
+`Inter subset, Inter latin-ext, System Color Emoji, Noto Sans Devanagari … Noto Naskh Arabic, Inter's Arial fallback,
+system-ui, sans-serif`.
 The fallback goes last on purpose: placed earlier, a local Arial (which has Arabic glyphs on Windows) would draw Urdu
 text before Noto Naskh Arabic could.
+
+## Emoji and the joiners
+
+`emoji.css` declares `System Color Emoji`: the device's own colour emoji font through `local()` (Apple Color Emoji,
+Segoe UI Emoji or Noto Color Emoji), with a `unicode-range` of emoji code points only. It is never downloaded. It is
+imported from `src/app/globals.css`, because `next/font` cannot declare a `local()` source.
+
+Why it sits before the Noto faces: every Noto range includes U+200C–200D (the zero-width non-joiner and joiner), and
+Inter has no glyph for either. An emoji ZWJ sequence such as 👩‍🎓 or 🤷‍♀️ carries U+200D. Chrome therefore tried the
+Noto faces for it in turn, and each one downloaded, still could not draw the emoji, and passed it on to the next: all
+ten files, about 1 MB, for one emoji. Placed first, the emoji face draws the whole sequence and no Noto file is fetched.
+
+Why the joiners stay in the Noto ranges: Chrome lets a face map only the code points in its `unicode-range`. Without
+U+200D, Noto's shaping rules no longer see the joiner. We compared both versions pixel by pixel on 2026-10-22, and
+Malayalam chillus written with ZWJ (ന്‍ ര്‍ ല്‍ ള്‍ ണ്‍, as in older data: അര്‍ജുന്‍) then showed a visible chandrakkala.
+Devanagari eyelash ra (र्‍य) and Telugu ర్‍య also changed. With the original ranges, the ZWJ chillus match the atomic
+chillus (ൻ ർ ൽ ൾ ൺ).
+
+The emoji face's range holds U+200D, U+FE0F, U+1F000–1FAFF, the tag characters U+E0020–E007F and the 15 BMP code
+points that occur in RGI ZWJ sequences (Unicode `emoji-zwj-sequences.txt` 18.0). A face must cover every code point of
+a sequence to draw it. As a side effect, those 15 symbols (↔ ↕ ☠ ♀ ♂ ⚕ ⚖ ⚧ ⛓ ⛹ ✈ ❄ ❤ ➡ ⬛) also draw in colour
+when written alone. On a device with none of the three fonts the face is skipped, and emoji ZWJ sequences again load
+the Noto files.
