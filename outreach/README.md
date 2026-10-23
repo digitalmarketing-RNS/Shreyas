@@ -85,6 +85,27 @@ see they're close, so "you're #14, here's what's holding you back" lands better 
 7. Email: their exact position + who is above them + 1-2 reasons + Naveen proof + Rs 15,000/month
    + "want the other 2 fixes?". WhatsApp and LinkedIn notes go in the private Drive doc.
 
+### Segment 2: engineering colleges (added 23 Oct)
+
+**Proof:** RNS Institute of Technology's (RNSIT) page is #1 on Google India for "best engineering
+college in Bangalore" and "top engineering colleges in Bangalore" (checked from Bangalore and
+Mumbai, 23 Oct). RNSIT approved being named.
+
+| Item | Rule |
+|---|---|
+| Who | Engineering colleges in Bangalore and other cities (Mysuru, Mangaluru, Belagavi, Hubballi-Dharwad, Hyderabad, Pune) |
+| Price | None in the first email. Ask for a 15-minute call; quote after scope |
+| Hook | Their own site missing from or on page 2 of "best/top engineering college in {city}", while Shiksha/Collegedunia take page 1 and sell their students back as leads |
+| Bangalore colleges | Don't promise to beat RNSIT on its two phrases; pitch their own gaps (course, area, broken pages) |
+| Timing line | Admissions searches peak after KCET/COMEDK (TG EAPCET, MHT CET) results in May-June; SEO takes 3-4 months |
+| Who to email | Named MD/CEO/Director/Principal; most colleges publish a principal@ address |
+| Files | Keep college prospect files out of the RNSIT Google account; the tracker lives as a private Gmail draft |
+
+**Checking claims on college sites:** many use page builders that leave old headings inside hidden
+HTML comments (e.g. "Admissions Open 2021-22"). Strip `<!-- -->` comments before counting H1s or
+quoting headings. On sites built with JavaScript, don't claim "no meta description" or "no H1" from
+the raw HTML; check what Google shows instead.
+
 Most Indian dealers have **no email and no real website**, only IndiaMART template sites
 or JustDial. Reach them on WhatsApp/Instagram, not email.
 
@@ -100,7 +121,8 @@ or JustDial. Reach them on WhatsApp/Instagram, not email.
 | 4. If Lusha has nothing | Indian company registry (ZaubaCorp, FalconEbiz: directors/partners of every Pvt Ltd/LLP), public LinkedIn via web search | Free |
 | 5. Last resort | Company inbox, addressed to the named person in subject and greeting | Free |
 
-Lusha is on the **free plan: 40 credits** (33 used by 23 Oct, 7 left). Phone reveals cost **5 credits**,
+Lusha is on the **free plan: 40 credits** (all 40 used by 23 Oct; wait for the monthly reset or
+use registries, college websites and public LinkedIn). Phone reveals cost **5 credits**,
 so reveal emails only (`waterfallEnabled: false`), and phones only for high-value prospects with
 no email. Search many domains in one call: 18 domains returned 17 senior people for 1 credit.
 Apollo (connected) is on its free plan, which blocks people search and email reveal, so it's used
