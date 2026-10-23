@@ -3,97 +3,102 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Naveen Tile hero preview</title>
+  <title>Naveen Tile video hero preview</title>
+  <!-- On the live site: add this preload to the <head> so the first frame paints fast. -->
+  <link rel="preload" as="image" href="media/naveen-hero-loop-1920x780-poster.webp" fetchpriority="high">
   <!-- The live theme already loads these two fonts; they are here only so the preview renders on its own. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Raleway:ital,wght@0,700;0,800;1,800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Raleway:ital,wght@0,800;1,800&display=swap">
   <link rel="stylesheet" href="hero.css">
   <style>body { margin: 0; background: #fff; }</style>
 </head>
 <body>
 
-<!-- ===== HERO START: paste from here ===== -->
-<section class="nt-hero" aria-labelledby="nt-hero-title">
+<!-- ===== HERO START: paste from here. On the live site, change every "media/" to the folder you upload the files to. ===== -->
+<section class="nt-vhero" aria-labelledby="nt-vhero-title">
 
-  <div class="nt-hero__copy">
-    <h1 class="nt-hero__title" id="nt-hero-title">
-      <span class="nt-hero__kicker">India's trusted tile company</span>
-      Designs that make spaces <em class="nt-hero__accent">breathe.</em>
+  <!-- Decorative: muted, no audio. Started by the script below so people who ask for less motion or less data never download it. -->
+  <video class="nt-vhero__video" muted loop playsinline preload="none" aria-hidden="true"
+         poster="media/naveen-hero-loop-1920x780-poster.webp">
+    <source media="(max-width: 767px)" src="media/naveen-hero-loop-720x900.webm" type="video/webm">
+    <source media="(max-width: 767px)" src="media/naveen-hero-loop-720x900.mp4" type="video/mp4">
+    <source src="media/naveen-hero-loop-1920x780.webm" type="video/webm">
+    <source src="media/naveen-hero-loop-1920x780.mp4" type="video/mp4">
+  </video>
+  <div class="nt-vhero__shade" aria-hidden="true"></div>
+
+  <div class="nt-vhero__copy">
+    <h1 class="nt-vhero__title" id="nt-vhero-title">
+      <span class="nt-vhero__kicker">India's trusted tile company</span>
+      Designs that make spaces <em class="nt-vhero__accent">breathe.</em>
     </h1>
-
-    <p class="nt-hero__lede">
-      Ceramic and vitrified tiles for floors, walls and outdoor spaces. Made in our
-      own plants at Sira and Karaikal, and sold by thousands of retailers across India.
+    <p class="nt-vhero__lede">
+      Ceramic and vitrified tiles for every room, made in our own plants since 1983
+      and sold by thousands of retailers across India.
     </p>
-
-    <div class="nt-hero__actions">
+    <div class="nt-vhero__actions">
       <a class="nt-btn nt-btn--primary" href="https://naveentile.com/products/">
         Explore collections
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
       <a class="nt-btn nt-btn--ghost" href="https://naveentile.com/find-store/">Find a store</a>
-      <a class="nt-hero__link" href="https://naveentile.com/download-catalogue/">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
-        Download catalogue
-      </a>
     </div>
-
-    <dl class="nt-hero__stats">
-      <div><dt>sq ft made a year</dt><dd>860 lakh</dd></div>
-      <div><dt>of manufacturing</dt><dd>56+ acres</dd></div>
-      <div><dt>certified quality</dt><dd>ISO 9001</dd></div>
-    </dl>
-
-    <p class="nt-hero__clients">
-      Chosen for projects by <strong>ISRO, Infosys, Prestige, Sobha</strong> and <strong>Manipal Hospitals</strong>.
-    </p>
   </div>
 
-  <div class="nt-hero__mosaic">
-    <a class="nt-tile nt-tile--a" href="https://naveentile.com/polished-glazed-vitrified-tiles/">
-      <img src="https://naveentile.com/wp-content/themes/Naveentile/webp/discover-our-exquisite-tile-collections-polished-glazed-vitrified-tiles.webp"
-           alt="Living room with glossy marble-look polished glazed vitrified floor tiles"
-           width="450" height="504" fetchpriority="high" decoding="async">
-      <span class="nt-tile__tag">
-        <span class="nt-tile__tag-title">Polished Glazed Vitrified</span>
-        <span class="nt-tile__tag-meta">High gloss, easy to clean</span>
-        <span class="nt-tile__tag-go" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
-      </span>
-    </a>
-
-    <a class="nt-tile nt-tile--b" href="https://naveentile.com/tile-type/kitchen-wall-tiles/">
-      <img src="https://naveentile.com/wp-content/themes/Naveentile/webp/kitchen-img1.webp"
-           alt="White kitchen with marble-effect wall tiles" width="535" height="320" decoding="async">
-      <span class="nt-tile__label">Kitchen walls <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-
-    <a class="nt-tile nt-tile--c" href="https://naveentile.com/products/">
-      <img src="https://naveentile.com/wp-content/themes/Naveentile/webp/st-5-itm-2-slide-img-1.webp"
-           alt="Close-up of a beige and brown fan-pattern designer tile" width="300" height="300" decoding="async">
-      <span class="nt-tile__label">All designs <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-
-    <a class="nt-tile nt-tile--d" href="https://naveentile.com/tile-type/bathroom-floor-tiles/">
-      <img src="https://naveentile.com/wp-content/themes/Naveentile/webp/bathroom-img1.webp"
-           alt="Bathroom with light vitrified floor tiles and a wood vanity" width="535" height="320" decoding="async">
-      <span class="nt-tile__label">Bathrooms <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-
-    <div class="nt-tile nt-tile--y">
-      <span>Making tiles since</span>
-      <strong>1983</strong>
-    </div>
-
-    <a class="nt-tile nt-tile--f" href="https://naveentile.com/tile-type/outdoor-floor-tiles/">
-      <img src="https://naveentile.com/wp-content/themes/Naveentile/webp/outdoor-img1.webp"
-           alt="Outdoor plaza paved with grey outdoor floor tiles" width="535" height="320" decoding="async">
-      <span class="nt-tile__label">Outdoor <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
+  <div class="nt-vhero__bar">
+    <ul class="nt-vhero__proof">
+      <li><strong>Since 1983</strong> making tiles in India</li>
+      <li><strong>860 lakh sq ft</strong> made every year</li>
+      <li><strong>56+ acres</strong> at Sira &amp; Karaikal</li>
+      <li><strong>ISO 9001</strong> certified quality</li>
+    </ul>
+    <button class="nt-vhero__toggle" type="button" aria-label="Pause background video">
+      <svg class="nt-icon-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+      <svg class="nt-icon-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+    </button>
   </div>
 
+  <script>
+    (function () {
+      // Fallback lookup in case a caching plugin moves or delays this script.
+      var hero = (document.currentScript && document.currentScript.closest('.nt-vhero')) ||
+                 document.querySelector('.nt-vhero');
+      var video = hero.querySelector('.nt-vhero__video');
+      var toggle = hero.querySelector('.nt-vhero__toggle');
+      var userPaused = false;
+
+      // Respect "reduce motion" and data-saver: keep the still poster, download nothing.
+      var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+                  (navigator.connection && navigator.connection.saveData);
+
+      function show(paused) {
+        if (paused) hero.setAttribute('data-paused', ''); else hero.removeAttribute('data-paused');
+        toggle.setAttribute('aria-label', paused ? 'Play background video' : 'Pause background video');
+      }
+      function play() {
+        var p = video.play();
+        if (p && p.catch) p.catch(function () { show(true); }); // e.g. iOS Low Power Mode
+        show(false);
+      }
+
+      toggle.addEventListener('click', function () {
+        userPaused = !video.paused;
+        if (userPaused) { video.pause(); show(true); } else { play(); }
+      });
+
+      if (still) { show(true); return; }
+      play();
+
+      // Pause while scrolled out of view to save battery; resume on return.
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          if (userPaused) return;
+          if (entries[0].isIntersecting) play(); else video.pause();
+        }).observe(hero);
+      }
+    })();
+  </script>
 </section>
 <!-- ===== HERO END ===== -->
 

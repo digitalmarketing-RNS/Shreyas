@@ -1,448 +1,277 @@
 /*
-  Naveen Tile homepage hero.
-  Everything is scoped under .nt-hero so it cannot clash with Bootstrap or the
+  Naveen Tile homepage video hero.
+  Everything is scoped under .nt-vhero so it cannot clash with Bootstrap or the
   theme. Raleway and Poppins are already loaded by the theme's revamp-style.css.
 */
 
-.nt-hero {
-  --nt-orange: #F26522;            /* brand orange: large fills */
-  --nt-orange-ink: #CF4B0C;        /* same hue, dark enough for white text and for text on stone (WCAG AA) */
-  --nt-orange-ink-hover: #B3400A;
-  --nt-blue: #4279B7;              /* brand blue */
-  --nt-ink: #13283F;               /* headline navy, a deep shade of the brand blue */
-  --nt-text: #3F4B5B;
-  --nt-muted: #5F6B7A;
-  --nt-stone: #F5F0E9;             /* warm ceramic background; also shows through as grout */
-  --nt-line: rgba(19, 40, 63, .12);
-  --nt-gap: 10px;                  /* grout width between mosaic tiles */
-  --nt-edge: max(20px, calc((100vw - 1320px) / 2 + 12px)); /* lines up with Bootstrap's .container (1320px at 1400px+) */
+.nt-vhero {
+  --nt-orange: #F26522;            /* brand orange */
+  --nt-orange-ink: #CF4B0C;        /* same hue, dark enough for white button text (WCAG AA) */
+  --nt-orange-ink-hover: #E0561A;
+  --nt-navy: #0B1A2C;
+  --nt-shade: 8, 18, 32;           /* rgb of the overlay that keeps text readable on bright frames */
+  --nt-edge: max(20px, calc((100vw - 1320px) / 2 + 12px)); /* lines up with Bootstrap's .container */
 
   position: relative;
   isolation: isolate;
   overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
-  min-height: 650px;
-  padding-left: var(--nt-edge);
-  background: var(--nt-stone);
-  color: var(--nt-text);
+  grid-template-rows: 1fr auto;
+  min-height: clamp(600px, 82vh, 860px);
+  padding: 0 var(--nt-edge);
+  background: var(--nt-navy);
+  color: #fff;
   font-family: "Poppins", system-ui, sans-serif;
   line-height: 1.5;
   text-align: left;
 }
 
-.nt-hero *,
-.nt-hero *::before,
-.nt-hero *::after { box-sizing: border-box; }
+.nt-vhero *,
+.nt-vhero *::before,
+.nt-vhero *::after { box-sizing: border-box; }
 
-/* Faint grout grid behind the copy, fading out toward the mosaic */
-.nt-hero::before {
-  content: "";
+.nt-vhero__video {
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(var(--nt-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--nt-line) 1px, transparent 1px);
-  background-size: 92px 92px;
-  background-position: -1px -1px;
-  -webkit-mask-image: linear-gradient(100deg, rgba(0,0,0,.55) 0%, transparent 52%);
-          mask-image: linear-gradient(100deg, rgba(0,0,0,.55) 0%, transparent 52%);
-}
-
-/* ---------- Copy ---------- */
-
-.nt-hero__copy {
-  align-self: center;
-  max-width: 680px;
-  padding: 48px clamp(24px, 3.5vw, 56px) 48px 0;
-}
-
-.nt-hero .nt-hero__title {
-  margin: 0;
-  font-family: "Raleway", sans-serif;
-  font-weight: 800;
-  font-size: clamp(40px, 4.3vw, 64px);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  color: var(--nt-ink);
-}
-
-.nt-hero__kicker {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
-  font-family: "Poppins", sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--nt-orange-ink);
-}
-
-/* Four-tile checker in the logo's two colours */
-.nt-hero__kicker::before {
-  content: "";
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 2px;
-  background: conic-gradient(var(--nt-orange) 0 25%, var(--nt-blue) 0 50%, var(--nt-orange) 0 75%, var(--nt-blue) 0);
-}
-
-.nt-hero__accent {
-  font-style: italic;
-  color: var(--nt-orange-ink);
-}
-
-.nt-hero .nt-hero__lede {
-  max-width: 33em;
-  margin: 22px 0 30px;
-  font-size: 17px;
-  font-weight: 400;      /* theme sets p to 300 */
-  line-height: 1.65;
-  text-align: left;      /* theme justifies every p */
-  color: var(--nt-text);
-}
-
-.nt-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px 16px;
-}
-
-.nt-hero .nt-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  height: 54px;
-  padding: 0 26px;
-  border: 1.5px solid transparent;
-  border-radius: 6px;
-  font: 600 16px/1 "Poppins", sans-serif;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background-color .2s, color .2s, border-color .2s;
-}
-
-.nt-hero .nt-btn svg { flex: none; transition: transform .2s; }
-.nt-hero .nt-btn:hover svg { transform: translateX(3px); }
-
-.nt-hero .nt-btn--primary,
-.nt-hero .nt-btn--primary:hover,
-.nt-hero .nt-btn--primary:focus { color: #fff; text-decoration: none; }
-.nt-hero .nt-btn--primary { background: var(--nt-orange-ink); }
-.nt-hero .nt-btn--primary:hover { background: var(--nt-orange-ink-hover); }
-
-.nt-hero .nt-btn--ghost { color: var(--nt-ink); border-color: var(--nt-ink); background: transparent; }
-.nt-hero .nt-btn--ghost:hover,
-.nt-hero .nt-btn--ghost:focus { color: #fff; background: var(--nt-ink); text-decoration: none; }
-
-.nt-hero .nt-hero__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 6px;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--nt-ink);
-  text-decoration: underline;
-  text-decoration-color: rgba(19, 40, 63, .35);
-  text-underline-offset: 4px;
-}
-.nt-hero .nt-hero__link:hover { color: var(--nt-orange-ink); text-decoration-color: currentColor; }
-
-.nt-hero a:focus-visible {
-  outline: 3px solid var(--nt-blue);
-  outline-offset: 3px;
-}
-
-/* ---------- Proof ---------- */
-
-.nt-hero .nt-hero__stats {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  justify-content: start;
-  margin: 38px 0 0;
-  padding: 22px 0 0;
-  border-top: 1px solid var(--nt-line);
-}
-
-.nt-hero .nt-hero__stats > div {
-  display: flex;
-  flex-direction: column-reverse; /* number on top, label under; source order stays label → value */
-  justify-content: flex-end;     /* in column-reverse this packs to the top */
-  gap: 4px;
-  padding: 0 32px;
-  border-left: 1px solid var(--nt-line);
-}
-.nt-hero .nt-hero__stats > div:first-child { padding-left: 0; border-left: 0; }
-
-.nt-hero .nt-hero__stats dt {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.35;
-  color: var(--nt-muted);
-}
-
-.nt-hero .nt-hero__stats dd {
-  margin: 0;
-  font-family: "Raleway", sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  font-variant-numeric: lining-nums;
-  line-height: 1.1;
-  color: var(--nt-ink);
-  white-space: nowrap;
-}
-
-.nt-hero .nt-hero__clients {
-  margin: 20px 0 0;
-  font-size: 13.5px;
-  font-weight: 400;
-  line-height: 1.5;
-  text-align: left;
-  color: var(--nt-muted);
-}
-.nt-hero .nt-hero__clients strong { font-weight: 600; color: var(--nt-text); }
-
-/* ---------- Mosaic ---------- */
-
-.nt-hero__mosaic {
-  display: grid;
-  gap: var(--nt-gap);
-  padding: var(--nt-gap) var(--nt-gap) var(--nt-gap) 0;
-  grid-template-columns: 1.35fr 1fr 1fr;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  grid-template-areas:
-    "a b b"
-    "a c d"
-    "y f f";
-}
-
-.nt-tile--a { grid-area: a; }
-.nt-tile--b { grid-area: b; }
-.nt-tile--c { grid-area: c; }
-.nt-tile--d { grid-area: d; }
-.nt-tile--y { grid-area: y; }
-.nt-tile--f { grid-area: f; }
-
-.nt-hero .nt-tile {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  min-height: 0;
-  border-radius: 3px;
-  background: #E6DED3;
-  color: var(--nt-ink);
-  text-decoration: none;
-}
-
-/* thin glaze highlight on every tile edge */
-.nt-hero .nt-tile::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
-  pointer-events: none;
-}
-
-.nt-hero .nt-tile img {
-  position: absolute;
-  inset: 0;
+  z-index: -2;
   width: 100%;
   height: 100%;
   max-width: none;
   object-fit: cover;
-  transition: transform .7s cubic-bezier(.2, .7, .2, 1);
 }
-.nt-hero a.nt-tile:hover img { transform: scale(1.045); }
 
-.nt-tile--a img { object-position: 50% 62%; }
-.nt-tile--b img { object-position: 50% 55%; }
-.nt-tile--d img { object-position: 30% 50%; }
-.nt-tile--f img { object-position: 50% 78%; }
-
-/* Small room label on each photo tile */
-.nt-hero .nt-tile__label {
+/* Left and bottom fade, so white marble frames never wash out the text */
+.nt-vhero__shade {
   position: absolute;
-  left: 12px;
-  bottom: 12px;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* measured from where the text starts, so it covers the copy at any width */
+    linear-gradient(90deg,
+      rgba(var(--nt-shade), .88) 0,
+      rgba(var(--nt-shade), .78) calc(var(--nt-edge) + 480px),
+      rgba(var(--nt-shade), .40) calc(var(--nt-edge) + 820px),
+      rgba(var(--nt-shade), 0) calc(var(--nt-edge) + 1120px)),
+    linear-gradient(0deg,
+      rgba(var(--nt-shade), .80) 0%,
+      rgba(var(--nt-shade), 0) 30%);
+}
+
+/* ---------- Copy ---------- */
+
+.nt-vhero__copy {
+  align-self: center;
+  max-width: 780px;
+  padding: 72px 0 48px;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, .25);
+}
+
+.nt-vhero__kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .9);
+}
+.nt-vhero__kicker::before {
+  content: "";
+  flex: none;
+  width: 40px;
+  height: 2px;
+  background: var(--nt-orange);
+}
+
+.nt-vhero .nt-vhero__title {
+  margin: 0;
+  font-family: "Raleway", sans-serif;
+  font-weight: 800;
+  font-size: clamp(44px, 5.1vw, 82px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  color: #fff;
+}
+
+.nt-vhero__accent {
+  font-style: italic;
+  color: var(--nt-orange);
+}
+
+.nt-vhero .nt-vhero__lede {
+  max-width: 30em;
+  margin: 26px 0 36px;
+  font-size: 18px;
+  font-weight: 400;   /* theme sets p to 300 */
+  line-height: 1.6;
+  text-align: left;   /* theme justifies every p */
+  text-wrap: pretty;  /* no single word left on the last line */
+  color: rgba(255, 255, 255, .86);
+}
+
+.nt-vhero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.nt-vhero .nt-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 11px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, .94);
-  font-size: 12.5px;
-  font-weight: 600;
-  line-height: 1;
-  color: var(--nt-ink);
-  box-shadow: 0 2px 10px rgba(19, 40, 63, .12);
-}
-.nt-hero .nt-tile__label svg { transition: transform .2s; }
-.nt-hero a.nt-tile:hover .nt-tile__label svg { transform: translateX(3px); }
-
-/* Showroom-style product tag on the feature tile */
-.nt-hero .nt-tile__tag {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  right: 14px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 2px 12px;
-  padding: 14px 14px 14px 16px;
+  justify-content: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 28px;
+  border: 1.5px solid transparent;
   border-radius: 6px;
-  background: rgba(255, 255, 255, .96);
-  box-shadow: 0 8px 24px rgba(19, 40, 63, .18);
+  font: 600 16px/1 "Poppins", sans-serif;
+  text-decoration: none;
+  text-shadow: none;
+  white-space: nowrap;
+  transition: background-color .2s, color .2s, border-color .2s;
 }
-.nt-hero .nt-tile__tag-title {
-  font-family: "Raleway", sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.2;
-  color: var(--nt-ink);
-}
-.nt-hero .nt-tile__tag-meta {
-  grid-column: 1;
-  font-size: 12.5px;
-  line-height: 1.4;
-  color: var(--nt-muted);
-}
-.nt-hero .nt-tile__tag-go {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--nt-orange-ink);
-  color: #fff;
-  transition: transform .2s;
-}
-.nt-hero a.nt-tile:hover .nt-tile__tag-go { transform: translateX(3px); }
+.nt-vhero .nt-btn svg { flex: none; transition: transform .2s; }
+.nt-vhero .nt-btn:hover svg { transform: translateX(3px); }
 
-/* The one coloured tile in the floor */
-.nt-hero .nt-tile--y {
+.nt-vhero .nt-btn--primary,
+.nt-vhero .nt-btn--primary:hover,
+.nt-vhero .nt-btn--primary:focus { color: #fff; text-decoration: none; }
+.nt-vhero .nt-btn--primary { background: var(--nt-orange-ink); }
+.nt-vhero .nt-btn--primary:hover { background: var(--nt-orange-ink-hover); }
+
+.nt-vhero .nt-btn--ghost { color: #fff; border-color: rgba(255, 255, 255, .7); background: rgba(255, 255, 255, .04); }
+.nt-vhero .nt-btn--ghost:hover,
+.nt-vhero .nt-btn--ghost:focus { color: var(--nt-navy); border-color: #fff; background: #fff; text-decoration: none; }
+
+.nt-vhero a:focus-visible,
+.nt-vhero button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---------- Proof bar ---------- */
+
+.nt-vhero__bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 0 28px;
+  border-top: 1px solid rgba(255, 255, 255, .18);
+}
+
+.nt-vhero .nt-vhero__proof {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nt-vhero .nt-vhero__proof li {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 18px 20px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 42%),
-    var(--nt-orange);
-  color: var(--nt-ink);
+  gap: 2px;
+  margin: 0;
+  padding: 0 36px;
+  border-left: 1px solid rgba(255, 255, 255, .18);
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, .72);
 }
-.nt-hero .nt-tile--y span {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-.nt-hero .nt-tile--y strong {
+.nt-vhero .nt-vhero__proof li:first-child { padding-left: 0; border-left: 0; }
+
+.nt-vhero .nt-vhero__proof strong {
   font-family: "Raleway", sans-serif;
-  font-size: clamp(40px, 3.6vw, 56px);
+  font-size: 24px;
   font-weight: 800;
-  font-variant-numeric: lining-nums;
-  line-height: .95;
-  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums; /* Raleway defaults to old-style numerals */
+  line-height: 1.15;
+  color: #fff;
 }
 
-/* Tiles are laid one after another on load. The feature tile is left out on
-   purpose: it is likely the LCP element, so it must paint straight away. */
+.nt-vhero .nt-vhero__toggle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, .45);
+  border-radius: 50%;
+  background: rgba(var(--nt-shade), .25);
+  color: #fff;
+  cursor: pointer;
+  transition: border-color .2s, background-color .2s;
+}
+.nt-vhero .nt-vhero__toggle:hover { border-color: #fff; background: rgba(var(--nt-shade), .5); }
+.nt-vhero__toggle .nt-icon-play { display: none; }
+.nt-vhero[data-paused] .nt-vhero__toggle .nt-icon-play { display: block; }
+.nt-vhero[data-paused] .nt-vhero__toggle .nt-icon-pause { display: none; }
+
+/* ---------- Entrance ---------- */
+
 @media (prefers-reduced-motion: no-preference) {
-  .nt-hero .nt-tile:not(.nt-tile--a) { animation: nt-lay .6s cubic-bezier(.2, .7, .2, 1) both; }
-  .nt-hero .nt-tile--b { animation-delay: .10s; }
-  .nt-hero .nt-tile--c { animation-delay: .18s; }
-  .nt-hero .nt-tile--d { animation-delay: .26s; }
-  .nt-hero .nt-tile--y { animation-delay: .34s; }
-  .nt-hero .nt-tile--f { animation-delay: .42s; }
+  .nt-vhero__copy > *,
+  .nt-vhero__bar { animation: nt-rise .9s cubic-bezier(.2, .7, .2, 1) both; }
+  .nt-vhero__copy > :nth-child(2) { animation-delay: .08s; }
+  .nt-vhero__copy > :nth-child(3) { animation-delay: .18s; }
+  .nt-vhero__bar { animation-delay: .32s; }
 }
 
-@keyframes nt-lay {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes nt-rise {
+  from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: none; }
 }
 
 /* ---------- Smaller screens ---------- */
 
 @media (max-width: 1399.98px) {
-  .nt-hero { --nt-edge: calc((100vw - 1140px) / 2 + 12px); }
+  .nt-vhero { --nt-edge: calc((100vw - 1140px) / 2 + 12px); }
 }
 
 @media (max-width: 1199.98px) {
-  .nt-hero {
-    --nt-edge: max(20px, calc((100vw - 960px) / 2 + 12px));
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .nt-hero .nt-tile__tag-meta { display: none; }
-  .nt-hero .nt-hero__stats > div { padding: 0 22px; }
-  .nt-hero .nt-hero__stats dd { font-size: 23px; }
+  .nt-vhero { --nt-edge: max(20px, calc((100vw - 960px) / 2 + 12px)); }
+  .nt-vhero .nt-vhero__proof li { padding: 0 24px; }
+  .nt-vhero .nt-vhero__proof strong { font-size: 21px; }
 }
 
-/* Stack: copy first, mosaic underneath */
 @media (max-width: 991.98px) {
-  .nt-hero {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: 0;
-    padding-left: 0;
-  }
-  .nt-hero__copy {
-    max-width: 640px;
-    padding: 48px 24px 36px;
-  }
-  .nt-hero__mosaic {
-    height: 460px;
-    padding: 0 var(--nt-gap) var(--nt-gap);
-  }
-  .nt-hero::before {
-    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 60%);
-            mask-image: linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 60%);
-  }
+  .nt-vhero { --nt-edge: 24px; }
+  .nt-vhero .nt-vhero__proof { display: grid; grid-template-columns: repeat(2, auto); gap: 16px 0; }
+  .nt-vhero .nt-vhero__proof li:nth-child(3) { padding-left: 0; border-left: 0; }
 }
 
-@media (max-width: 575.98px) {
-  .nt-hero { --nt-gap: 8px; }
-  .nt-hero__copy { padding: 36px 16px 28px; }
-  .nt-hero__kicker { margin-bottom: 16px; font-size: 12px; }
-  .nt-hero .nt-hero__lede { margin: 18px 0 26px; font-size: 16px; }
-
-  .nt-hero__actions { gap: 12px; }
-  .nt-hero .nt-btn { flex: 1 1 100%; }
-  .nt-hero .nt-hero__link { margin: 4px 0 0; }
-
-  .nt-hero .nt-hero__stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 32px;
-    padding-top: 20px;
+/* Phones: text sits at the bottom, video shows above it */
+@media (max-width: 767.98px) {
+  .nt-vhero {
+    --nt-edge: 16px;
+    min-height: clamp(640px, 92svh, 780px);
   }
-  .nt-hero .nt-hero__stats > div { padding: 0 12px; }
-  .nt-hero .nt-hero__stats dd { font-size: 19px; }
-  .nt-hero .nt-hero__stats dt { font-size: 12px; }
-
-  .nt-hero__mosaic {
-    height: 400px;
-    grid-template-columns: 1.1fr 1fr;
-    grid-template-areas:
-      "a b"
-      "a d"
-      "y f";
+  .nt-vhero__shade {
+    background: linear-gradient(0deg,
+      rgba(var(--nt-shade), .94) 0%,
+      rgba(var(--nt-shade), .86) 58%,
+      rgba(var(--nt-shade), .62) 76%,
+      rgba(var(--nt-shade), .12) 100%);
   }
-  .nt-hero .nt-tile--c { display: none; }
-  .nt-hero .nt-tile__tag { top: 8px; left: 8px; right: 8px; padding: 10px 10px 10px 12px; gap: 2px 8px; }
-  .nt-hero .nt-tile__tag-title { font-size: 14px; }
-  .nt-hero .nt-tile__tag-meta { font-size: 11.5px; }
-  .nt-hero .nt-tile__tag-go { width: 30px; height: 30px; }
-  .nt-hero .nt-tile__label { left: 8px; bottom: 8px; padding: 6px 9px; font-size: 12px; }
-  .nt-hero .nt-tile--y { padding: 14px; }
-  .nt-hero .nt-tile--y span { font-size: 10.5px; }
+  .nt-vhero__copy { align-self: end; padding: 120px 0 28px; }
+  .nt-vhero__kicker { margin-bottom: 18px; font-size: 11.5px; gap: 10px; }
+  .nt-vhero__kicker::before { width: 28px; }
+  .nt-vhero .nt-vhero__lede { margin: 18px 0 26px; font-size: 16px; }
+  .nt-vhero__actions { gap: 10px; }
+  .nt-vhero .nt-btn { flex: 1 1 100%; height: 52px; }
+  .nt-vhero__bar { align-items: flex-end; gap: 12px; padding: 18px 0 22px; }
+  .nt-vhero .nt-vhero__proof { gap: 14px 0; }
+  .nt-vhero .nt-vhero__proof li { padding: 0 16px; font-size: 12px; }
+  .nt-vhero .nt-vhero__proof li:first-child,
+  .nt-vhero .nt-vhero__proof li:nth-child(3) { padding-left: 0; }
+  .nt-vhero .nt-vhero__proof strong { font-size: 19px; }
+  .nt-vhero .nt-vhero__toggle { width: 40px; height: 40px; }
 }
