@@ -2,8 +2,13 @@
 
 Selling EEAT Minds SEO to tile companies. Owner: Shreyas V Patil.
 
-**Status (23 Oct 2026): pilot batch of 10 emails sitting in Gmail drafts (eeatminds.in@gmail.com),
-waiting for Shreyas's OK.** Once approved, Claude sends up to 20 new emails a day plus follow-ups.
+**Status (23 Oct 2026): 17 cold emails sent from eeatminds.in@gmail.com.** 10 to Morbi/Gulf
+companies (SEO-gap pitch) and 7 to national brands' marketing heads (city-showroom pitch).
+Follow-ups go out on 26 Oct to anyone who hasn't replied. Up to 20 new emails a day.
+
+**Gmail connector gotcha:** any web address in an email body (even `example.com` or `google.co.in`)
+is rewritten into a long google.com redirect link, which looks like spam. Write "your website" and
+"Google India" instead, and keep the signature to name + phone.
 
 > **This repo is public.** Names, personal emails, phone numbers and security findings about
 > prospects live only in the private Google Drive folder **"EEAT Tile Outreach (private)"**:
@@ -40,6 +45,20 @@ Pitch manufacturers on **export** and **product** keywords instead
 | Tile dealers / showrooms | Indian cities | WhatsApp, Instagram DM, phone | "You have 200+ JustDial reviews but no website, so Google sends your buyers to JustDial, which lists your competitors" |
 | Tile manufacturers / exporters | Morbi, Gujarat | Email to named MD/partner + LinkedIn + WhatsApp | "Foreign buyers searching 'porcelain tiles manufacturer India' see Porcious, Italus, Bluetone, not you" |
 | Tile traders | Dubai / UAE / GCC | Email to named CEO/MD + LinkedIn | "When I searched 'tiles shop in Dubai', you weren't on page 1" |
+| National tile brands | India (Somany, Nitco, Orientbell, Simpolo, Johnson, AGL, Varmora…) | Email to CMO / Head of Marketing + LinkedIn to them **and** their digital manager | City showroom searches: "In Pune, Hyderabad, Bangalore, Chennai and Mumbai, Orientbell, Simpolo and Johnson have city pages on page 1; you have none" (or, for the leaders, the one city where they slip) |
+
+### National brands: what's different
+
+- **Who decides SEO:** the CMO / Head of Marketing, not the MD. Their digital marketing manager
+  usually runs the vendor, so contact both (email the senior one, LinkedIn both).
+- **No price in the first email.** ₹15,000/month reads as too small for a listed brand. Offer a free
+  city-by-city report for their top 20 cities and quote after scope.
+- **The hook is city pages**, not "you're not on page 1 for your product". Leaders (Orientbell,
+  Simpolo, Johnson) get the one city where they slip; brands with no city pages get the 5-city gap.
+- **No cold WhatsApp to corporate execs.** Email + LinkedIn only.
+- **Kajaria is skipped on purpose:** the Naveen Tile proof is framed as beating Kajaria.
+- **Watch the Naveen conflict:** don't take on brand-level keywords ("best tile company") for a
+  national brand while Naveen Tile is a client.
 
 Most Indian dealers have **no email and no real website**, only IndiaMART template sites
 or JustDial. Reach them on WhatsApp/Instagram, not email.
@@ -56,7 +75,7 @@ or JustDial. Reach them on WhatsApp/Instagram, not email.
 | 4. If Lusha has nothing | Indian company registry (ZaubaCorp, FalconEbiz: directors/partners of every Pvt Ltd/LLP), public LinkedIn via web search | Free |
 | 5. Last resort | Company inbox, addressed to the named person in subject and greeting | Free |
 
-Lusha is on the **free plan: 40 credits** (11 used in the pilot). Phone reveals cost **5 credits**,
+Lusha is on the **free plan: 40 credits** (21 used by 23 Oct, 19 left). Phone reveals cost **5 credits**,
 so reveal emails only, and phones only for high-value prospects with no email.
 Apollo (connected) is on its free plan, which blocks people search and email reveal, so it's used
 for company lists only.
