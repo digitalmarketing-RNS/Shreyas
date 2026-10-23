@@ -1,0 +1,448 @@
+/*
+  Naveen Tile homepage hero.
+  Everything is scoped under .nt-hero so it cannot clash with Bootstrap or the
+  theme. Raleway and Poppins are already loaded by the theme's revamp-style.css.
+*/
+
+.nt-hero {
+  --nt-orange: #F26522;            /* brand orange: large fills */
+  --nt-orange-ink: #CF4B0C;        /* same hue, dark enough for white text and for text on stone (WCAG AA) */
+  --nt-orange-ink-hover: #B3400A;
+  --nt-blue: #4279B7;              /* brand blue */
+  --nt-ink: #13283F;               /* headline navy, a deep shade of the brand blue */
+  --nt-text: #3F4B5B;
+  --nt-muted: #5F6B7A;
+  --nt-stone: #F5F0E9;             /* warm ceramic background; also shows through as grout */
+  --nt-line: rgba(19, 40, 63, .12);
+  --nt-gap: 10px;                  /* grout width between mosaic tiles */
+  --nt-edge: max(20px, calc((100vw - 1320px) / 2 + 12px)); /* lines up with Bootstrap's .container (1320px at 1400px+) */
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  min-height: 650px;
+  padding-left: var(--nt-edge);
+  background: var(--nt-stone);
+  color: var(--nt-text);
+  font-family: "Poppins", system-ui, sans-serif;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.nt-hero *,
+.nt-hero *::before,
+.nt-hero *::after { box-sizing: border-box; }
+
+/* Faint grout grid behind the copy, fading out toward the mosaic */
+.nt-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--nt-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nt-line) 1px, transparent 1px);
+  background-size: 92px 92px;
+  background-position: -1px -1px;
+  -webkit-mask-image: linear-gradient(100deg, rgba(0,0,0,.55) 0%, transparent 52%);
+          mask-image: linear-gradient(100deg, rgba(0,0,0,.55) 0%, transparent 52%);
+}
+
+/* ---------- Copy ---------- */
+
+.nt-hero__copy {
+  align-self: center;
+  max-width: 680px;
+  padding: 48px clamp(24px, 3.5vw, 56px) 48px 0;
+}
+
+.nt-hero .nt-hero__title {
+  margin: 0;
+  font-family: "Raleway", sans-serif;
+  font-weight: 800;
+  font-size: clamp(40px, 4.3vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--nt-ink);
+}
+
+.nt-hero__kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--nt-orange-ink);
+}
+
+/* Four-tile checker in the logo's two colours */
+.nt-hero__kicker::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  background: conic-gradient(var(--nt-orange) 0 25%, var(--nt-blue) 0 50%, var(--nt-orange) 0 75%, var(--nt-blue) 0);
+}
+
+.nt-hero__accent {
+  font-style: italic;
+  color: var(--nt-orange-ink);
+}
+
+.nt-hero .nt-hero__lede {
+  max-width: 33em;
+  margin: 22px 0 30px;
+  font-size: 17px;
+  font-weight: 400;      /* theme sets p to 300 */
+  line-height: 1.65;
+  text-align: left;      /* theme justifies every p */
+  color: var(--nt-text);
+}
+
+.nt-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 16px;
+}
+
+.nt-hero .nt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 54px;
+  padding: 0 26px;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  font: 600 16px/1 "Poppins", sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .2s, color .2s, border-color .2s;
+}
+
+.nt-hero .nt-btn svg { flex: none; transition: transform .2s; }
+.nt-hero .nt-btn:hover svg { transform: translateX(3px); }
+
+.nt-hero .nt-btn--primary,
+.nt-hero .nt-btn--primary:hover,
+.nt-hero .nt-btn--primary:focus { color: #fff; text-decoration: none; }
+.nt-hero .nt-btn--primary { background: var(--nt-orange-ink); }
+.nt-hero .nt-btn--primary:hover { background: var(--nt-orange-ink-hover); }
+
+.nt-hero .nt-btn--ghost { color: var(--nt-ink); border-color: var(--nt-ink); background: transparent; }
+.nt-hero .nt-btn--ghost:hover,
+.nt-hero .nt-btn--ghost:focus { color: #fff; background: var(--nt-ink); text-decoration: none; }
+
+.nt-hero .nt-hero__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--nt-ink);
+  text-decoration: underline;
+  text-decoration-color: rgba(19, 40, 63, .35);
+  text-underline-offset: 4px;
+}
+.nt-hero .nt-hero__link:hover { color: var(--nt-orange-ink); text-decoration-color: currentColor; }
+
+.nt-hero a:focus-visible {
+  outline: 3px solid var(--nt-blue);
+  outline-offset: 3px;
+}
+
+/* ---------- Proof ---------- */
+
+.nt-hero .nt-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  margin: 38px 0 0;
+  padding: 22px 0 0;
+  border-top: 1px solid var(--nt-line);
+}
+
+.nt-hero .nt-hero__stats > div {
+  display: flex;
+  flex-direction: column-reverse; /* number on top, label under; source order stays label → value */
+  justify-content: flex-end;     /* in column-reverse this packs to the top */
+  gap: 4px;
+  padding: 0 32px;
+  border-left: 1px solid var(--nt-line);
+}
+.nt-hero .nt-hero__stats > div:first-child { padding-left: 0; border-left: 0; }
+
+.nt-hero .nt-hero__stats dt {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--nt-muted);
+}
+
+.nt-hero .nt-hero__stats dd {
+  margin: 0;
+  font-family: "Raleway", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: lining-nums;
+  line-height: 1.1;
+  color: var(--nt-ink);
+  white-space: nowrap;
+}
+
+.nt-hero .nt-hero__clients {
+  margin: 20px 0 0;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--nt-muted);
+}
+.nt-hero .nt-hero__clients strong { font-weight: 600; color: var(--nt-text); }
+
+/* ---------- Mosaic ---------- */
+
+.nt-hero__mosaic {
+  display: grid;
+  gap: var(--nt-gap);
+  padding: var(--nt-gap) var(--nt-gap) var(--nt-gap) 0;
+  grid-template-columns: 1.35fr 1fr 1fr;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    "a b b"
+    "a c d"
+    "y f f";
+}
+
+.nt-tile--a { grid-area: a; }
+.nt-tile--b { grid-area: b; }
+.nt-tile--c { grid-area: c; }
+.nt-tile--d { grid-area: d; }
+.nt-tile--y { grid-area: y; }
+.nt-tile--f { grid-area: f; }
+
+.nt-hero .nt-tile {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-height: 0;
+  border-radius: 3px;
+  background: #E6DED3;
+  color: var(--nt-ink);
+  text-decoration: none;
+}
+
+/* thin glaze highlight on every tile edge */
+.nt-hero .nt-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+  pointer-events: none;
+}
+
+.nt-hero .nt-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  transition: transform .7s cubic-bezier(.2, .7, .2, 1);
+}
+.nt-hero a.nt-tile:hover img { transform: scale(1.045); }
+
+.nt-tile--a img { object-position: 50% 62%; }
+.nt-tile--b img { object-position: 50% 55%; }
+.nt-tile--d img { object-position: 30% 50%; }
+.nt-tile--f img { object-position: 50% 78%; }
+
+/* Small room label on each photo tile */
+.nt-hero .nt-tile__label {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .94);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--nt-ink);
+  box-shadow: 0 2px 10px rgba(19, 40, 63, .12);
+}
+.nt-hero .nt-tile__label svg { transition: transform .2s; }
+.nt-hero a.nt-tile:hover .nt-tile__label svg { transform: translateX(3px); }
+
+/* Showroom-style product tag on the feature tile */
+.nt-hero .nt-tile__tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 14px 14px 14px 16px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 8px 24px rgba(19, 40, 63, .18);
+}
+.nt-hero .nt-tile__tag-title {
+  font-family: "Raleway", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--nt-ink);
+}
+.nt-hero .nt-tile__tag-meta {
+  grid-column: 1;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--nt-muted);
+}
+.nt-hero .nt-tile__tag-go {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--nt-orange-ink);
+  color: #fff;
+  transition: transform .2s;
+}
+.nt-hero a.nt-tile:hover .nt-tile__tag-go { transform: translateX(3px); }
+
+/* The one coloured tile in the floor */
+.nt-hero .nt-tile--y {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px 20px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 42%),
+    var(--nt-orange);
+  color: var(--nt-ink);
+}
+.nt-hero .nt-tile--y span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.nt-hero .nt-tile--y strong {
+  font-family: "Raleway", sans-serif;
+  font-size: clamp(40px, 3.6vw, 56px);
+  font-weight: 800;
+  font-variant-numeric: lining-nums;
+  line-height: .95;
+  letter-spacing: -0.02em;
+}
+
+/* Tiles are laid one after another on load. The feature tile is left out on
+   purpose: it is likely the LCP element, so it must paint straight away. */
+@media (prefers-reduced-motion: no-preference) {
+  .nt-hero .nt-tile:not(.nt-tile--a) { animation: nt-lay .6s cubic-bezier(.2, .7, .2, 1) both; }
+  .nt-hero .nt-tile--b { animation-delay: .10s; }
+  .nt-hero .nt-tile--c { animation-delay: .18s; }
+  .nt-hero .nt-tile--d { animation-delay: .26s; }
+  .nt-hero .nt-tile--y { animation-delay: .34s; }
+  .nt-hero .nt-tile--f { animation-delay: .42s; }
+}
+
+@keyframes nt-lay {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Smaller screens ---------- */
+
+@media (max-width: 1399.98px) {
+  .nt-hero { --nt-edge: calc((100vw - 1140px) / 2 + 12px); }
+}
+
+@media (max-width: 1199.98px) {
+  .nt-hero {
+    --nt-edge: max(20px, calc((100vw - 960px) / 2 + 12px));
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .nt-hero .nt-tile__tag-meta { display: none; }
+  .nt-hero .nt-hero__stats > div { padding: 0 22px; }
+  .nt-hero .nt-hero__stats dd { font-size: 23px; }
+}
+
+/* Stack: copy first, mosaic underneath */
+@media (max-width: 991.98px) {
+  .nt-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-left: 0;
+  }
+  .nt-hero__copy {
+    max-width: 640px;
+    padding: 48px 24px 36px;
+  }
+  .nt-hero__mosaic {
+    height: 460px;
+    padding: 0 var(--nt-gap) var(--nt-gap);
+  }
+  .nt-hero::before {
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 60%);
+            mask-image: linear-gradient(180deg, rgba(0,0,0,.5) 0%, transparent 60%);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nt-hero { --nt-gap: 8px; }
+  .nt-hero__copy { padding: 36px 16px 28px; }
+  .nt-hero__kicker { margin-bottom: 16px; font-size: 12px; }
+  .nt-hero .nt-hero__lede { margin: 18px 0 26px; font-size: 16px; }
+
+  .nt-hero__actions { gap: 12px; }
+  .nt-hero .nt-btn { flex: 1 1 100%; }
+  .nt-hero .nt-hero__link { margin: 4px 0 0; }
+
+  .nt-hero .nt-hero__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 32px;
+    padding-top: 20px;
+  }
+  .nt-hero .nt-hero__stats > div { padding: 0 12px; }
+  .nt-hero .nt-hero__stats dd { font-size: 19px; }
+  .nt-hero .nt-hero__stats dt { font-size: 12px; }
+
+  .nt-hero__mosaic {
+    height: 400px;
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-areas:
+      "a b"
+      "a d"
+      "y f";
+  }
+  .nt-hero .nt-tile--c { display: none; }
+  .nt-hero .nt-tile__tag { top: 8px; left: 8px; right: 8px; padding: 10px 10px 10px 12px; gap: 2px 8px; }
+  .nt-hero .nt-tile__tag-title { font-size: 14px; }
+  .nt-hero .nt-tile__tag-meta { font-size: 11.5px; }
+  .nt-hero .nt-tile__tag-go { width: 30px; height: 30px; }
+  .nt-hero .nt-tile__label { left: 8px; bottom: 8px; padding: 6px 9px; font-size: 12px; }
+  .nt-hero .nt-tile--y { padding: 14px; }
+  .nt-hero .nt-tile--y span { font-size: 10.5px; }
+}
