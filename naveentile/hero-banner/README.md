@@ -1,127 +1,88 @@
-# Naveen Tile: homepage video hero
+# Naveen Tile: homepage hero video
 
-A full-width video hero for naveentile.com. A 16-second loop of Naveen's own
-showroom plays behind the headline, two buttons and a slim proof bar.
+A clean, cinematic background video for the naveentile.com homepage hero:
+17.5 seconds of real filmed luxury interiors, glossy tiled floors and marble,
+looping with no visible jump. It has **no text and no buttons**, so the
+headline and calls to action can be added during web development.
 
-![First frame of the desktop banner](exports/naveen-hero-banner-1920x780.jpg)
+![First frame](media/naveen-hero-1920x1080-poster.jpg)
 
-**The footage is theirs.** It is cut from the 98-second showroom walkthrough
-already on the site (`/wp-content/themes/Naveentile/video/banner-video.mp4`):
-five clean shots, slowed to 80% so the camera feels calm, joined with soft
-dissolves. The end dissolves back into the start, so the loop has no jump.
+## Files (`media/`)
 
-| # | Shot | Source time |
+| File | Use | Size |
 |---|---|---|
-| 1 | Dark marble corridor (first frame and poster) | 23.00–26.60s |
-| 2 | Marble slab gallery | 37.25–39.90s |
-| 3 | Tile rack corridor | 56.20–59.45s |
-| 4 | Close-up of tile samples | 60.15–61.85s |
-| 5 | Glossy marble corridor | 86.60–90.50s |
+| `naveen-hero-1920x1080.webm` / `.mp4` | Desktop and tablet (16:9) | 5.7 MB / 6.3 MB |
+| `naveen-hero-1080x1920.webm` / `.mp4` | Phones (9:16, reframed per shot) | 4.3 MB / 5.2 MB |
+| `naveen-hero-1280x720.mp4` | Lighter fallback for slow connections | 3.1 MB |
+| `*-poster.webp` / `.jpg` | First frame of each, shown while the video loads | 60–270 KB |
 
-## Files
+For comparison, the video on the homepage today is 25 MB and downloads in full on page load.
 
-| File | What it is |
-|---|---|
-| `preview.html` | Open in a browser. The hero markup (with its small script) sits between `HERO START` and `HERO END` |
-| `hero.css` | All styles, scoped under `.nt-vhero`. Tested against the live theme CSS: renders pixel-identically |
-| `media/naveen-hero-loop-1920x780.{webm,mp4}` | Background loop for desktop. 2.7 MB / 3.2 MB |
-| `media/naveen-hero-loop-720x900.{webm,mp4}` | Background loop for phones, 4:5 centre crop. 1.0 MB / 1.1 MB |
-| `media/*-poster.{webp,jpg}` | First frame, shown before the video starts |
-| `exports/naveen-hero-banner-1920x780.mp4` | Same loop with the text built in, for the existing slider slot. 3.1 MB |
-| `exports/naveen-hero-banner-720x900.mp4` | Phone version with the text built in. 1.0 MB |
-| `exports/*.jpg` | First frames, for client approval |
-| `build_video.py` | Re-cuts the loop from the source video |
-| `render.cjs` | Re-makes the text-in videos after copy changes |
+`preview.html` plays the right file for the screen size, full screen, with nothing on top.
 
-## Two ways to put it live
+## The edit
 
-### A. Coded section (recommended)
+| # | Shot | Pexels clip | Treatment |
+|---|---|---|---|
+| 1 | Palm leaves part to reveal a sunlit villa lounge | [5744429](https://www.pexels.com/video/a-footage-of-an-interior-of-a-house-5744429/) | 4.0 s, normal speed |
+| 2 | High, slow glide over a living room with a glossy floor and pool | [18531410](https://www.pexels.com/video/the-living-room-has-a-large-flat-screen-tv-and-a-pool-18531410/) (Abdullah \| 4K) | 60 fps at half speed |
+| 3 | Water running over a black marble block | [9166288](https://www.pexels.com/video/water-dripping-on-the-floor-9166288/) (Ron Lach) | Slowed to 83% |
+| 4 | Sunlight falling across a tiled floor, from above | [5744421](https://www.pexels.com/video/video-of-a-living-room-5744421/) | Normal speed |
+| 5 | Marble-clad bathroom | [39024338](https://www.pexels.com/video/luxurious-modern-bathroom-with-marble-finish-39024338/) (Alef Morais) | Normal speed |
+| 6 | Glide across a glossy marble floor into the dining area | [11630727](https://www.pexels.com/video/showcase-of-modern-home-interior-11630727/) | Slowed to 83% |
 
-1. Upload everything in `media/` to `/wp-content/themes/Naveentile/video/`
-2. In the theme's front-page template, replace the whole
-   `<section class="home-sec"> … </section>` block with the markup between
-   `HERO START` and `HERO END` in `preview.html`, and change every `media/` to
-   `/wp-content/themes/Naveentile/video/`
-3. Add `hero.css` to the theme: paste it at the end of `revamp-style.css`, or
-   enqueue it as its own file
-4. Add the poster preload from `preview.html`'s `<head>` to the site's `<head>`
-5. Change the next section's heading, *"Your Trusted India's No.1 Tile
-   Company"*, from `<h1>` to `<h2>`. The hero now holds the page's one H1
+The shots are joined with 0.6-second dissolves, and the last shot dissolves back into the first.
+All sources are 4K except shot 4 (1440p), so both the 16:9 and 9:16 versions stay sharp.
+Grading is kept light (4–5% contrast and saturation) so tile colours stay true.
 
-### B. Swap the video in the existing slider
+**Licence:** every clip is from Pexels, free for commercial use with no attribution
+required, and editing is allowed ([Pexels License](https://www.pexels.com/license/)).
+No people appear in any shot. Credits are listed above anyway.
 
-If the theme can't be edited, upload the two `exports/` videos and change the
-slider's video slide to:
+## Embedding
 
 ```html
-<video autoplay muted loop playsinline preload="metadata" width="100%"
-       poster="/PATH/naveen-hero-banner-1920x780.jpg">
-  <source media="(max-width: 767px)" src="/PATH/naveen-hero-banner-720x900.mp4" type="video/mp4">
-  <source src="/PATH/naveen-hero-banner-1920x780.mp4" type="video/mp4">
-</video>
+<section class="hero">
+  <video class="hero__video" autoplay muted loop playsinline preload="auto"
+         poster="/PATH/naveen-hero-1920x1080-poster.webp">
+    <source media="(max-width: 767px)" src="/PATH/naveen-hero-1080x1920.webm" type="video/webm">
+    <source media="(max-width: 767px)" src="/PATH/naveen-hero-1080x1920.mp4" type="video/mp4">
+    <source src="/PATH/naveen-hero-1920x1080.webm" type="video/webm">
+    <source src="/PATH/naveen-hero-1920x1080.mp4" type="video/mp4">
+  </video>
+  <!-- headline and buttons go here -->
+</section>
+
+<style>
+  .hero { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+  .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+</style>
 ```
 
-The text is part of the picture in this version, so search engines can't read
-it and the buttons can't be clicked. Link the slide to `/products/`.
+Notes for the developer:
 
-## What changes for the site
-
-| | Current video slide | New hero |
-|---|---|---|
-| File size | 25 MB, downloaded in full on load (`preload="auto"`) | 3.2 MB desktop, 1.1 MB phone |
-| Length | 98 s, plays once | 16 s, loops with no jump |
-| Phones | Full 2256×916 file | Own 720×900 file |
-| Headline | None | Live H1 that search engines can read |
-| Motion settings | Ignored | Nothing downloads for visitors who ask for less motion or use data saver; a still frame shows instead |
-| Battery | Keeps running | Pauses when scrolled out of view |
-| Pause button | None | Yes, which accessibility guidelines (WCAG 2.2.2) require for moving content longer than 5 s |
-
-## Where each claim comes from
-
-| On the banner | Source |
-|---|---|
-| Since 1983 | Homepage: "Tile Manufacturing Excellence Since 1983" |
-| 860 lakh sq ft made every year | `/manufacturers/`: "production capacity of 860 lakh sqft per year" |
-| 56+ acres at Sira & Karaikal | `/manufacturers/`: "spread across 56+ acres in Sira (Tumakuru) and Karaikal (Pondicherry)" |
-| ISO 9001 | `/manufacturers/` and the certificate image on the homepage (see caveats) |
-| Thousands of retailers across India | Homepage: "We work with thousands of retailers across India" |
-| "Designs that make spaces breathe" | Tagline on the current banner |
-
-The kicker says *"India's trusted tile company"*, not *"India's No.1"*. It keeps
-the "tile company" keyword without making a ranking claim that can't be shown.
-
-## Design notes
-
-- **Readability:** a navy fade sits behind the text. It is measured from where
-  the text column starts, not from the screen edge, so it covers the copy at
-  every width, even over the brightest white marble shots
-- **Colours:** brand orange `#F26522` for "breathe." and the accent rule. The
-  button uses `#CF4B0C`, the same hue darkened just enough for white text to
-  meet WCAG AA (4.5:1)
-- **Grade:** only a touch of contrast and saturation (4%), so tile colours stay true
-- **Numbers:** `lining-nums` stops Raleway's default numerals dropping below the line
-- **Alignment:** the copy's left edge follows Bootstrap's `.container` at each
-  breakpoint, so it lines up with the header logo
+- **Text on top:** most frames are bright, so put a dark gradient behind any white text
+- **Pause button:** accessibility guidelines (WCAG 2.2.2) require a way to pause
+  moving content that runs longer than 5 seconds
+- **Reduced motion:** for visitors with "reduce motion" turned on, pause the
+  video so they see the still poster frame instead
+- **First paint:** preload the poster in `<head>` so the hero is never blank:
+  `<link rel="preload" as="image" href="/PATH/naveen-hero-1920x1080-poster.webp" fetchpriority="high">`
 
 ## Rebuilding
 
 ```bash
-python3 build_video.py                     # re-cut media/ from the source video
-NODE_PATH=$(npm root -g) node render.cjs   # re-make exports/ after copy changes
+python3 build_video.py
 ```
 
-Needs ffmpeg (libx264, libvpx-vp9) and Playwright with Chromium.
+This downloads the six source clips from Pexels into `.cache/` (not committed),
+then rebuilds everything in `media/`. To change a shot, edit its `start`, `end`,
+`speed` or crop in the `SHOTS` list. Needs ffmpeg with libx264 and libvpx-vp9.
+It takes about 7 minutes.
 
-## Caveats
+## Caveat
 
-- **The footage is a 3D render** of the showroom, not filmed. It's Naveen's
-  own and shows their tiles, but if they have a real filmed walkthrough or a
-  higher-quality export of this render, point `build_video.py` at it and
-  everything else stays the same
-- **Very old browsers** (Chrome or Firefox before late 2023) ignore the
-  phone/desktop switch and play the phone file on desktop: a little soft, but it works
-- **ISO version mismatch on their site:** `/manufacturers/` says
-  "ISO 9001-2000", but the certificate image reads "ISO 9001:2015". The banner
-  says just "ISO 9001"
-- **Dead tile links:** 54 tile links on the homepage (menu and footer lists by
-  area, design, type, colour and collection) point to `#`. A quick SEO fix
+This is stock footage of well-designed interiors, not Naveen's own products.
+That's fine as mood footage behind a headline. If Naveen later shoots its own
+showroom, factory or a finished project in 4K, swap those clips into `SHOTS`
+and everything else stays the same.
