@@ -27,8 +27,8 @@ const sections = [
 describe("forms gallery specimens", () => {
   for (const [name, load] of sections) {
     it(`renders ${name} on the server`, async () => {
-      const module = (await load()) as Record<string, () => React.ReactElement>;
-      const exported = Object.entries(module).filter(([key, value]) => key.endsWith("Specimens") && typeof value === "function");
+      const specimens = (await load()) as Record<string, () => React.ReactElement>;
+      const exported = Object.entries(specimens).filter(([key, value]) => key.endsWith("Specimens") && typeof value === "function");
       expect(exported.length).toBeGreaterThan(0);
       for (const [key, Component] of exported) {
         // The root layout provides the Tooltip provider in the app.

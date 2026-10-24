@@ -72,6 +72,7 @@ export function OrgSwitcher({
   const { toast } = useToast();
   const switching = switchingProp || switchingNow;
   const drawer = variant === "drawer";
+  const interactive = memberships.length > 1;
 
   const choose = async (id: string) => {
     if (switching || id === current.id) return;
@@ -96,8 +97,10 @@ export function OrgSwitcher({
           <span className="truncate pt-0.5 pb-1">Switching…</span>
         </span>
       ) : (
-        <span dir="auto" className="min-w-0 flex-1 truncate pt-0.5 pb-1 text-left font-medium">
-          {current.name}
+        <span className="min-w-0 flex-1 truncate pt-0.5 pb-1 text-left font-medium">
+          {interactive ? <span className="sr-only">Institution: </span> : null}
+          <span dir="auto">{current.name}</span>
+          {interactive ? <span className="sr-only">. Switch institution</span> : null}
         </span>
       )}
       {current.trial && !switching ? <Badge variant="tag">Trial</Badge> : null}
@@ -120,7 +123,6 @@ export function OrgSwitcher({
   const trigger = (
     <button
       type="button"
-      aria-label={`Institution: ${current.name}. Switch institution`}
       aria-disabled={switching || undefined}
       onPointerDown={(event) => {
         if (switching) event.preventDefault();

@@ -176,7 +176,7 @@ function TabsView({
   return (
     <RadixTabs.Root value={value} onValueChange={setValue} activationMode={activation} className={className}>
       <div ref={rowRef} className="relative flex min-w-0 items-end gap-1 border-b border-border">
-        <RadixTabs.List aria-label={label} className="flex min-w-0 items-end gap-1">
+        <RadixTabs.List aria-label={label} className="-mb-0.5 flex min-w-0 items-end gap-1 overflow-x-clip pb-0.5">
           {visible.map((item) => (
             <TabTrigger key={item.value} item={item} size={size} active={item.value === value} />
           ))}

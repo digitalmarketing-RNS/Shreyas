@@ -91,14 +91,14 @@ export function AvatarGroup({ people, kind = "owners", size = "md", max = 3, rin
           trigger={
             <button
               type="button"
-              aria-label={`Show all ${ordered.length} ${noun.many}`}
               className={cn(
                 "relative inline-flex shrink-0 items-center justify-center rounded-pill bg-surface-sunken text-xs font-medium text-fg tabular-nums transition-colors duration-fast hover:bg-surface-hover",
                 size === "sm" ? "size-avatar-sm" : "size-avatar-md",
                 RING[ring],
               )}
             >
-              +{hidden}
+              <span aria-hidden="true">+{hidden}</span>
+              <span className="sr-only">{`Show all ${ordered.length} ${noun.many}`}</span>
             </button>
           }
         >

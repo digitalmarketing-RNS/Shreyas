@@ -119,13 +119,13 @@ export function UserMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={`Account menu for ${user.name}`}
           className={cn(
             "inline-flex size-control-md shrink-0 items-center justify-center rounded-md transition-colors duration-fast hover:bg-surface-hover data-[state=open]:bg-surface-hover",
             className,
           )}
         >
           <Avatar name={user.name} size="md" variant="you" />
+          <span className="sr-only">{`Account menu for ${user.name}`}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 max-w-[calc(100vw-2rem)]">

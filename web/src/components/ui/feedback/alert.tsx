@@ -73,7 +73,7 @@ export function Alert({
   const role = live === "polite" ? "status" : live === "assertive" ? "alert" : undefined;
   const catalogueAction =
     message?.action && onAction ? (
-      <Button variant="secondary" size="sm" onClick={onAction}>
+      <Button variant="secondary" size="sm" onClick={onAction} className="h-auto min-h-control-sm py-1 text-left whitespace-normal">
         {message.action.label}
       </Button>
     ) : null;

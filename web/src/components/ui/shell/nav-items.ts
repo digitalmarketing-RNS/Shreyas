@@ -152,6 +152,12 @@ export function navAccessibleName(item: NavItem, count?: number): string {
   return `${item.label}, ${shown} ${count === 1 ? item.count.one : item.count.other}`;
 }
 
+/** The words after the label in a link's name: ", 4 chats waiting" (sr-only text). */
+export function navCountWords(item: NavItem, count?: number): string {
+  if (!item.count || !count) return "";
+  return `, ${count > 99 ? "99+" : count} ${count === 1 ? item.count.one : item.count.other}`;
+}
+
 /** "Inbox · 4 waiting" for the collapsed tooltip. */
 export function navTooltip(item: NavItem, count?: number): string {
   if (!item.count || !count) return item.label;

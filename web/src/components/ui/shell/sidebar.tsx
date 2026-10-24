@@ -13,7 +13,7 @@ import {
   type NavItem,
   type NavItemId,
   activeNavState,
-  navAccessibleName,
+  navCountWords,
   navTooltip,
 } from "./nav-items";
 import { useShell } from "./shell-context";
@@ -34,7 +34,10 @@ type FormClasses = {
   groupLabel: string;
   divider: string;
   link: string;
+  /** The item label: sr-only in the collapsed form (it still names the link), visible when expanded. */
   label: string;
+  /** Text shown only in the expanded form and removed when collapsed (the collapse button's label). */
+  expandedText: string;
   badge: string;
   dot: string;
   /** Shown only in the expanded form / only in the collapsed form. */
@@ -56,7 +59,8 @@ const FORMS: Record<"drawer" | `rail-${SidebarPreference}`, FormClasses> = {
     groupLabel: "",
     divider: "hidden",
     link: "gap-3 px-2",
-    label: "block",
+    label: "",
+    expandedText: "block",
     badge: "inline-flex",
     dot: "hidden",
     expandedOnly: "block",
@@ -69,7 +73,8 @@ const FORMS: Record<"drawer" | `rail-${SidebarPreference}`, FormClasses> = {
     groupLabel: "sr-only",
     divider: "block",
     link: "w-control-md justify-center",
-    label: "hidden",
+    label: "sr-only",
+    expandedText: "hidden",
     badge: "hidden",
     dot: "block",
     expandedOnly: "hidden",
@@ -82,7 +87,8 @@ const FORMS: Record<"drawer" | `rail-${SidebarPreference}`, FormClasses> = {
     groupLabel: "sr-only @5xl/shell:not-sr-only",
     divider: "block @5xl/shell:hidden",
     link: "w-control-md justify-center @5xl/shell:w-auto @5xl/shell:justify-start @5xl/shell:gap-3 @5xl/shell:px-2",
-    label: "hidden @5xl/shell:block",
+    label: "sr-only @5xl/shell:not-sr-only",
+    expandedText: "hidden @5xl/shell:block",
     badge: "hidden @5xl/shell:inline-flex",
     dot: "block @5xl/shell:hidden",
     expandedOnly: "hidden @5xl/shell:block",
@@ -95,7 +101,8 @@ const FORMS: Record<"drawer" | `rail-${SidebarPreference}`, FormClasses> = {
     groupLabel: "sr-only @7xl/shell:not-sr-only",
     divider: "block @7xl/shell:hidden",
     link: "w-control-md justify-center @7xl/shell:w-auto @7xl/shell:justify-start @7xl/shell:gap-3 @7xl/shell:px-2",
-    label: "hidden @7xl/shell:block",
+    label: "sr-only @7xl/shell:not-sr-only",
+    expandedText: "hidden @7xl/shell:block",
     badge: "hidden @7xl/shell:inline-flex",
     dot: "block @7xl/shell:hidden",
     expandedOnly: "hidden @7xl/shell:block",
@@ -267,7 +274,6 @@ function SidebarLink({
       href={item.href}
       prefetch={prefetch}
       aria-current={current}
-      aria-label={navAccessibleName(item, count)}
       onNavigate={
         onNavigate
           ? (event) => {
@@ -279,7 +285,10 @@ function SidebarLink({
       className={cn(navItemClassName, classes.link, active && navItemActiveClassName, "min-w-0 flex-1")}
     >
       <Icon aria-hidden="true" className={cn("size-icon-md shrink-0", active ? "text-accent" : "text-muted group-hover/item:text-fg")} />
-      <span className={cn("min-w-0 flex-1 truncate pt-0.5 pb-1", classes.label)}>{item.label}</span>
+      <span className={cn("flex min-w-0 flex-1", classes.label)}>
+        <span className="min-w-0 truncate pt-0.5 pb-1">{item.label}</span>
+      </span>
+      {count ? <span className="sr-only">{navCountWords(item, count)}</span> : null}
       {count ? (
         <>
           <Badge variant="count" count={count} decorative className={cn("ml-auto", classes.badge)} />
@@ -332,7 +341,7 @@ function CollapseButton({
     >
       <PanelLeftClose aria-hidden="true" className={cn("size-icon-md shrink-0", classes.expandedOnly)} />
       <PanelLeftOpen aria-hidden="true" className={cn("size-icon-md shrink-0", classes.collapsedOnly)} />
-      <span className={cn("min-w-0 flex-1 truncate pt-0.5 pb-1 text-left", classes.label)}>Collapse menu</span>
+      <span className={cn("min-w-0 flex-1 truncate pt-0.5 pb-1 text-left", classes.expandedText)}>Collapse menu</span>
       <span className={classes.collapsedSrOnly}>Expand menu</span>
     </button>
   );

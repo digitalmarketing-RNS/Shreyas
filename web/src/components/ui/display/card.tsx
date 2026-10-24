@@ -26,7 +26,10 @@ export type CardProps = {
   padding?: 4 | 5 | 6;
   /** Interactive: where the card goes. */
   href?: string;
-  /** Interactive without a title: the card link's accessible name ("Leads this week: 1,240. Open report"). */
+  /**
+   * Interactive without a title: words read after the card's own text to complete the link's name
+   * ("Open the attribution report"), as sr-only text so the visible text stays part of the name.
+   */
   label?: string;
   /** Render a <section aria-labelledby> (only for the few main parts of a page). */
   asSection?: boolean;
@@ -74,8 +77,9 @@ export function Card({
 
   if (interactive && !title) {
     return (
-      <Link id={id} href={href} aria-label={label} className={cn(frame, "block")}>
+      <Link id={id} href={href} className={cn(frame, "block")}>
         {children}
+        {label ? <span className="sr-only">{` ${label}`}</span> : null}
       </Link>
     );
   }

@@ -132,7 +132,7 @@ export default function Page() {
             </ul>
           </Card>
           <Card variant="interactive" href="#card" title="Fees collected" titleLevel={3}>
-            <p className="m-0 text-sm text-muted">interactive, heading link: the link's ::after covers the card; one tab stop.</p>
+            <p className="m-0 text-sm text-muted">interactive, heading link: the link&apos;s ::after covers the card; one tab stop.</p>
           </Card>
           <Card variant="interactive" href="#card" label="Leads this week: 1,240. Open the attribution report">
             <p className="m-0 text-xs font-medium text-muted">Leads this week</p>
