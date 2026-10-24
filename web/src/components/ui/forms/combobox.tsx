@@ -161,7 +161,8 @@ export function Combobox(props: ComboboxProps) {
   const [known, setKnown] = useState<Record<string, ComboboxOption>>(() =>
     Object.fromEntries([...options, ...selectedOptions].map((option) => [option.value, option])),
   );
-  const lookup = (value: string): ComboboxOption => known[value] ?? options.find((o) => o.value === value) ?? { value, label: value };
+  // The current options win, so a label that changes (a zone's offset on another date) stays fresh.
+  const lookup = (value: string): ComboboxOption => options.find((o) => o.value === value) ?? known[value] ?? { value, label: value };
   const chosenLabel = !multiple && selected[0] !== undefined ? lookup(selected[0]).label : "";
 
   // -- input and list state ------------------------------------------------------------------------

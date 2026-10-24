@@ -264,6 +264,8 @@ export function DropdownMenuRadioGroup({
 
 export type DropdownMenuRadioItemProps = Omit<ItemContentProps, "destructive"> & {
   value: string;
+  /** Something after the label (a StatusPill "Suspended"). */
+  badge?: ReactNode;
   unavailableReason?: string;
   highlighted?: boolean;
   className?: string;
@@ -272,6 +274,7 @@ export type DropdownMenuRadioItemProps = Omit<ItemContentProps, "destructive"> &
 
 export function DropdownMenuRadioItem({
   value,
+  badge,
   icon,
   children,
   description,
@@ -285,7 +288,7 @@ export function DropdownMenuRadioItem({
   const twoLine = Boolean(description ?? unavailableReason);
   const classes = cn(ITEM, twoLine ? "min-h-menu-item py-1.5" : "h-menu-item", "pl-8", UNAVAILABLE, className);
   const content = (
-    <ItemContent icon={icon} description={unavailableReason ?? description} shortcut={shortcut}>
+    <ItemContent icon={icon} description={unavailableReason ?? description} shortcut={shortcut} trailing={badge}>
       {children}
     </ItemContent>
   );

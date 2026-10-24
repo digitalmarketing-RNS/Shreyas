@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertDialog } from "radix-ui";
-import { type ReactElement, type ReactNode, useEffect, useId, useState } from "react";
+import { type ReactElement, type ReactNode, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/feedback/alert";
 import { cn } from "@/lib/cn";
@@ -92,12 +92,15 @@ export function ConfirmDialog({
     onOpenChange?.(next);
   };
 
-  // A fresh start each time it opens: no old error, nothing typed.
-  useEffect(() => {
-    if (!open) return;
-    setOwnError(null);
-    setTyped("");
-  }, [open]);
+  // A fresh start each time it opens: no old error, nothing typed (adjusted during render).
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setOwnError(null);
+      setTyped("");
+    }
+  }
 
   const matches = !typedConfirmation || typed.trim() === typedConfirmation;
 

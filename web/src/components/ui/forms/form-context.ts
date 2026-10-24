@@ -14,6 +14,8 @@ export type FormContextValue = {
   surface: FieldSurface;
   errors: FormErrors;
   pending: boolean;
+  /** Submit is waiting for file uploads that are still running ("Uploading…"). */
+  uploading: boolean;
   /** Called by a Field with a name: the control id its error-summary link points at. */
   registerField: (name: string, controlId: string) => () => void;
 };

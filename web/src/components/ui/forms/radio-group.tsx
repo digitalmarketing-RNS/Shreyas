@@ -46,7 +46,7 @@ export function radioCircleClassName(isPublic: boolean, ownRing = true) {
   return cn(
     "peer m-0 shrink-0 cursor-pointer appearance-none rounded-pill border border-input bg-surface transition-colors duration-fast",
     isPublic ? "size-5" : "size-checkbox",
-    "hover:border-muted checked:border-accent aria-invalid:border-danger",
+    "hover:border-muted checked:border-accent data-invalid:border-danger",
     "disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-subtle",
     "forced-colors:appearance-auto",
     !ownRing && "focus-visible:outline-none",
@@ -187,7 +187,8 @@ function RadioRow({
           checked={checked}
           disabled={option.disabled}
           required={required}
-          aria-invalid={group?.invalid || undefined}
+          // Radios do not take aria-invalid (ARIA 1.2); the fieldset's aria-describedby carries the error.
+          data-invalid={group?.invalid ? "" : undefined}
           aria-describedby={descriptionId}
           onChange={() => onChoose(option.value)}
           className={radioCircleClassName(isPublic, !card)}
