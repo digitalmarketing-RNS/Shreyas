@@ -22,7 +22,7 @@ export type SegmentedControlProps = {
   legendHidden?: boolean;
   /**
    * In a sentence (ConditionBuilder: "Leads that match [all | any] of these conditions"): the ids
-   * of the text before and after it. The root becomes <div role="radiogroup" aria-labelledby>
+   * of the text before and after it. The root becomes <span role="radiogroup" aria-labelledby>
    * with no fieldset or legend of its own.
    */
   labelledBy?: string;
@@ -81,9 +81,8 @@ export function SegmentedControl({
   const groupName = name ?? `${base}-segment`;
 
   const track = (
-    <div
-      className={cn(segmentTrackClassName(size), fullWidth && "flex w-full")}
-    >
+    // Spans throughout: in a sentence the control is phrasing content inside a <p>.
+    <span className={cn(segmentTrackClassName(size), fullWidth && "flex w-full")}>
       {options.map((option, index) => {
         const id = `${base}-${index}`;
         const off = disabled || option.disabled;
@@ -127,14 +126,14 @@ export function SegmentedControl({
           </Tooltip.Root>
         );
       })}
-    </div>
+    </span>
   );
 
   if (labelledBy) {
     return (
-      <div role="radiogroup" aria-labelledby={labelledBy} className={cn("inline-flex align-middle", className)}>
+      <span role="radiogroup" aria-labelledby={labelledBy} className={cn("inline-flex align-middle", className)}>
         {track}
-      </div>
+      </span>
     );
   }
 
