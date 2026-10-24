@@ -1,0 +1,376 @@
+<title>Naveen Tiles Bus Routes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: route-board header, then map (sticky on desktop) beside the ranked list; table, buying steps and caveats run full width below */
+:root {
+  --bg: #f4f5f3;
+  --surface: #ffffff;
+  --ink: #15181b;
+  --ink-2: #454c53;
+  --muted: #6b737a;
+  --rule: #dce0dd;
+  --net: #c3c9c5;
+  --chip: #e8ebe9;
+  --nw: #2a78d6;
+  --jay: #eb6834;
+  --jig: #1baf7a;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131615; --surface: #1b1f1d; --ink: #eef0ee; --ink-2: #c1c7c3; --muted: #939a96;
+    --rule: #2d3330; --net: #39403c; --chip: #252a27;
+    --nw: #3987e5; --jay: #d95926; --jig: #199e70;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131615; --surface: #1b1f1d; --ink: #eef0ee; --ink-2: #c1c7c3; --muted: #939a96;
+  --rule: #2d3330; --net: #39403c; --chip: #252a27;
+  --nw: #3987e5; --jay: #d95926; --jig: #199e70;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: 0.005em; }
+h1 { font-size: clamp(2.3rem, 5.4vw, 3.9rem); font-weight: 700; }
+h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+h3 { font-size: 1.3rem; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--ink-2); max-width: 68ch; }
+.lede strong { color: var(--ink); }
+header { display: grid; gap: 16px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.fact { padding: 14px 16px 14px 0; display: grid; gap: 2px; }
+.fact b { font-family: var(--display); font-size: 2rem; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.fact span { font-size: 0.88rem; color: var(--ink-2); }
+
+/* map + list */
+.board { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.mapcol { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 12px; min-width: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button { font: 500 0.9rem/1 var(--body); color: var(--ink); background: var(--chip); border: 1px solid transparent; border-radius: 999px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.filters button:focus-visible, .card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.sw { width: 10px; height: 10px; display: inline-block; border-radius: 2px; flex: none; }
+.sw.nw { background: var(--nw); } .sw.jay { background: var(--jay); } .sw.jig { background: var(--jig); }
+.mapbox { position: relative; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+#map { display: block; width: 100%; height: auto; max-height: 82vh; }
+#map .net { fill: none; stroke: var(--net); stroke-width: 0.6px; vector-effect: non-scaling-stroke; }
+#map .rt { fill: none; stroke-width: 2.6px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: opacity .15s, stroke-width .15s; }
+#map .rt.nw { stroke: var(--nw); } #map .rt.jay { stroke: var(--jay); } #map .rt.jig { stroke: var(--jig); }
+#map .halo { fill: none; stroke: var(--surface); stroke-width: 5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+#map .hit { fill: none; stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; pointer-events: stroke; cursor: pointer; }
+#map g.route.dim { opacity: 0.12; }
+#map g.route.hot .rt { stroke-width: 4.5px; }
+#map .lbl rect { fill: var(--surface); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+#map .lbl.nw rect { stroke: var(--nw); } #map .lbl.jay rect { stroke: var(--jay); } #map .lbl.jig rect { stroke: var(--jig); }
+#map .lbl text { fill: var(--ink); font-family: var(--display); font-weight: 700; dominant-baseline: central; text-anchor: middle; }
+#map .lm circle { fill: var(--muted); }
+#map .lm text { fill: var(--muted); font-family: var(--body); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+#map .sr rect { stroke: var(--surface); stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+#map .sr.nw rect { fill: var(--nw); } #map .sr.jay rect { fill: var(--jay); } #map .sr.jig rect { fill: var(--jig); }
+#map .sr text { fill: var(--ink); font-family: var(--display); font-weight: 700; paint-order: stroke; stroke: var(--surface); stroke-linejoin: round; }
+#map .scale line { stroke: var(--ink-2); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+#map .scale text { fill: var(--ink-2); font-family: var(--mono); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.85rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .pin { width: 11px; height: 11px; border: 2px solid var(--ink); border-radius: 1px; display: inline-block; }
+.legend .ln { width: 18px; height: 0; border-top: 1px solid var(--net); display: inline-block; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; line-height: 1.35; box-shadow: 0 4px 16px rgba(0,0,0,.12); max-width: 240px; }
+.tip b { font-family: var(--display); font-size: 1.05rem; }
+
+.list { display: grid; gap: 10px; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.card { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 12px; padding: 14px 16px 14px 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; cursor: default; transition: border-color .15s; }
+.card.hot { border-color: var(--ink); }
+.card.dim { opacity: 0.35; }
+.rank { font-family: var(--display); font-size: 2.1rem; font-weight: 600; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; grid-row: span 3; padding-top: 2px; }
+.cardhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.rno { font-family: var(--display); font-weight: 700; font-size: 1.5rem; line-height: 1; padding: 3px 8px 2px; border: 2px solid; border-radius: 4px; }
+.rno.nw { border-color: var(--nw); } .rno.jay { border-color: var(--jay); } .rno.jig { border-color: var(--jig); }
+.ends { font-weight: 700; }
+.why { color: var(--ink-2); font-size: 0.95rem; }
+.stats { display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--mono); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 500; }
+
+section { display: grid; gap: 16px; min-width: 0; }
+.tablebox { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 0.9rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--surface); }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+th.num { text-align: right; }
+tr.reserve td { color: var(--ink-2); }
+tr.sep td { background: var(--chip); font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 6px 12px; }
+.tno { font-family: var(--display); font-weight: 700; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.note { font-size: 0.85rem; color: var(--muted); max-width: 90ch; }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+ol.steps li::before { content: counter(s); font-family: var(--display); font-weight: 700; font-size: 1.3rem; line-height: 1; width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 4px; }
+ol.steps b { display: block; }
+ol.steps span { color: var(--ink-2); font-size: 0.95rem; }
+.facts-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.facts-list li { padding-left: 14px; border-left: 2px solid var(--rule); color: var(--ink-2); font-size: 0.95rem; }
+.facts-list li b { color: var(--ink); }
+.src { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); display: block; margin-top: 2px; }
+a { color: var(--ink); text-underline-offset: 2px; }
+.depots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.depot { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; }
+.depot b { font-family: var(--display); font-size: 1.2rem; font-weight: 600; }
+.depot span { font-size: 0.9rem; color: var(--ink-2); }
+.calc { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; display: grid; gap: 6px; font-size: 0.95rem; color: var(--ink-2); }
+.calc code { font-family: var(--mono); font-size: 0.85rem; color: var(--ink); }
+footer { border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 8px; font-size: 0.85rem; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .board, .two { grid-template-columns: minmax(0, 1fr); }
+  .mapcol { position: static; }
+  #map { max-height: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Naveen Tiles · BMTC bus advertising · Bengaluru · Oct 2026</p>
+    <h1>The 10 BMTC routes to brand for Naveen Tiles</h1>
+    <p class="lede">Every pick runs past one of the four Bengaluru showrooms and through areas where people are building or redoing homes. Brand <strong>one bus on each route</strong>. Together they pass within 400 m of a showroom about <strong>110 times a day</strong>. Buy them by depot, lock the route numbers into the contract, and check the buses yourself in the Namma BMTC app.</p>
+    <div class="facts">
+      <div class="fact"><b>4</b><span>showrooms: Rajajinagar, Yeshwanthpur, Jayanagar, Jigani</span></div>
+      <div class="fact"><b>1,009</b><span>route-directions pass within 400 m of a showroom</span></div>
+      <div class="fact"><b>~1,490</b><span>scheduled trips a day on the 10 picked routes</span></div>
+      <div class="fact"><b>~110</b><span>showroom pass-bys a day by 10 branded buses (est.)</span></div>
+    </div>
+  </header>
+
+  <div class="board">
+    <div class="mapcol">
+      <div class="filters" role="group" aria-label="Filter by showroom">
+        <button type="button" id="f-all" data-f="all" aria-pressed="true">All 10</button>
+        <button type="button" id="f-nw" data-f="nw" aria-pressed="false"><i class="sw nw"></i>Rajajinagar + Yeshwanthpur</button>
+        <button type="button" id="f-jay" data-f="jay" aria-pressed="false"><i class="sw jay"></i>Jayanagar</button>
+        <button type="button" id="f-jig" data-f="jig" aria-pressed="false"><i class="sw jig"></i>Jigani</button>
+      </div>
+      <div class="mapbox" id="mapbox">
+        <svg id="map" role="img" aria-label="Map of the 10 recommended BMTC routes and the four Naveen Tiles showrooms in Bengaluru"></svg>
+        <div class="tip" id="tip" hidden></div>
+      </div>
+      <div class="legend">
+        <span><i class="pin"></i>Showroom</span>
+        <span><i class="sw nw"></i>Rajajinagar + Yeshwanthpur routes</span>
+        <span><i class="sw jay"></i>Jayanagar routes</span>
+        <span><i class="sw jig"></i>Jigani routes</span>
+        <span><i class="ln"></i>All other BMTC routes</span>
+      </div>
+    </div>
+    <ol class="list" id="list" aria-label="Ranked routes"></ol>
+  </div>
+
+  <section>
+    <h2>The numbers behind each pick</h2>
+    <div class="tablebox">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Route</th><th>Runs between</th><th>Showroom it passes</th>
+          <th class="num">Closest pass</th><th class="num">Trips / day</th><th class="num">Passes / bus / day</th><th class="num">Stop busyness</th><th>Depot (confirm)</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note"><b>Trips / day</b>: scheduled trips on the route, both directions. <b>Passes / bus / day</b>: estimated times one branded bus goes by a showroom, assuming a bus covers about 200 km a day. <b>Stop busyness</b>: average daily bus departures at the stops the route uses, a stand-in for how busy its roads are. Depot numbers come from route tags in the BMTC app data and are hints to confirm with the vendor.</p>
+  </section>
+
+  <section>
+    <h2>Book by depot, not by route</h2>
+    <p class="lede">Agencies sell BMTC buses by depot, and a bus can be moved between routes. Ask for buses from these depots, then name the route schedules in the contract.</p>
+    <div class="depots">
+      <div class="depot"><b>Kothnur · Depot 34</b><span>Runs 215-H. Also runs 369, 215-C and the Bannerghatta Road routes to Jigani (366 series), so one depot covers the Jayanagar and Jigani areas.</span></div>
+      <div class="depot"><b>Jigani · Depot 27</b><span>Runs 365-J and 398-CH. About 1 km from the Jigani showroom.</span></div>
+      <div class="depot"><b>Kottigepalya · Depot 31</b><span>Runs 80-A and part of 401-M. 410-FA passes its gate.</span></div>
+      <div class="depot"><b>Kengeri · Depot 12</b><span>Runs part of 401-M and 501-C.</span></div>
+      <div class="depot"><b>Dasanapura · Depot 40</b><span>Runs the 258 family to Nelamangala. Ask here for 258-CC.</span></div>
+    </div>
+  </section>
+
+  <section class="two">
+    <div style="display:grid; gap:16px; min-width:0">
+      <h2>How to buy so the ROI holds</h2>
+      <ol class="steps">
+        <li><div><b>Get quotes from three agencies</b><span>Give each agency this list of 10 routes and 5 depots. Ask for full-wrap and rear-panel prices on non-AC buses.</span></div></li>
+        <li><div><b>Put route numbers in the contract</b><span>Name the route schedule for each bus, with a make-good clause if a bus is moved off its route or is off the road for more than a few days.</span></div></li>
+        <li><div><b>Get each bus's registration number</b><span>Spot-check them weekly in the Namma BMTC app's live tracking, and ask the vendor for monthly route proof.</span></div></li>
+        <li><div><b>Make one design per showroom area</b><span>Kannada first (BMTC requires it), with the nearest showroom and a landmark the bus passes. Examples: "Goraguntepalya Metro" on 401-M and 410-FA, "South End Circle" on 215-H and 60-A, "Navarang, Dr. Rajkumar Road" on 258-CC and 80-A.</span></div></li>
+        <li><div><b>Give each area its own number</b><span>Use a separate WhatsApp number or QR code per showroom area, and ask walk-ins where they saw Naveen. Compare 8 weeks before and after.</span></div></li>
+        <li><div><b>Run 3 months, then cut the weakest</b><span>Drop the bottom two routes by leads and move those buses to the reserves below.</span></div></li>
+      </ol>
+    </div>
+    <div style="display:grid; gap:16px; align-content:start; min-width:0">
+      <h2>Formats and cost: what is confirmed</h2>
+      <ul class="facts-list">
+        <li><b>Full-body wraps are available.</b> BMTC has wrapped 3,400 AC and non-AC buses since 2025. Every ad needs BMTC approval and must be in Kannada, and BMTC can keep up to 10% of the space for public notices.<span class="src">The Hindu, 17 Jul 2026</span></li>
+        <li><b>The 1,000 Tata non-AC electric buses take rear-panel ads only</b>, an 18 sq ft panel, under a 3-year rights tender. If a depot gives you these buses, you get the rear panel and no wrap.<span class="src">Times of India, 9 Jul 2026</span></li>
+        <li><b>BMTC's floor price for those rear panels is ₹4,800 per bus per month</b> plus GST. That is what the agency pays BMTC. Your price will be higher.<span class="src">The Hindu, 17 Jul 2026</span></li>
+        <li><b>Minimum order is usually 5 bus-months.</b> One agency claims about 50,000 daily views for a full non-AC wrap and 22,000 for a rear panel. Treat those as sales claims.<span class="src">bmtcbusbranding.com, agency site</span></li>
+      </ul>
+      <div class="calc">
+        <b style="color:var(--ink)">Break-even check per bus</b>
+        <code>orders needed per month = monthly cost per bus ÷ gross margin per order</code>
+        <span>Example with assumed figures: a ₹40,000 wrap and a ₹1.5 lakh house order at 20% margin (₹30,000) needs about 1.3 extra orders a month per bus. Plug in your real numbers.</span>
+      </div>
+      <p class="note">If budget is tight, wrap #1–#5 and put rear panels on #6–#10. Rear panels still get long looks in Bengaluru traffic.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reserves</h2>
+    <p class="lede">Use these if a pick isn't available, or to replace a route that underperforms after 3 months.</p>
+    <ul class="facts-list" id="reserves"></ul>
+  </section>
+
+  <footer>
+    <p><b>How this was built.</b> Showroom addresses are from naveentile.com/find-store. Routes, stops and timetables are from the unofficial BMTC GTFS dataset (github.com/Vonter/bmtc-gtfs), taken from the Namma BMTC app and refreshed in September 2026. A route counts as passing a showroom when its path comes within 400 m. Ranking weighs four things: how close the route passes, how often it runs, how busy its stops are, and whether its areas are full of home-builders and renovators.</p>
+    <p><b>Limits.</b> The BMTC app data covers only routes with live tracking, and its timetables are approximate. Trip counts are scheduled, not ridership. Pass-by estimates assume about 200 km per bus per day. The Rajajinagar showroom sits on Dr. Rajkumar Road, which few BMTC routes use. Most Rajajinagar routes (80-A, 176) run one block away, about 250 m.</p>
+  </footer>
+</div>
+
+<script>
+const MAP = __MAP__;
+const ROUTES = __ROUTES__;
+const RESERVES = __RESERVES__;
+const LABEL_AT = __LABELAT__;
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("map");
+svg.setAttribute("viewBox", `0 0 ${MAP.w} ${MAP.h}`);
+const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+mk("path", { d: MAP.network, class: "net" }, svg);
+const routeLayer = mk("g", {}, svg);
+const labelLayer = mk("g", {}, svg);
+const lmLayer = mk("g", {}, svg);
+const srLayer = mk("g", {}, svg);
+const scaleLayer = mk("g", { class: "scale" }, svg);
+const CL = { "Rajajinagar": "nw", "Yeshwanthpur": "nw", "Jayanagar": "jay", "Jigani": "jig" };
+
+const groups = {}, labels = {};
+[...ROUTES].reverse().forEach(r => {
+  const g = mk("g", { class: "route", "data-r": r.no }, routeLayer);
+  mk("path", { d: MAP.routes[r.no], class: "halo" }, g);
+  mk("path", { d: MAP.routes[r.no], class: "rt " + r.cluster }, g);
+  const hit = mk("path", { d: MAP.routes[r.no], class: "hit" }, g);
+  hit.addEventListener("pointerenter", e => { focusRoute(r.no); showTip(r, e); });
+  hit.addEventListener("pointermove", e => showTip(r, e));
+  hit.addEventListener("pointerleave", () => { focusRoute(null); hideTip(); });
+  groups[r.no] = g;
+});
+ROUTES.forEach(r => {
+  const pts = MAP.route_pts[r.no];
+  const p = pts[Math.min(pts.length - 1, Math.round((LABEL_AT[r.no] ?? 0.5) * (pts.length - 1)))];
+  const g = mk("g", { class: "lbl " + r.cluster, "data-r": r.no }, labelLayer);
+  mk("rect", { rx: 4 }, g);
+  const t = mk("text", {}, g); t.textContent = r.no;
+  labels[r.no] = { g, x: p[0], y: p[1] };
+});
+const LEFT = new Set(["Banashankari", "Harohalli", "Bommasandra", "Kengeri"]);
+for (const [n, p] of Object.entries(MAP.landmarks)) {
+  const g = mk("g", { class: "lm" }, lmLayer);
+  mk("circle", { cx: p[0], cy: p[1], r: 3 }, g);
+  const t = mk("text", { x: p[0] + (LEFT.has(n) ? -7 : 7), y: p[1] + 4, "text-anchor": LEFT.has(n) ? "end" : "start" }, g);
+  t.textContent = n;
+  g.dataset.lm = n;
+}
+const SR_SIDE = { Rajajinagar: "end", Yeshwanthpur: "end", Jayanagar: "start", Jigani: "start" };
+for (const [n, p] of Object.entries(MAP.showrooms)) {
+  const g = mk("g", { class: "sr " + CL[n] }, srLayer);
+  mk("rect", { x: p[0] - 9, y: p[1] - 9, width: 18, height: 18, rx: 2 }, g);
+  const t = mk("text", { x: p[0] + (SR_SIDE[n] === "end" ? -14 : 14), y: p[1] + 6, "text-anchor": SR_SIDE[n] }, g);
+  t.textContent = n;
+}
+// scale bar, bottom right
+const sx = MAP.w - 40, sy = MAP.h - 40;
+mk("line", { x1: sx - MAP.scale_10km, y1: sy, x2: sx, y2: sy }, scaleLayer);
+mk("line", { x1: sx - MAP.scale_10km, y1: sy - 6, x2: sx - MAP.scale_10km, y2: sy + 6 }, scaleLayer);
+mk("line", { x1: sx, y1: sy - 6, x2: sx, y2: sy + 6 }, scaleLayer);
+const st = mk("text", { x: sx - MAP.scale_10km / 2, y: sy - 12, "text-anchor": "middle" }, scaleLayer); st.textContent = "10 km";
+
+function sizeText() {
+  const s = (svg.getBoundingClientRect().width || 560) / MAP.w;
+  const fs = v => (v / s).toFixed(1);
+  for (const r of ROUTES) {
+    const L = labels[r.no], t = L.g.querySelector("text"), rect = L.g.querySelector("rect");
+    t.setAttribute("font-size", fs(13)); t.setAttribute("x", L.x); t.setAttribute("y", L.y);
+    const w = t.getComputedTextLength() + 10 / s, h = 18 / s;
+    rect.setAttribute("x", L.x - w / 2); rect.setAttribute("y", L.y - h / 2); rect.setAttribute("width", w); rect.setAttribute("height", h);
+  }
+  svg.querySelectorAll(".lm text").forEach(t => t.setAttribute("font-size", fs(11)));
+  svg.querySelectorAll(".lm circle").forEach(c => c.setAttribute("r", fs(2.5)));
+  svg.querySelectorAll(".sr text").forEach(t => { t.setAttribute("font-size", fs(15)); t.setAttribute("stroke-width", fs(3)); });
+  svg.querySelectorAll(".sr rect").forEach(rc => {
+    const cx = +rc.getAttribute("x") + +rc.getAttribute("width") / 2, cy = +rc.getAttribute("y") + +rc.getAttribute("height") / 2, z = 12 / s;
+    rc.setAttribute("x", cx - z / 2); rc.setAttribute("y", cy - z / 2); rc.setAttribute("width", z); rc.setAttribute("height", z);
+  });
+  svg.querySelectorAll(".scale text").forEach(t => t.setAttribute("font-size", fs(11)));
+}
+
+// list + table
+const list = document.getElementById("list"), tbody = document.getElementById("tbody");
+const cards = {};
+ROUTES.forEach(r => {
+  const li = document.createElement("li");
+  li.className = "card"; li.tabIndex = 0; li.dataset.r = r.no; li.dataset.c = r.cluster;
+  li.innerHTML = `<div class="rank">${r.rank}</div>
+    <div class="cardhead"><span class="rno ${r.cluster}">${r.no}</span><span class="ends">${r.ends}</span></div>
+    <p class="why">${r.why}</p>
+    <div class="stats"><span>Passes <b>${r.showroom}</b> at <b>${r.dist}</b></span><span><b>${r.trips}</b> trips/day</span><span>~<b>${r.passes}</b> passes/bus/day</span></div>`;
+  li.addEventListener("pointerenter", () => focusRoute(r.no));
+  li.addEventListener("pointerleave", () => focusRoute(null));
+  li.addEventListener("focus", () => focusRoute(r.no));
+  li.addEventListener("blur", () => focusRoute(null));
+  list.appendChild(li); cards[r.no] = li;
+});
+const row = (r, cls) => `<tr class="${cls}"><td>${r.rank ?? "–"}</td><td><span class="tno"><i class="sw ${r.cluster}"></i>${r.no}</span></td><td>${r.ends}<br><span class="note">${r.via}</span></td><td>${r.showroom}</td><td class="num">${r.dist}</td><td class="num">${r.trips}</td><td class="num">${r.passes}</td><td class="num">${r.busy}</td><td>${r.depot}</td></tr>`;
+tbody.innerHTML = ROUTES.map(r => row(r, "")).join("") + `<tr class="sep"><td colspan="9">Reserves</td></tr>` + RESERVES.map(r => row(r, "reserve")).join("");
+document.getElementById("reserves").innerHTML = RESERVES.map(r => `<li><b>${r.no}</b> · ${r.ends}. ${r.why}</li>`).join("");
+
+// interaction
+let filter = "all";
+function applyState(hot) {
+  ROUTES.forEach(r => {
+    const inF = filter === "all" || r.cluster === filter;
+    const on = hot ? r.no === hot : inF;
+    groups[r.no].classList.toggle("dim", !on);
+    groups[r.no].classList.toggle("hot", r.no === hot);
+    labels[r.no].g.style.opacity = on ? 1 : 0.15;
+    cards[r.no].classList.toggle("hot", r.no === hot);
+    cards[r.no].classList.toggle("dim", !inF);
+  });
+  if (hot) routeLayer.appendChild(groups[hot]);
+}
+function focusRoute(no) { applyState(no); }
+document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+  filter = b.dataset.f;
+  document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  applyState(null);
+}));
+const tip = document.getElementById("tip"), box = document.getElementById("mapbox");
+function showTip(r, e) {
+  const bb = box.getBoundingClientRect();
+  tip.innerHTML = `<b>#${r.rank} · ${r.no}</b><br>${r.ends}<br>${r.trips} trips/day · passes ${r.showroom} at ${r.dist}`;
+  tip.hidden = false;
+  const x = Math.min(e.clientX - bb.left + 14, bb.width - 250), y = Math.max(8, e.clientY - bb.top - 70);
+  tip.style.left = Math.max(8, x) + "px"; tip.style.top = y + "px";
+}
+function hideTip() { tip.hidden = true; }
+window.addEventListener("resize", sizeText);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeText);
+sizeText();
+applyState(null);
+</script>
