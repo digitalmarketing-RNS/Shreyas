@@ -1,0 +1,26 @@
+/* App stylesheet.
+
+   The design tokens live in replica/design/tokens.json and tokens.dark.json.
+   src/styles/ holds the files build_tokens.py generates from them; never edit
+   those by hand. After a token change run `npm run tokens` (and `npm run
+   tokens:check` in CI, which `npm run check` does).
+
+   ../styles/tailwind.css starts with @import "tailwindcss" and
+   @import "./tokens.css", so this one import brings in Tailwind, the token
+   custom properties (light, dark, reduced motion) and the @theme mapping that
+   turns them into utilities (bg-surface, text-muted, h-control-md ...).
+   Importing "tailwindcss" here as well would emit Tailwind twice.
+
+   ../fonts/emoji.css declares the device's colour emoji font as a face; next/font cannot
+   declare a local() source. src/fonts/index.ts puts it in the font stack. */
+@import "../styles/tailwind.css";
+@import "../fonts/emoji.css";
+
+@layer base {
+  body {
+    min-height: 100dvh;
+    background-color: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
