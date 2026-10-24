@@ -4,7 +4,7 @@ import { Minus, Plus } from "lucide-react";
 import { type KeyboardEvent, type PointerEvent, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { CONTROL_HEIGHT, RING_FROM_INPUT, controlBox } from "./control-styles";
-import { useFieldControl } from "./field-context";
+import { FieldContext, useFieldControl } from "./field-context";
 import { Select } from "./select";
 
 export type DurationUnit = { value: string; label: string; minutes: number };
@@ -304,19 +304,22 @@ export function NumberStepper({
       </div>
       {units ? (
         <div className={cn(size === "sm" ? "w-28" : "w-32")}>
-          <Select
-            size={size}
-            aria-label={`${valueName} unit`}
-            options={units.map((u) => ({ value: u.value, label: u.label }))}
-            value={unitValue}
-            disabled={control.disabled}
-            onValueChange={(next) => {
-              if (!next) return;
-              setUnitValue(next);
-              const minutes = units.find((u) => u.value === next)?.minutes ?? 1;
-              emit(text, minutes);
-            }}
-          />
+          {/* The unit picker is its own control: it must not take the Field's id or error. */}
+          <FieldContext.Provider value={null}>
+            <Select
+              size={size}
+              aria-label={`${valueName} unit`}
+              options={units.map((u) => ({ value: u.value, label: u.label }))}
+              value={unitValue}
+              disabled={control.disabled}
+              onValueChange={(next) => {
+                if (!next) return;
+                setUnitValue(next);
+                const minutes = units.find((u) => u.value === next)?.minutes ?? 1;
+                emit(text, minutes);
+              }}
+            />
+          </FieldContext.Provider>
         </div>
       ) : unit ? (
         <span className="text-sm text-muted">{unit}</span>

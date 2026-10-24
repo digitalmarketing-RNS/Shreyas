@@ -26,6 +26,8 @@ export type DatePickerProps = {
   value?: string | null;
   defaultValue?: string | null;
   onValueChange?: (iso: string | null) => void;
+  /** What the person typed, when a server response sends it back unread ("31/02/2026"). */
+  defaultText?: string;
   min?: string;
   max?: string;
   /** Days that cannot be chosen (holidays), as ISO dates. */
@@ -64,6 +66,7 @@ export function DatePicker({
   value,
   defaultValue = null,
   onValueChange,
+  defaultText,
   min,
   max,
   disabledDates = [],
@@ -96,7 +99,7 @@ export function DatePicker({
   const [innerValue, setInnerValue] = useState<string | null>(defaultValue);
   const iso = value !== undefined ? value : innerValue;
   const chosen = fromIso(iso);
-  const [text, setText] = useState(chosen ? formatPlainDate(chosen) : "");
+  const [text, setText] = useState(defaultText ?? (chosen ? formatPlainDate(chosen) : ""));
   const [open, setOpen] = useState(false);
   const [errorShown, setErrorShown] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);

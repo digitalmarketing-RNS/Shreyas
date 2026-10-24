@@ -25,7 +25,7 @@ import {
   toIso,
   todayIn,
 } from "./dates";
-import { joinIds } from "./field-context";
+import { FieldContext, joinIds } from "./field-context";
 import { Select } from "./select";
 
 export type DateRangeCompare = "previous" | "last_year";
@@ -307,140 +307,143 @@ export function DateRangePicker({
           <ChevronDown aria-hidden="true" className="size-icon-sm shrink-0 text-muted" />
         </Popover.Trigger>
         <Popover.Portal>
-          <Popover.Content
-            ref={contentRef}
-            aria-label="Choose a date range"
-            align="start"
-            sideOffset={4}
-            collisionPadding={8}
-            onKeyDown={onContentKeyDown}
-            onOpenAutoFocus={(event) => {
-              event.preventDefault();
-              const target =
-                contentRef.current?.querySelector<HTMLInputElement>("input[type=radio]:checked") ??
-                contentRef.current?.querySelector<HTMLInputElement>(presets ? "input[type=radio]" : "input[data-range-input=from]");
-              target?.focus();
-            }}
-            className={cn(POPOVER_PANEL, "flex max-h-(--radix-popover-content-available-height) w-[min(40rem,calc(100vw-1rem))] flex-col overflow-y-auto")}
-          >
-            <div className="flex flex-col md:flex-row">
-              {presets ? (
-                <fieldset className="m-0 min-w-0 border-0 border-b border-border p-2 md:w-44 md:shrink-0 md:border-r md:border-b-0">
-                  <legend className="float-left mb-1 w-full px-2 pt-1 text-xs font-medium text-muted">Quick ranges</legend>
-                  <div className="clear-both flex flex-col">
-                    {DATE_RANGE_PRESETS.map((preset) => (
-                      <label
-                        key={preset.value}
-                        className={cn(
-                          "flex h-menu-item cursor-pointer items-center justify-between gap-2 rounded-sm px-2 text-sm text-fg transition-colors duration-fast hover:bg-surface-hover",
-                          "focus-inset has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus-ring has-[:focus-visible]:outline-solid",
-                          "has-[:checked]:bg-accent-subtle has-[:checked]:font-medium",
-                        )}
-                      >
-                        <input
-                          type="radio"
-                          name={`${base}-preset`}
-                          value={preset.value}
-                          checked={draft.preset === preset.value}
-                          onChange={() => choosePreset(preset.value)}
-                          className="peer sr-only"
-                        />
-                        <span className="truncate">{preset.label}</span>
-                        <Check aria-hidden="true" className="hidden size-icon-sm shrink-0 text-accent peer-checked:block" />
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              ) : null}
-              <div className="flex min-w-0 flex-1 flex-col gap-3 p-3">
-                <div className="flex flex-wrap gap-2">
-                  {(["from", "to"] as const).map((which) => {
-                    const id = `${base}-${which}`;
-                    return (
-                      <div key={which} className="flex flex-col gap-1">
-                        <label htmlFor={id} className="text-xs font-medium text-fg">
-                          {which === "from" ? "From" : "To"}
+          {/* The parts inside label themselves; none may take an outer Field's id. */}
+          <FieldContext.Provider value={null}>
+            <Popover.Content
+              ref={contentRef}
+              aria-label="Choose a date range"
+              align="start"
+              sideOffset={4}
+              collisionPadding={8}
+              onKeyDown={onContentKeyDown}
+              onOpenAutoFocus={(event) => {
+                event.preventDefault();
+                const target =
+                  contentRef.current?.querySelector<HTMLInputElement>("input[type=radio]:checked") ??
+                  contentRef.current?.querySelector<HTMLInputElement>(presets ? "input[type=radio]" : "input[data-range-input=from]");
+                target?.focus();
+              }}
+              className={cn(POPOVER_PANEL, "flex max-h-(--radix-popover-content-available-height) w-[min(40rem,calc(100vw-1rem))] flex-col overflow-y-auto")}
+            >
+              <div className="flex flex-col md:flex-row">
+                {presets ? (
+                  <fieldset className="m-0 min-w-0 border-0 border-b border-border p-2 md:w-44 md:shrink-0 md:border-r md:border-b-0">
+                    <legend className="float-left mb-1 w-full px-2 pt-1 text-xs font-medium text-muted">Quick ranges</legend>
+                    <div className="clear-both flex flex-col">
+                      {DATE_RANGE_PRESETS.map((preset) => (
+                        <label
+                          key={preset.value}
+                          className={cn(
+                            "flex h-menu-item cursor-pointer items-center justify-between gap-2 rounded-sm px-2 text-sm text-fg transition-colors duration-fast hover:bg-surface-hover",
+                            "focus-inset has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus-ring has-[:focus-visible]:outline-solid",
+                            "has-[:checked]:bg-accent-subtle has-[:checked]:font-medium",
+                          )}
+                        >
+                          <input
+                            type="radio"
+                            name={`${base}-preset`}
+                            value={preset.value}
+                            checked={draft.preset === preset.value}
+                            onChange={() => choosePreset(preset.value)}
+                            className="peer sr-only"
+                          />
+                          <span className="truncate">{preset.label}</span>
+                          <Check aria-hidden="true" className="hidden size-icon-sm shrink-0 text-accent peer-checked:block" />
                         </label>
-                        <input
-                          id={id}
-                          data-range-input={which}
-                          type="text"
-                          autoComplete="off"
-                          spellCheck={false}
-                          value={which === "from" ? draft.fromText : draft.toText}
-                          aria-invalid={Boolean(problem) || undefined}
-                          aria-describedby={joinIds(problem && errorId)}
-                          onChange={(event) =>
-                            update(which === "from" ? { fromText: event.currentTarget.value } : { toText: event.currentTarget.value })
-                          }
-                          onBlur={(event) => readInput(which, event.currentTarget.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" && !event.ctrlKey && !event.metaKey) {
-                              event.preventDefault();
-                              readInput(which, event.currentTarget.value);
+                      ))}
+                    </div>
+                  </fieldset>
+                ) : null}
+                <div className="flex min-w-0 flex-1 flex-col gap-3 p-3">
+                  <div className="flex flex-wrap gap-2">
+                    {(["from", "to"] as const).map((which) => {
+                      const id = `${base}-${which}`;
+                      return (
+                        <div key={which} className="flex flex-col gap-1">
+                          <label htmlFor={id} className="text-xs font-medium text-fg">
+                            {which === "from" ? "From" : "To"}
+                          </label>
+                          <input
+                            id={id}
+                            data-range-input={which}
+                            type="text"
+                            autoComplete="off"
+                            spellCheck={false}
+                            value={which === "from" ? draft.fromText : draft.toText}
+                            aria-invalid={Boolean(problem) || undefined}
+                            aria-describedby={joinIds(problem && errorId)}
+                            onChange={(event) =>
+                              update(which === "from" ? { fromText: event.currentTarget.value } : { toText: event.currentTarget.value })
                             }
-                          }}
-                          className={cn("w-36 px-2.5 text-sm", CONTROL_HEIGHT.sm, controlBox({ invalid: Boolean(problem) }))}
+                            onBlur={(event) => readInput(which, event.currentTarget.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" && !event.ctrlKey && !event.metaKey) {
+                                event.preventDefault();
+                                readInput(which, event.currentTarget.value);
+                              }
+                            }}
+                            className={cn("w-36 px-2.5 text-sm", CONTROL_HEIGHT.sm, controlBox({ invalid: Boolean(problem) }))}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {problem ? (
+                    <p id={errorId} role="alert" className="m-0 text-xs font-medium text-danger">
+                      {problem}
+                    </p>
+                  ) : null}
+                  <Calendar
+                    mode="range"
+                    range={{ from: draft.from, to: draft.to }}
+                    numberOfMonths={wide ? 2 : 1}
+                    month={draft.month}
+                    onMonthChange={(month) => update({ month })}
+                    today={today}
+                    onSelect={onDay}
+                  />
+                  {showCompare ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="flex min-h-hit cursor-pointer items-center gap-2 text-sm text-fg">
+                        <input
+                          type="checkbox"
+                          checked={draft.compareOn}
+                          onChange={(event) => update({ compareOn: event.currentTarget.checked })}
+                          className="size-checkbox cursor-pointer appearance-none rounded-xs border border-input bg-surface checked:border-accent checked:bg-accent forced-colors:appearance-auto"
+                        />
+                        Compare with
+                      </label>
+                      <div className="w-52">
+                        <Select
+                          size="sm"
+                          aria-label="Comparison period"
+                          disabled={!draft.compareOn}
+                          value={draft.compare}
+                          onValueChange={(next) => update({ compare: (next as DateRangeCompare) ?? "previous" })}
+                          options={[
+                            { value: "previous", label: "Previous period" },
+                            { value: "last_year", label: "Same period last year" },
+                          ]}
                         />
                       </div>
-                    );
-                  })}
-                </div>
-                {problem ? (
-                  <p id={errorId} role="alert" className="m-0 text-xs font-medium text-danger">
-                    {problem}
-                  </p>
-                ) : null}
-                <Calendar
-                  mode="range"
-                  range={{ from: draft.from, to: draft.to }}
-                  numberOfMonths={wide ? 2 : 1}
-                  month={draft.month}
-                  onMonthChange={(month) => update({ month })}
-                  today={today}
-                  onSelect={onDay}
-                />
-                {showCompare ? (
-                  <div className="flex flex-wrap items-center gap-3">
-                    <label className="flex min-h-hit cursor-pointer items-center gap-2 text-sm text-fg">
-                      <input
-                        type="checkbox"
-                        checked={draft.compareOn}
-                        onChange={(event) => update({ compareOn: event.currentTarget.checked })}
-                        className="size-checkbox cursor-pointer appearance-none rounded-xs border border-input bg-surface checked:border-accent checked:bg-accent forced-colors:appearance-auto"
-                      />
-                      Compare with
-                    </label>
-                    <div className="w-52">
-                      <Select
-                        size="sm"
-                        aria-label="Comparison period"
-                        disabled={!draft.compareOn}
-                        value={draft.compare}
-                        onValueChange={(next) => update({ compare: (next as DateRangeCompare) ?? "previous" })}
-                        options={[
-                          { value: "previous", label: "Previous period" },
-                          { value: "last_year", label: "Same period last year" },
-                        ]}
-                      />
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </div>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-3 py-2">
-              <span className="text-xs text-muted">{zoneNote}</span>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="ghost" onClick={() => setRange(null, null, "custom")}>
-                  Clear
-                </Button>
-                <Popover.Close asChild>
-                  <Button variant="secondary">Cancel</Button>
-                </Popover.Close>
-                <Button onClick={apply}>Apply</Button>
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-3 py-2">
+                <span className="text-xs text-muted">{zoneNote}</span>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="ghost" onClick={() => setRange(null, null, "custom")}>
+                    Clear
+                  </Button>
+                  <Popover.Close asChild>
+                    <Button variant="secondary">Cancel</Button>
+                  </Popover.Close>
+                  <Button onClick={apply}>Apply</Button>
+                </div>
               </div>
-            </div>
-          </Popover.Content>
+            </Popover.Content>
+          </FieldContext.Provider>
         </Popover.Portal>
       </Popover.Root>
       {name && applied ? (

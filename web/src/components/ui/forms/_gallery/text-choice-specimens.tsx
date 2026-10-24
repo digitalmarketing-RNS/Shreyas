@@ -23,7 +23,7 @@ import { Switch } from "../switch";
 import { TextInput } from "../text-input";
 import { Textarea } from "../textarea";
 import { KeyboardNote } from "./keyboard-note";
-import { COUNSELLORS, GALLERY_NOW, GALLERY_TODAY, PROGRAMMES, STAGES, remarkOfLength, searchLeads, wait } from "./sample-data";
+import { COUNSELLORS, GALLERY_NOW, PROGRAMMES, STAGES, remarkOfLength, searchLeads, wait } from "./sample-data";
 
 /* -------------------------------------------------------------------------------------------------
  * TextInput

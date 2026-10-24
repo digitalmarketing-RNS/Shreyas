@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { ControlSpinner, IconButton } from "../icon-button";
 import { Kbd } from "../primitives/kbd";
 import { CONTROL_HEIGHT, CONTROL_TEXT, RING_FROM_INPUT, controlBox } from "./control-styles";
-import { joinIds } from "./field-context";
+import { FieldContext, joinIds } from "./field-context";
 import { useDebouncedCallback, useDelayedFlag } from "./hooks";
 import { Select } from "./select";
 import { SEARCH_SCOPES, type SearchScope, isSearchable, resolveScope } from "./search-scope";
@@ -136,19 +136,21 @@ export function SearchInput({
     <search className={cn("flex w-full min-w-0 items-stretch", CONTROL_HEIGHT[size], className)}>
       {withScope ? (
         <div className="w-28 shrink-0 [&_button]:rounded-r-none">
-          <Select
-            size={size}
-            aria-label="Search in"
-            options={SEARCH_SCOPES.map((option) => ({ value: option.value, label: option.label }))}
-            value={scope}
-            disabled={disabled}
-            onValueChange={(next) => {
-              const chosen = (next ?? "auto") as SearchScope;
-              if (scopeProp === undefined) setInnerScope(chosen);
-              onScopeChange?.(chosen);
-              if (query.trim()) fire(query, chosen);
-            }}
-          />
+          <FieldContext.Provider value={null}>
+            <Select
+              size={size}
+              aria-label="Search in"
+              options={SEARCH_SCOPES.map((option) => ({ value: option.value, label: option.label }))}
+              value={scope}
+              disabled={disabled}
+              onValueChange={(next) => {
+                const chosen = (next ?? "auto") as SearchScope;
+                if (scopeProp === undefined) setInnerScope(chosen);
+                onScopeChange?.(chosen);
+                if (query.trim()) fire(query, chosen);
+              }}
+            />
+          </FieldContext.Provider>
         </div>
       ) : null}
       <div
