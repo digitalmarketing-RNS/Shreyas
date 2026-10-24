@@ -139,6 +139,22 @@ or JustDial. Reach them on WhatsApp/Instagram, not email.
 | 4. If Lusha has nothing | Indian company registry (ZaubaCorp, FalconEbiz: directors/partners of every Pvt Ltd/LLP), public LinkedIn via web search | Free |
 | 5. Last resort | Company inbox, addressed to the named person in subject and greeting | Free |
 
+**Where heads' direct addresses actually are (found 24 Oct):** the website's info@/admissions@
+inbox rarely reaches the decision-maker, so look here first:
+
+| Segment | Source | What it gives |
+|---|---|---|
+| Colleges | NAAC AQAR / SSR PDFs (usually on the college's NAAC or IQAC page) | "Name of the Head", mobile, registered and alternate email (often the principal's own Gmail/Hotmail) |
+| Colleges | AICTE Mandatory Disclosure PDF | Principal's name and mobile; trust/society chairman and secretary, sometimes with email |
+| Colleges | VTU's list of principal email IDs (a public PDF) | The principal address each VTU college has registered with VTU (some are Gmail) |
+| Companies | Company registry (ZaubaCorp/FalconEbiz) | Current directors' names and the email filed with the government (sometimes the owner's Gmail; often just info@) |
+| Shops/dealers | IndiaMART/JustDial "owner" contact | Owner's name and mobile, so use WhatsApp |
+
+Use only addresses published by the institution or a government filing. Check the person is still
+in post (college site or LinkedIn) before using a name. A "roc." or CA-firm address in the registry
+is a compliance inbox, so skip it. Apollo's people search and enrichment are blocked on its free
+plan; Firecrawl offers Apollo search too, but an admin must accept its terms in the Firecrawl dashboard.
+
 Lusha is on the **free plan: 40 credits** (all 40 used by 23 Oct; wait for the monthly reset or
 use registries, college websites and public LinkedIn). Phone reveals cost **5 credits**,
 so reveal emails only (`waterfallEnabled: false`), and phones only for high-value prospects with
