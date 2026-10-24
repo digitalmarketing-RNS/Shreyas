@@ -2,10 +2,28 @@
 
 Selling EEAT Minds SEO to tile companies. Owner: Shreyas V Patil.
 
-**Status (23 Oct 2026): 23 cold emails sent from eeatminds.in@gmail.com** (Morbi/Gulf SEO-gap
-pitches, national brands' marketing heads, companies hiring marketers, and three South India
-brands). 13 more "page 2" emails go out 24 Oct. Follow-ups go out on Day 3 to anyone who hasn't
-replied. Up to 20 new emails a day.
+**Status (24 Oct 2026): 56 cold emails sent from eeatminds.in@gmail.com on 23 Oct** (36 tile
+companies, 20 engineering colleges). No replies yet, which is normal before the Day 3 follow-ups.
+Batch 6 (20 emails, owners and principals only) is drafted. Up to 20 new emails a day.
+
+### What changed on 24 Oct
+
+1. **Email the person who signs the cheque:** owner, MD, founder, chairman, CEO or principal.
+   Not the marketing head. SEO is already their job, so an outside agency reads as a threat to
+   it. (Several 23 Oct emails went to marketing heads at national brands; none replied.)
+2. **Hiring signal:** a company advertising an SEO or digital-marketing job has budget and a gap
+   right now. Email the founder or director *before* they hire: "Before you hire that digital
+   marketing executive...".
+3. **Subject lines that get opened:** the person's name or brand plus one specific, checkable
+   finding. Examples: *"{Brand} is 4 spots off page 1 for '{phrase}'"*, *"{Brand} makes parking
+   tiles. Google thinks you sell home decor."*, *"{College} is NAAC A+, so why can't students find
+   it on Google?"*. No "SEO services", "proposal" or "audit" in the subject, and no claim we
+   haven't checked.
+4. **Short bodies (about 100-150 words):** one finding, one or two reasons, the proof line, one
+   yes/no ask, opt-out.
+5. **Rival prospects:** several prospects can compete for one phrase (e.g. "parking tiles
+   manufacturer in Morbi", "tiles dealers in Pune"). Never name one prospect in another's email.
+   Whoever signs first gets that phrase; stop pitching it to the rest.
 
 **Gmail connector gotcha:** any web address in an email body (even `example.com` or `google.co.in`)
 is rewritten into a long google.com redirect link, which looks like spam. Write "your website" and
@@ -49,12 +67,12 @@ manufacturer in India/Morbi", and city showroom searches outside Karnataka.
 | Tile dealers / showrooms | Indian cities | WhatsApp, Instagram DM, phone | "You have 200+ JustDial reviews but no website, so Google sends your buyers to JustDial, which lists your competitors" |
 | Tile manufacturers / exporters | Morbi, Gujarat | Email to named MD/partner + LinkedIn + WhatsApp | "Foreign buyers searching 'porcelain tiles manufacturer India' see Porcious, Italus, Bluetone, not you" |
 | Tile traders | Dubai / UAE / GCC | Email to named CEO/MD + LinkedIn | "When I searched 'tiles shop in Dubai', you weren't on page 1" |
-| National tile brands | India (Somany, Nitco, Orientbell, Simpolo, Johnson, AGL, Varmora…) | Email to CMO / Head of Marketing + LinkedIn to them **and** their digital manager | City showroom searches: "In Pune, Hyderabad, Bangalore, Chennai and Mumbai, Orientbell, Simpolo and Johnson have city pages on page 1; you have none" (or, for the leaders, the one city where they slip) |
+| National tile brands | India (Somany, Nitco, Orientbell, Simpolo, Johnson, AGL, Varmora…) | Email to the MD / CEO / promoter-director + LinkedIn to the same person | City showroom searches: "In Pune, Hyderabad, Bangalore, Chennai and Mumbai, Orientbell, Simpolo and Johnson have city pages on page 1; you have none" (or, for the leaders, the one city where they slip) |
 
 ### National brands: what's different
 
-- **Who decides SEO:** the CMO / Head of Marketing, not the MD. Their digital marketing manager
-  usually runs the vendor, so contact both (email the senior one, LinkedIn both).
+- **Who to contact (changed 24 Oct):** the MD, CEO or a promoter-director, not the CMO or
+  marketing head (see "What changed on 24 Oct"). LinkedIn notes go to the same person.
 - **No price in the first email.** ₹15,000/month reads as too small for a listed brand. Offer a free
   city-by-city report for their top 20 cities and quote after scope.
 - **The hook is city pages**, not "you're not on page 1 for your product". Leaders (Orientbell,
@@ -98,8 +116,8 @@ Mumbai, 23 Oct). RNSIT approved being named.
 | Hook | Their own site missing from or on page 2 of "best/top engineering college in {city}", while Shiksha/Collegedunia take page 1 and sell their students back as leads |
 | Bangalore colleges | Don't promise to beat RNSIT on its two phrases; pitch their own gaps (course, area, broken pages) |
 | Timing line | Admissions searches peak after KCET/COMEDK (TG EAPCET, MHT CET) results in May-June; SEO takes 3-4 months |
-| Who to email | Named MD/CEO/Director/Principal; most colleges publish a principal@ address |
-| Files | Keep college prospect files out of the RNSIT Google account; the tracker lives as a private Gmail draft |
+| Who to email | Named Chairman, Secretary, Director or Principal; most colleges publish a principal@ address. Not the admissions or marketing team, except to ask them to forward |
+| Files | Keep college prospect files out of the RNSIT Google account and out of this repo; the tracker is a private file Claude shares in the session |
 
 **Checking claims on college sites:** many use page builders that leave old headings inside hidden
 HTML comments (e.g. "Admissions Open 2021-22"). Strip `<!-- -->` comments before counting H1s or
@@ -140,7 +158,7 @@ profiles via search and writes the LinkedIn notes; Shreyas sends them.
 
 | Day | Channel | What | Who sends |
 |---|---|---|---|
-| 0 | Email 1 | Specific finding + Naveen proof + price + "want the 3 fixes?" | Claude (after approval) |
+| 0 | Email 1 | Specific finding + proof + price (tiles only) + "want the 3 fixes?" or a 15-minute call | Claude (after approval) |
 | 0 | LinkedIn | Connection note to the named decision-maker | Shreyas (Claude drafts) |
 | 1 | WhatsApp / Instagram | Short personal message to the listed mobile | Shreyas (Claude drafts) |
 | 3 | Email 2 | Same thread: one more finding + screenshot of the Naveen #1 result | Claude |
