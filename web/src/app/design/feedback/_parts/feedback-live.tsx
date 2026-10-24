@@ -321,8 +321,8 @@ function SkeletonFreeTable() {
     ["ગુરુપ્રસાદ જોશી", "Interested", "Asha Menon", "3 days ago"],
   ];
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-left text-table">
+    <div>
+      <table className="w-full table-fixed border-collapse text-left text-table">
         <caption className="sr-only">Leads</caption>
         <thead>
           <tr className="h-row-header border-b border-border">
@@ -337,7 +337,7 @@ function SkeletonFreeTable() {
           {rows.map((row) => (
             <tr key={row[0]} className="h-row border-b border-border last:border-b-0">
               {row.map((cell, index) => (
-                <td key={cell} dir={index === 0 ? "auto" : undefined} className={`px-3 text-fg ${index === 3 ? "text-right text-muted" : ""}`}>
+                <td key={cell} dir={index === 0 ? "auto" : undefined} className={`px-3 py-1 break-words text-fg ${index === 3 ? "text-right text-muted" : ""}`}>
                   {cell}
                 </td>
               ))}

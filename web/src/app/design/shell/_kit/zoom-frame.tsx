@@ -15,7 +15,7 @@ export function ZoomFrame({
   note,
   width,
   height,
-  minZoom = 0.5,
+  minZoom = 0.75,
   children,
   className,
 }: {
@@ -24,7 +24,10 @@ export function ZoomFrame({
   /** The width the preview renders at, in CSS px. */
   width: number;
   height: number;
-  /** Below this the frame scrolls sideways instead of shrinking further. */
+  /**
+   * Below this the frame scrolls sideways instead of shrinking further. 0.75 keeps the shell's
+   * 32 px targets at 24 px (2.5.8 Target Size), which axe measures as rendered.
+   */
   minZoom?: number;
   children: ReactNode;
   className?: string;

@@ -135,7 +135,7 @@ export default function Page() {
               const message: ComplianceMessage = COMPLIANCE_MESSAGES[key];
               const action = message.action;
               const actionButton = action ? (
-                <Button variant="secondary" size="sm">
+                <Button variant="secondary" size="sm" className="h-auto min-h-control-sm py-1 text-left whitespace-normal">
                   {action.label}
                 </Button>
               ) : undefined;

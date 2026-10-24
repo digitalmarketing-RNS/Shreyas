@@ -103,7 +103,7 @@ export function FieldDraw({ label, value, invalid, error }: { label: string; val
   return (
     <div className="flex flex-col gap-1">
       <span className="text-sm font-medium text-fg">{label}</span>
-      <span className={`${BOX} flex h-control-md items-center ${invalid ? "border-danger" : ""}`}>{value}</span>
+      <span className={`${BOX} flex min-h-control-md items-center py-2 leading-prose ${invalid ? "border-danger" : ""}`}>{value}</span>
       {error ? <span className="text-xs text-danger">{error}</span> : null}
     </div>
   );

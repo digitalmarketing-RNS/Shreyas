@@ -235,7 +235,7 @@ export function Sidebar({
         })}
       </div>
       <div className="flex flex-col gap-0.5 border-t border-border py-2">
-        {renderItem(footerItem)}
+        <div className="flex">{renderItem(footerItem)}</div>
         {form === "rail" ? (
           <CollapseButton
             classes={classes}

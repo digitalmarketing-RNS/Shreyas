@@ -94,13 +94,6 @@ const TRIGGER = cn(
 );
 const SIZE = { md: "h-control-md px-3", sm: "h-control-sm px-2" } as const;
 
-function tabName(item: TabItem): string | undefined {
-  const parts = [item.label];
-  if (item.count) parts.push(formatCount(item.count));
-  if (item.attention) parts.push("needs attention");
-  return parts.length > 1 ? parts.join(", ") : undefined;
-}
-
 function TabsView({
   items,
   value: valueProp,
@@ -232,6 +225,9 @@ function TabFace({ item, active }: { item: TabItem; active: boolean }) {
   return (
     <>
       <span>{item.label}</span>
+      {item.count || item.attention ? (
+        <span className="sr-only">{`${item.count ? `, ${formatCount(item.count)}` : ""}${item.attention ? ", needs attention" : ""}`}</span>
+      ) : null}
       {item.count ? (
         <span
           aria-hidden="true"
@@ -257,7 +253,6 @@ function TabTrigger({ item, size, active }: { item: TabItem; size: "md" | "sm"; 
     <RadixTabs.Trigger
       value={item.value}
       data-value={item.value}
-      aria-label={tabName(item)}
       aria-disabled={blocked || undefined}
       onMouseDown={block}
       onFocus={block}

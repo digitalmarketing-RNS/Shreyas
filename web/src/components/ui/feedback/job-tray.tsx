@@ -75,8 +75,8 @@ export function JobTray({ jobs, actionsFor, onHide, defaultExpanded = false, inl
       }}
       onKeyDown={onKeyDown}
       className={cn(
-        "flex w-[min(360px,calc(100vw-2rem))] flex-col gap-2",
-        !inline && "fixed right-4 z-(--z-sidebar)",
+        "flex flex-col gap-2",
+        inline ? "w-full max-w-90" : "fixed right-4 z-(--z-sidebar) w-[min(360px,calc(100vw-2rem))]",
         !inline && (moved ? "top-[calc(var(--layout-header)+1rem)]" : "bottom-[calc(var(--bottom-sticky,0px)+1rem)]"),
         className,
       )}

@@ -29,8 +29,8 @@ export function SkeletonTable({
   caption: string;
 }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-left text-table">
+    <div className="overflow-hidden">
+      <table className="w-full table-fixed border-collapse text-left text-table">
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr className="h-row-header border-b border-border">
@@ -38,7 +38,7 @@ export function SkeletonTable({
               <th
                 key={column.header}
                 scope="col"
-                className={cn("px-3 text-xs font-medium whitespace-nowrap text-muted", column.align === "end" && "text-right")}
+                className={cn("px-3 text-xs font-medium text-muted", column.align === "end" && "text-right")}
               >
                 {column.header}
               </th>

@@ -35,7 +35,7 @@ export function SkipLinkSpecimens() {
   );
 }
 
-function SidebarBox({ children, height = "h-140" }: { children: ReactNode; height?: string }) {
+function SidebarBox({ children, height = "h-150" }: { children: ReactNode; height?: string }) {
   return <div className={cn("flex w-fit overflow-hidden rounded-md border border-border", height)}>{children}</div>;
 }
 
