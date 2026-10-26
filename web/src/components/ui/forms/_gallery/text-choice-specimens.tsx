@@ -33,31 +33,33 @@ function InlineEditDemo() {
   const [value, setValue] = useState("Shivajinagar, Pune");
   const [editing, setEditing] = useState(false);
   return (
-    <div className="flex w-full flex-col gap-2 md:grid md:grid-cols-[var(--layout-kv-label)_minmax(0,1fr)] md:items-center md:gap-x-4">
-      <span id="kv-address-label" className="text-sm text-muted">
-        Address
-      </span>
-      {editing ? (
-        <TextInput
-          size="sm"
-          aria-labelledby="kv-address-label"
-          defaultValue={value}
-          autoFocus
-          onSave={(next) => {
-            setValue(next);
-            setEditing(false);
-          }}
-          onCancel={() => setEditing(false)}
-          autoComplete="off"
-        />
-      ) : (
-        <span className="flex items-center gap-2 text-sm text-fg">
-          {value}
-          <Button variant="ghost" size="xs" leadingIcon={<Pencil />} onClick={() => setEditing(true)}>
-            Edit
-          </Button>
+    <div className="w-full @container">
+      <div className="flex w-full flex-col gap-2 @min-[26rem]:grid @min-[26rem]:grid-cols-[var(--layout-kv-label)_minmax(0,1fr)] @min-[26rem]:items-center @min-[26rem]:gap-x-4">
+        <span id="kv-address-label" className="text-sm text-muted">
+          Address
         </span>
-      )}
+        {editing ? (
+          <TextInput
+            size="sm"
+            aria-labelledby="kv-address-label"
+            defaultValue={value}
+            autoFocus
+            onSave={(next) => {
+              setValue(next);
+              setEditing(false);
+            }}
+            onCancel={() => setEditing(false)}
+            autoComplete="off"
+          />
+        ) : (
+          <span className="flex items-center gap-2 text-sm text-fg">
+            {value}
+            <Button variant="ghost" size="xs" leadingIcon={<Pencil />} onClick={() => setEditing(true)}>
+              Edit
+            </Button>
+          </span>
+        )}
+      </div>
     </div>
   );
 }

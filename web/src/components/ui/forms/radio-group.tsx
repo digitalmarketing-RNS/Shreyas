@@ -30,7 +30,10 @@ export type RadioGroupProps = {
   /** Settings show the saved value. Choices with consequences start with nothing chosen. */
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** list (vertical), inline (3 or fewer short labels), cards (stacked) or card-grid (2 or 3 columns from md up). */
+  /**
+   * list (vertical), inline (3 or fewer short labels), cards (stacked) or card-grid (2 or 3 columns
+   * once the group is wide enough for 200 px cards).
+   */
   variant?: "list" | "inline" | "cards" | "card-grid";
   columns?: 2 | 3;
   surface?: "staff" | "public";
@@ -105,37 +108,42 @@ export function RadioGroup({
       required={required}
       disabled={disabled}
       surface={surface}
-      className={className}
+      className={cn(variant === "card-grid" && "w-full", className)}
     >
-      <div
-        className={cn(
-          variant === "inline" && "flex flex-row flex-wrap gap-x-6 gap-y-1",
-          variant === "list" && "flex flex-col gap-1",
-          variant === "cards" && "flex flex-col gap-3",
-          variant === "card-grid" && cn("grid grid-cols-1 gap-3", columns === 3 ? "md:grid-cols-3" : "md:grid-cols-2"),
-        )}
-      >
-        {options.map((option, index) => {
-          const id = `${base}-${index}`;
-          const isChosen = chosen === option.value;
-          return (
-            <div key={option.value} className={cn("flex min-w-0 flex-col", isCards && "min-w-50")}>
-              <RadioRow
-                id={id}
-                name={name}
-                option={option}
-                checked={isChosen}
-                onChoose={setChosen}
-                isPublic={isPublic}
-                card={isCards}
-                required={required}
-              />
-              {isChosen && option.reveal ? (
-                <div className={cn("pt-2", isCards ? "" : isPublic ? "pl-8" : "pl-6")}>{option.reveal}</div>
-              ) : null}
-            </div>
-          );
-        })}
+      {/* Card grids add columns only when the group has room for 200 px cards (a container query),
+          so a grid inside a narrow column or dialog never overflows. */}
+      <div className={cn(variant === "card-grid" && "@container")}>
+        <div
+          className={cn(
+            variant === "inline" && "flex flex-row flex-wrap gap-x-6 gap-y-1",
+            variant === "list" && "flex flex-col gap-1",
+            variant === "cards" && "flex flex-col gap-3",
+            variant === "card-grid" &&
+              cn("grid grid-cols-1 gap-3 @min-[26rem]:grid-cols-2", columns === 3 && "@min-[39rem]:grid-cols-3"),
+          )}
+        >
+          {options.map((option, index) => {
+            const id = `${base}-${index}`;
+            const isChosen = chosen === option.value;
+            return (
+              <div key={option.value} className={cn("flex min-w-0 flex-col", isCards && "min-w-50")}>
+                <RadioRow
+                  id={id}
+                  name={name}
+                  option={option}
+                  checked={isChosen}
+                  onChoose={setChosen}
+                  isPublic={isPublic}
+                  card={isCards}
+                  required={required}
+                />
+                {isChosen && option.reveal ? (
+                  <div className={cn("pt-2", isCards ? "" : isPublic ? "pl-8" : "pl-6")}>{option.reveal}</div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </FieldGroup>
   );

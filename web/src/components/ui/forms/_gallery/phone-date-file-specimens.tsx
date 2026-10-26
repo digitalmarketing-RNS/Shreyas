@@ -252,7 +252,7 @@ export function DatePickerSpecimens() {
       description="One calendar date, no time. Type it (day first: 06/10/2026, 6 Oct 2026, 2026-10-06) or pick it from the calendar; the input is always enough on its own. The value leaves as an ISO date."
     >
       <Section id="date-picker-variants" title="Variants" level={3}>
-        <StateGrid columns={3}>
+        <StateGrid columns={2}>
           <Specimen label="popover (staff default)" note="Try it: Alt + ArrowDown or the calendar button">
             <Field label="Follow-up date" hint="For example 06/10/2026" className="w-full">
               <DatePicker today={GALLERY_TODAY} defaultValue="2026-10-09" name="follow_up_date" />
@@ -264,7 +264,7 @@ export function DatePickerSpecimens() {
           <Specimen label="memorable date (staff, S07 and S08)">
             <MemorableDate legend="Date of birth" name="lead_dob" surface="staff" defaultValue="2008-03-27" />
           </Specimen>
-          <Specimen label="inline calendar (no input)">
+          <Specimen label="inline calendar (no input)" className="sm:col-span-2">
             <div className={cn(POPOVER_PANEL, "p-3")}>
               <Calendar today={TODAY} selected={fromIso("2026-10-09")} defaultMonth={{ year: 2026, month: 10 }} />
             </div>
@@ -347,7 +347,7 @@ export function DatePickerSpecimens() {
               <DatePicker today={GALLERY_TODAY} defaultValue="2026-10-06" />
             </Field>
           </Specimen>
-          <Specimen label="open (the popover is a dialog: “Choose a date”)" className="sm:col-span-2 lg:col-span-1">
+          <Specimen label="open (the popover is a dialog: “Choose a date”)" className="sm:col-span-2">
             <div className={cn(POPOVER_PANEL, "p-3")}>
               <Calendar today={TODAY} selected={fromIso("2026-10-14")} defaultMonth={{ year: 2026, month: 10 }} isDateDisabled={(d) => d.day === 20 && d.month === 10} />
               <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
@@ -511,7 +511,7 @@ export function DateRangePickerSpecimens() {
       </Section>
 
       <Section id="date-range-picker-states" title="States" level={3} description="States inside the popover are still pictures drawn with the component's own parts.">
-        <StateGrid columns={3}>
+        <StateGrid columns={2}>
           <Specimen label="empty (“Any date”)">
             <DateRangePicker today={GALLERY_TODAY} />
           </Specimen>
@@ -539,12 +539,12 @@ export function DateRangePickerSpecimens() {
               ))}
             </fieldset>
           </Specimen>
-          <Specimen label="start chosen (waiting for the end)">
+          <Specimen label="start chosen (waiting for the end)" className="sm:col-span-2">
             <div className={cn(POPOVER_PANEL, "p-3")}>
               <Calendar mode="range" today={TODAY} range={{ from: fromIso("2026-10-12"), to: null }} defaultMonth={{ year: 2026, month: 10 }} />
             </div>
           </Specimen>
-          <Specimen label="range chosen (ends filled, the days between tinted)">
+          <Specimen label="range chosen (ends filled, the days between tinted)" className="sm:col-span-2">
             <div className={cn(POPOVER_PANEL, "p-3")}>
               <Calendar mode="range" today={TODAY} range={{ from: fromIso("2026-10-05"), to: fromIso("2026-10-16") }} defaultMonth={{ year: 2026, month: 10 }} />
             </div>
@@ -565,7 +565,7 @@ export function DateRangePickerSpecimens() {
             <p className="m-0 text-xs font-medium text-danger">The end date is before the start date.</p>
             <p className="m-0 text-xs font-medium text-danger">Choose a range of 366 days or less.</p>
           </Specimen>
-          <Specimen label="two months (from 768 px)" className="sm:col-span-2 lg:col-span-3">
+          <Specimen label="two months (from 768 px)" className="sm:col-span-2">
             <div className={cn(POPOVER_PANEL, "max-w-full overflow-x-auto p-3")}>
               <Calendar mode="range" numberOfMonths={2} today={TODAY} range={{ from: fromIso("2026-09-21"), to: fromIso("2026-10-06") }} defaultMonth={{ year: 2026, month: 9 }} />
             </div>

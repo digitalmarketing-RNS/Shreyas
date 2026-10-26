@@ -81,7 +81,6 @@ export function SegmentedControlSpecimens() {
               options={[
                 { value: "today", label: "Today", count: 12 },
                 { value: "overdue", label: "Overdue", count: 4 },
-                { value: "upcoming", label: "Upcoming", count: 31 },
               ]}
               defaultValue="overdue"
             />

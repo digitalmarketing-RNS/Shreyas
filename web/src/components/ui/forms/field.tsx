@@ -27,7 +27,8 @@ export type FieldProps = {
   readOnly?: boolean;
   /**
    * stacked (default, label above); inline (label beside the control); key-value (S08: a 200 px
-   * label column from md up); hidden-label (table cells and toolbars: the label is sr-only).
+   * label column once the row has room for it); hidden-label (table cells and toolbars: the label
+   * is sr-only).
    */
   layout?: FieldLayout;
   /** staff (default, or the Form's) or public: public labels are text-base, hints and errors text-sm. */
@@ -147,16 +148,20 @@ export function Field({
   }
 
   if (layout === "key-value") {
+    // The 200 px label column appears when the row has room for it (a container query), so rows in
+    // a narrow panel stack instead of overflowing; on a full-width page that is from md up.
     return (
       <FieldContext.Provider value={context}>
-        <div className={cn("flex flex-col md:grid md:grid-cols-[var(--layout-kv-label)_minmax(0,1fr)] md:gap-x-4", className)}>
-          <div className="flex flex-col md:pt-1.5">
-            {labelNode}
-            {hintNode}
-          </div>
-          <div className="mt-2 flex min-w-0 flex-col md:mt-0">
-            {children}
-            {errorNode}
+        <div className={cn("w-full @container", className)}>
+          <div className="flex flex-col @min-[26rem]:grid @min-[26rem]:grid-cols-[var(--layout-kv-label)_minmax(0,1fr)] @min-[26rem]:gap-x-4">
+            <div className="flex flex-col @min-[26rem]:pt-1.5">
+              {labelNode}
+              {hintNode}
+            </div>
+            <div className="mt-2 flex min-w-0 flex-col @min-[26rem]:mt-0">
+              {children}
+              {errorNode}
+            </div>
           </div>
         </div>
       </FieldContext.Provider>

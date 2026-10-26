@@ -275,14 +275,14 @@ function InlineEditGroupDemo() {
   if (!editing) {
     return (
       <div className="flex w-full flex-col gap-1">
-        <dl className="m-0 flex w-full flex-col gap-1 text-sm">
+        <dl className="m-0 flex w-full flex-col gap-1 text-sm @container">
           {(
             [
               ["City", values.city],
               ["School", values.school],
             ] as const
           ).map(([key, value]) => (
-            <div key={key} className="flex min-h-kv-row flex-col md:grid md:grid-cols-[var(--layout-kv-label)_minmax(0,1fr)] md:items-center md:gap-x-4">
+            <div key={key} className="flex min-h-kv-row flex-col @min-[26rem]:grid @min-[26rem]:grid-cols-[var(--layout-kv-label)_minmax(0,1fr)] @min-[26rem]:items-center @min-[26rem]:gap-x-4">
               <dt className="text-muted">{key}</dt>
               <dd className="m-0 text-fg">{value}</dd>
             </div>
@@ -312,7 +312,7 @@ function InlineEditGroupDemo() {
       <Field label="School" layout="key-value">
         <TextInput size="sm" name="kv_school" defaultValue={values.school} autoComplete="off" />
       </Field>
-      <div className="flex gap-2 md:pl-[calc(var(--layout-kv-label)+1rem)]">
+      <div className="flex gap-2">
         <SubmitButton size="sm">Save</SubmitButton>
         <Button variant="secondary" size="sm" onClick={() => setEditing(false)}>
           Cancel

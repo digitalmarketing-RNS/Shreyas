@@ -218,38 +218,43 @@ export function DateTimePicker({
       error={groupError}
       disabled={disabled}
       describedBy={joinIds(pastWarning && warningId, clash && clashId)}
-      className={className}
+      className={cn("w-full", className)}
     >
-      <div className="flex flex-col gap-3 min-[30rem]:flex-row min-[30rem]:items-start">
-        <Field label="Date" className="shrink-0">
-          <DatePicker
-            size={size}
-            defaultValue={defaultDate ?? null}
-            today={toIso(todayIn(zone, new Date(now)))}
-            onValueChange={(iso) => setDate(fromIso(iso))}
-          />
-        </Field>
-        <Field label="Time" className="w-32 shrink-0">
-          <TimeField size={size} defaultValue={time} now={utcToZoned(now, zone).time} onValueChange={setTime} />
-        </Field>
-        {zonePicker ? (
-          <Field label="Time zone" className="min-w-48 flex-1">
-            <Combobox
+      {/* The parts stack when the control has less room than they need side by side (160 + 128 + 192 px
+          plus gaps): a container query, so the rule holds in narrow columns and dialogs as well as on
+          phones (the spec's "below 480 px"). */}
+      <div className="@container">
+        <div className="flex flex-col gap-3 @min-[32rem]:flex-row @min-[32rem]:items-start">
+          <Field label="Date" className="shrink-0">
+            <DatePicker
               size={size}
-              options={zoneOptions}
-              value={zone}
-              onValueChange={(next) => {
-                if (next) setZone(next);
-              }}
-              placeholder="Search time zones"
-              noun={{ one: "time zone", other: "time zones" }}
+              defaultValue={defaultDate ?? null}
+              today={toIso(todayIn(zone, new Date(now)))}
+              onValueChange={(iso) => setDate(fromIso(iso))}
             />
           </Field>
-        ) : (
-          <p className="m-0 self-end pb-2 text-sm text-muted min-[30rem]:pb-2.5">
-            Times in {zoneShortName(zone, startsAtMs ?? now)}
-          </p>
-        )}
+          <Field label="Time" className="w-32 shrink-0">
+            <TimeField size={size} defaultValue={time} now={utcToZoned(now, zone).time} onValueChange={setTime} />
+          </Field>
+          {zonePicker ? (
+            <Field label="Time zone" className="min-w-48 flex-1">
+              <Combobox
+                size={size}
+                options={zoneOptions}
+                value={zone}
+                onValueChange={(next) => {
+                  if (next) setZone(next);
+                }}
+                placeholder="Search time zones"
+                noun={{ one: "time zone", other: "time zones" }}
+              />
+            </Field>
+          ) : (
+            <p className="m-0 text-sm text-muted @min-[32rem]:self-end @min-[32rem]:pb-2.5">
+              Times in {zoneShortName(zone, startsAtMs ?? now)}
+            </p>
+          )}
+        </div>
       </div>
       {withEndTime ? (
         showEnd ? (
