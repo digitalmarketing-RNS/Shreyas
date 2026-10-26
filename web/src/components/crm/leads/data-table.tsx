@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { type ReactNode, type Ref, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/feedback/alert";
 import { Checkbox } from "@/components/ui/forms/checkbox";
@@ -8,6 +8,7 @@ import { Link } from "@/components/ui/primitives/link";
 import { Tooltip } from "@/components/ui/overlays/tooltip";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
+import { mergeRefs } from "@/lib/merge-refs";
 import {
   type DataTableColumn,
   type PrimaryColumn,
@@ -72,6 +73,8 @@ export type DataTableProps<Row> = {
   announcement?: string;
   /** Classes for the scroll container (a max height, so the header sticks). */
   scrollClassName?: string;
+  /** The select-all checkbox, so BulkActionBar's "Clear selection" can return focus to it. */
+  selectAllRef?: Ref<HTMLInputElement>;
   /** Extra row classes (the gallery draws hover and focus with them). */
   rowClassName?: (row: Row) => string | undefined;
   className?: string;
@@ -126,6 +129,7 @@ export function DataTable<Row>({
   announcement,
   scrollClassName,
   rowClassName,
+  selectAllRef: selectAllRefProp,
   className,
 }: DataTableProps<Row>) {
   const base = useId();
@@ -134,6 +138,7 @@ export function DataTable<Row>({
   const scrollRef = useRef<HTMLDivElement>(null);
   const primaryHeadRef = useRef<HTMLTableCellElement>(null);
   const selectAllRef = useRef<HTMLInputElement>(null);
+  const composedSelectAllRef = useMemo(() => mergeRefs(selectAllRefProp, selectAllRef), [selectAllRefProp]);
   const [scrolled, setScrolled] = useState(false);
   const [stickyWidth, setStickyWidth] = useState(0);
   const [live, setLive] = useState("");
@@ -281,7 +286,7 @@ export function DataTable<Row>({
       {selectable ? (
         <th scope="col" {...cellAttrs(0, 0)} className={cn(headCell, stickyHead, "left-0 w-10 px-2")}>
           <Checkbox
-            ref={selectAllRef}
+            ref={composedSelectAllRef}
             variant="table"
             aria-label={`Select all ${countWords(selectableRows.length)} on this page`}
             checked={allOnPage}
