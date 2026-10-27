@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naveen BIS Posts</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --navy-950:#050F22; --navy-900:#071630; --navy-800:#0B1F40; --navy-700:#10305E;
+  --blue:#4279B7; --blue-300:#9CC2EE;
+  --orange:#F26522; --orange-300:#FF9A5C; --orange-600:#D44A0C;
+  --white:#FFFFFF; --mute:rgba(255,255,255,.74); --soft:rgba(255,255,255,.5);
+  --line:rgba(255,255,255,.14); --glass:rgba(255,255,255,.06);
+  --ink:#0B1730; --ink-mute:#4A5874;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#1d2230}
+body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:column;gap:40px;align-items:center;-webkit-font-smoothing:antialiased}
+.h{font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1,"pnum" 1;}
+.x{font-family:Poppins,sans-serif;font-weight:500;margin:0 .06em;position:relative;top:-.04em}
+.num{font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1,"tnum" 1;}
+
+/* ---------- Artboard ---------- */
+.art{position:relative;width:1080px;height:1350px;overflow:hidden;color:var(--white);isolation:isolate;flex:none;
+  background:
+    radial-gradient(820px 620px at 92% 4%, rgba(66,121,183,.55), transparent 62%),
+    radial-gradient(760px 520px at -4% 102%, rgba(242,101,34,.20), transparent 62%),
+    linear-gradient(168deg,var(--navy-700) 0%,var(--navy-800) 42%,var(--navy-950) 100%);}
+.art.story{height:1920px}
+/* faint grout grid, like a tiled wall */
+.art::before{content:"";position:absolute;inset:0;z-index:-1;
+  background-image:
+    linear-gradient(rgba(255,255,255,.055) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(255,255,255,.055) 1.5px, transparent 1.5px);
+  background-size:135px 135px;background-position:-1px -1px;
+  -webkit-mask-image:radial-gradient(900px 700px at 85% 10%, #000 0%, transparent 75%);
+          mask-image:radial-gradient(900px 700px at 85% 10%, #000 0%, transparent 75%);}
+/* film grain */
+.art::after{content:"";position:absolute;inset:0;z-index:50;pointer-events:none;opacity:.09;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");}
+
+/* ---------- Header ---------- */
+.hdr{position:absolute;left:64px;right:64px;top:56px;display:flex;align-items:center;justify-content:space-between;z-index:5}
+.logo-card{background:#fff;border-radius:18px;padding:10px 18px;box-shadow:0 18px 40px -18px rgba(0,0,0,.6)}
+.logo-card img{display:block;height:74px;width:auto}
+.logo-rev{display:block;width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+.pill{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 22px 0 16px;border-radius:999px;
+  border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);backdrop-filter:blur(6px);
+  font-weight:500;font-size:19px;letter-spacing:.02em;color:#fff}
+.pill svg{width:22px;height:22px;flex:none}
+.pill b{font-weight:600}
+.pill .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5)}
+
+/* ---------- Headline block ---------- */
+.eyebrow{display:flex;align-items:center;gap:16px;font-weight:600;font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:var(--orange-300)}
+.eyebrow::before{content:"";width:46px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--orange),var(--orange-300))}
+.h1{font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:900;letter-spacing:-.025em;line-height:.94;color:#fff}
+.grad{background:linear-gradient(100deg,#FFB27A 0%,var(--orange) 45%,#FF7A2F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-weight:400;color:var(--mute);line-height:1.45}
+.sub b{color:#fff;font-weight:600}
+
+/* ---------- Seal ---------- */
+.seal{display:block;filter:drop-shadow(0 26px 50px rgba(242,101,34,.38)) drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+
+/* ---------- Tile showcase ---------- */
+.stage{position:absolute;left:0;right:0}
+.floor{position:absolute;left:-200px;right:-200px;height:520px;perspective:900px;perspective-origin:50% 0;pointer-events:none}
+.floor .plane{position:absolute;inset:0;transform-origin:50% 0;transform:rotateX(74deg);
+  background:
+    linear-gradient(rgba(255,255,255,.16) 2px, transparent 2px) 0 0/150px 150px,
+    linear-gradient(90deg, rgba(255,255,255,.16) 2px, transparent 2px) 0 0/150px 150px,
+    linear-gradient(180deg, rgba(66,121,183,.30), rgba(5,15,34,0) 80%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 40%,transparent 90%);
+          mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 40%,transparent 90%);}
+.floor-glow{position:absolute;left:50%;width:900px;height:160px;transform:translate(-50%,-50%);
+  background:radial-gradient(closest-side, rgba(242,101,34,.28), rgba(66,121,183,.12) 55%, transparent);filter:blur(6px)}
+.lineup{display:flex;justify-content:center;align-items:flex-start;gap:var(--gap,18px)}
+.item{display:grid;grid-template-rows:var(--th,240px) auto;justify-items:center}
+.item>.tile,.item>.stack{align-self:end}
+.tile{position:relative;width:var(--w);height:var(--h);border-radius:0;
+  box-shadow:var(--edge), 0 30px 40px -18px rgba(0,0,0,.65);
+  -webkit-box-reflect:below 5px linear-gradient(transparent 72%, rgba(255,255,255,.22));}
+.tile img.tx{object-fit:cover;position:absolute;inset:0;width:100%;height:100%;border-radius:0;display:block}
+.tile .gloss{position:absolute;inset:0;border-radius:0;
+  background:linear-gradient(128deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.08) 30%, rgba(255,255,255,0) 52%, rgba(255,255,255,.14) 78%, rgba(255,255,255,.0) 100%)}
+.tile.matte .gloss{background:linear-gradient(128deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 45%, rgba(0,0,0,.06) 100%)}
+.lbl .ok{width:28px;height:28px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;background:var(--orange);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 0 3px rgba(242,101,34,.22),0 8px 18px -6px rgba(242,101,34,.9)}
+.lbl .ok svg{width:15px;height:15px}
+.stack{position:relative;width:var(--w);height:var(--h)}
+.stack .tile{position:absolute}
+.lbl{position:relative;z-index:2;margin-top:var(--lbl,74px);text-align:center;white-space:nowrap}
+.lbl .sz{height:32px;line-height:32px;font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:25px;letter-spacing:-.01em;color:#fff}
+.lbl .sz small{font-size:15px;font-weight:700;color:var(--soft);margin-left:3px;letter-spacing:.02em}
+.lbl .ap{margin-top:4px;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange-300)}
+
+/* ---------- Licence strip ---------- */
+.lic{position:absolute;left:64px;right:64px;display:flex;align-items:center;gap:26px;padding:18px 26px 18px 18px;border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.04));border:1.5px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.isi{flex:none;width:100px;height:100px;border-radius:14px;background:#fff;display:grid;place-items:center;overflow:hidden}
+.isi img{width:94px;height:94px;display:block}
+.lic dl{flex:1;display:grid;grid-template-columns:1.05fr 1.25fr 1.2fr .95fr;gap:0}
+.lic dl>div{padding:0 18px;border-left:1.5px solid rgba(255,255,255,.14)}
+.lic dl>div:first-child{border-left:0;padding-left:4px}
+.lic dt{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.lic dd{margin-top:6px;font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:22px;letter-spacing:.005em;white-space:nowrap}
+
+/* ---------- Footer ---------- */
+.ftr{position:absolute;left:64px;right:64px;display:flex;align-items:center;justify-content:space-between;font-size:19px;color:var(--mute)}
+.ftr .it{display:flex;align-items:center;gap:10px}
+.ftr .it svg{width:22px;height:22px}
+.ftr b{color:#fff;font-weight:600}
+
+/* ---------- Carousel bits ---------- */
+.pager{display:flex;align-items:center;gap:14px;font-weight:600;font-size:18px;letter-spacing:.12em;color:var(--soft)}
+.pager i{display:block;width:30px;height:4px;border-radius:2px;background:rgba(255,255,255,.22)}
+.pager i.on{background:var(--orange);width:46px}
+.swipe{position:absolute;right:64px;display:flex;align-items:center;gap:14px;font-weight:600;font-size:21px;color:#fff}
+.swipe .arr{width:62px;height:62px;border-radius:50%;background:linear-gradient(140deg,var(--orange-300),var(--orange) 55%,var(--orange-600));display:grid;place-items:center;box-shadow:0 14px 30px -10px rgba(242,101,34,.8)}
+.swipe .arr svg{width:28px;height:28px}
+
+/* spec cards (slide 2) */
+.cards{position:absolute;left:64px;right:64px;display:flex;flex-direction:column;gap:16px}
+.card{position:relative;display:flex;align-items:center;gap:30px;height:160px;padding:0 30px 0 22px;border-radius:24px;
+  background:linear-gradient(120deg,rgba(255,255,255,.10),rgba(255,255,255,.035));border:1.5px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.card .sw{flex:none;width:124px;height:124px;display:grid;place-items:center;border-radius:16px;background:rgba(5,15,34,.45);border:1px solid rgba(255,255,255,.08)}
+.card .sw .tile{-webkit-box-reflect:unset;box-shadow:var(--edge),0 12px 20px -10px rgba(0,0,0,.7)}
+.card .body{flex:1;min-width:0}
+.card .nm{font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:31px;letter-spacing:-.01em;line-height:1.1}
+.card .meta{margin-top:6px;font-size:19px;color:var(--mute)}
+.card .meta b{color:#fff;font-weight:600}
+.chips{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:32px;padding:0 13px;border-radius:999px;display:inline-flex;align-items:center;font-size:14.5px;font-weight:500;letter-spacing:.02em;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.88)}
+.chip.app{background:rgba(242,101,34,.16);border-color:rgba(242,101,34,.55);color:#FFC29C;font-weight:600}
+.grp{flex:none;width:112px;text-align:center}
+.grp .k{font-size:12.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+.grp .v{margin-top:2px;font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:900;font-size:40px;letter-spacing:-.02em;line-height:1}
+.grp .v sub{font-size:23px;vertical-align:baseline;position:relative;top:5px;margin-left:1px;font-weight:800;letter-spacing:.04em}
+.grp .ok{margin:10px auto 0;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:999px;background:var(--orange);font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.grp .ok svg{width:13px;height:13px}
+.legend{position:absolute;left:64px;right:64px;font-size:15.5px;line-height:1.5;color:var(--soft)}
+.legend b{color:rgba(255,255,255,.85);font-weight:600}
+
+/* slide 3 */
+.benefits{position:absolute;left:64px;right:64px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.bf{padding:30px 26px 28px;border-radius:24px;background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1.5px solid rgba(255,255,255,.14)}
+.bf .ic{width:60px;height:60px;border-radius:16px;display:grid;place-items:center;background:rgba(242,101,34,.16);border:1.5px solid rgba(242,101,34,.5)}
+.bf .ic svg{width:30px;height:30px}
+.bf h3{margin-top:22px;font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:27px;line-height:1.15;letter-spacing:-.01em}
+.bf p{margin-top:10px;font-size:17px;line-height:1.5;color:var(--mute)}
+.cert{position:absolute;left:64px;right:64px;border-radius:28px;background:#fff;color:var(--ink);display:flex;overflow:hidden;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.7)}
+.cert .l{flex:none;width:250px;background:linear-gradient(160deg,#FFF5EE,#FFE6D6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border-right:1px dashed rgba(242,101,34,.45)}
+.cert .l img{width:136px;height:136px;display:block;border-radius:10px}
+.cert .l span{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--orange-600)}
+.cert .r{flex:1;padding:32px 40px 30px}
+.cert .r .t{display:flex;align-items:center;justify-content:space-between}
+.cert .r .t h4{font-family:Raleway,sans-serif;font-weight:800;font-size:28px;letter-spacing:-.01em}
+.badge-ok{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;background:#E8F6EE;color:#13804A;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.badge-ok svg{width:16px;height:16px}
+.cert .grid{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;row-gap:20px;column-gap:28px}
+.cert dt{font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#8592AA}
+.cert dd{margin-top:4px;font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:25px;color:var(--ink)}
+.cert dd.o{color:var(--orange-600)}
+.cta{position:absolute;left:64px;right:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.cta .thanks{font-family:Raleway,sans-serif;font-weight:800;font-size:34px;line-height:1.15;letter-spacing:-.01em}
+.cta .thanks span{display:block;font-family:Poppins,sans-serif;font-weight:400;font-size:19px;color:var(--mute);letter-spacing:0;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:14px;height:76px;padding:0 16px 0 32px;border-radius:999px;background:linear-gradient(140deg,var(--orange-300),var(--orange) 50%,var(--orange-600));
+  font-weight:600;font-size:24px;color:#fff;box-shadow:0 22px 44px -16px rgba(242,101,34,.85);white-space:nowrap}
+.btn i{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center}
+.btn i svg{width:24px;height:24px}
+
+.label{position:absolute;left:0;top:-30px;font:500 14px Poppins;color:#8b93a7;letter-spacing:.06em}
+.wrap{position:relative}
+</style>
+</head>
+<body>
+
+<!-- ======== Shared SVG defs (textures, gradients, paths) ======== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-or" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFB27A"/><stop offset=".5" stop-color="#F26522"/><stop offset="1" stop-color="#C9440A"/>
+    </linearGradient>
+    <radialGradient id="g-disc" cx=".35" cy=".3" r=".85">
+      <stop offset="0" stop-color="#FF9F63"/><stop offset=".55" stop-color="#F26522"/><stop offset="1" stop-color="#B83C08"/>
+    </radialGradient>
+    <linearGradient id="g-ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16396C"/><stop offset="1" stop-color="#0A1D3C"/>
+    </linearGradient>
+    <path id="ring-path" d="M220,220 m-171,0 a171,171 0 1,1 342,0 a171,171 0 1,1 -342,0"/>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="none" stroke="#FF9A5C" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="#FF9A5C"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="#FF9A5C" stroke-width="1.8"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.9 5.7 3.9 9.2s-1.3 6.6-3.9 9.2c-2.6-2.6-3.9-5.7-3.9-9.2S9.4 5.4 12 2.8z"/></g></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.5l3 .4 1.3 4-2 1.6a12.5 12.5 0 0 0 5.6 5.6l1.6-2 4 1.3.4 3c.1.9-.6 1.8-1.6 1.8C10.6 19.2 4.8 13.4 4.8 5.1c0-1 .9-1.7 1.8-1.6z" fill="none" stroke="#FF9A5C" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5.5l6.5 6.5-6.5 6.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-lab" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.2L4.6 18.4A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.6-2.6L14 9.2V3M7.2 14.5h9.6" fill="none" stroke="#FF9A5C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.8l7.5 3v5.6c0 4.6-3.1 8.4-7.5 9.8-4.4-1.4-7.5-5.2-7.5-9.8V5.8z" fill="none" stroke="#FF9A5C" stroke-width="1.9" stroke-linejoin="round"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8" fill="none" stroke="#FF9A5C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-factory" viewBox="0 0 24 24"><path d="M3 20.5V10l5 3V10l5 3V5.5h4l1 5h3v10z" fill="none" stroke="#FF9A5C" stroke-width="1.9" stroke-linejoin="round"/><path d="M7 17h2M11.5 17h2M16 17h2" stroke="#FF9A5C" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ======== Reusable components ======== -->
+<template id="tpl-seal">
+  <svg class="seal" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="220" cy="220" r="216" fill="url(#g-ring)"/>
+    <circle cx="220" cy="220" r="216" fill="none" stroke="url(#g-or)" stroke-width="4"/>
+    <circle cx="220" cy="220" r="203" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="10" stroke-dasharray="1.6 6.4"/>
+    <text font-family="Raleway" font-weight="800" font-size="21" fill="#fff" letter-spacing="3" style="font-feature-settings:'lnum' 1">
+      <textPath href="#ring-path" startOffset="0" textLength="1068" lengthAdjust="spacing">BIS CERTIFIED  •  IS 15622:2017  •  KARAIKAL PLANT  •  QUALITY ASSURED  • </textPath>
+    </text>
+    <circle cx="220" cy="220" r="146" fill="url(#g-disc)"/>
+    <circle cx="220" cy="220" r="146" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+    <circle cx="220" cy="220" r="132" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.5" stroke-dasharray="2 6"/>
+    <ellipse cx="190" cy="150" rx="95" ry="48" fill="rgba(255,255,255,.14)"/>
+    <path d="M180 156 l26 26 l52 -54" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="220" y="262" text-anchor="middle" font-family="Raleway" font-weight="900" font-size="66" fill="#fff" letter-spacing="2">BIS</text>
+    <text x="221" y="294" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="19" fill="#fff" letter-spacing="7">CERTIFIED</text>
+  </svg>
+</template>
+
+<template id="tpl-lineup">
+  <div class="lineup">
+    <div class="item"><div class="tile matte" style="--w:114px;--h:114px;--edge:1px 1px 0 #8f7354,2px 2px 0 #856a4d,3px 3px 0 #7a6146"><img class="tx" src="assets/tiles/300x300-1009-fl.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">300<span class="x">×</span>300<small>mm</small></div><div class="ap">Floor &amp; Wall</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:171px;--h:114px;--edge:1px 1px 0 #d6d4d0,2px 2px 0 #cdcbc7,3px 3px 0 #c3c1bd"><img class="tx" src="assets/tiles/450x300-1115-l.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">450<span class="x">×</span>300<small>mm</small></div><div class="ap">Wall</div></div></div>
+    <div class="item"><div class="tile" style="--w:228px;--h:228px;--edge:1px 1px 0 #7d7468,2px 2px 0 #746c61,3px 3px 0 #6b635a,4px 4px 0 #625b53"><img class="tx" src="assets/tiles/600x600-4254-mizar-full.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">600<span class="x">×</span>600<small>mm</small></div><div class="ap">Floor · Polished</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:152px;--h:152px;--edge:1px 1px 0 #9a9894,2px 2px 0 #91908c,3px 3px 0 #888783,4px 4px 0 #7f7e7a,5px 5px 0 #767571"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">400<span class="x">×</span>400<small>mm</small></div><div class="ap">Floor</div></div></div>
+    <div class="item"><div class="stack" style="--w:186px;--h:160px">
+        <div class="tile" style="--w:160px;--h:160px;--edge:1px 1px 0 #c2c2c2,2px 2px 0 #b8b8b8,3px 3px 0 #aeaeae,4px 4px 0 #a4a4a4;left:0;top:0"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:124px;--h:124px;--edge:1px 1px 0 #7d6040,2px 2px 0 #73583a,3px 3px 0 #695034,4px 4px 0 #5f482f;left:40px;top:36px"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:92px;--h:92px;--edge:1px 1px 0 #d8cfae,2px 2px 0 #cec5a4,3px 3px 0 #c4bb9a,4px 4px 0 #bab190;left:94px;top:68px"><img class="tx" src="assets/tiles/bia-5091-grand-crema.jpg" alt=""><div class="gloss"></div></div>
+      </div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">All Sizes</div><div class="ap">Unglazed Vitrified</div></div></div>
+  </div>
+</template>
+
+<template id="tpl-floor">
+  <div class="floor"><div class="plane"></div></div>
+</template>
+
+<!-- ================================================================ -->
+<!-- 2) CAROUSEL 1/3 — hero                                            -->
+<!-- ================================================================ -->
+<div class="wrap"><div class="label">carousel 1/3 · 1080×1350</div>
+<section class="art" id="c1" data-out="naveen-bis-carousel-1-of-3">
+  <header class="hdr">
+    <img class="logo-rev" src="assets/naveen-logo-reversed.png" alt="Naveen Ceramic &amp; Vitrified Tiles" style="height:118px;margin:-14px 0 0 -6px">
+    <div class="pill"><svg><use href="#i-pin"/></svg><b>Karaikal Plant</b><span class="dot"></span>Puducherry</div>
+  </header>
+
+  <div style="position:absolute;left:64px;top:224px;width:640px;z-index:3">
+    <div class="eyebrow">Great news</div>
+    <h1 class="h1" style="font-size:118px;margin-top:26px">Now <span class="grad">BIS</span><br>Certified.</h1>
+    <p class="sub" style="font-size:26px;margin-top:30px;width:610px">New product varieties from our Karaikal plant are <b>officially approved &amp; included</b> in our BIS certification.</p>
+  </div>
+  <div style="position:absolute;right:46px;top:196px;width:310px;transform:rotate(-8deg);z-index:3" data-use="tpl-seal"></div>
+
+  <div class="stage" style="top:0;height:100%;--floor:1030px;--lbl:16px">
+    <div style="position:absolute;left:0;right:0;top:var(--floor)" data-use="tpl-floor"></div>
+    <div class="floor-glow" style="top:var(--floor)"></div>
+    <div style="position:absolute;left:0;right:0;top:calc(var(--floor) - var(--th,240px))" data-use="tpl-lineup"></div>
+  </div>
+
+  <div class="pager" style="position:absolute;left:64px;top:1238px"><span class="num">01</span><i class="on"></i><i></i><i></i></div>
+  <div class="swipe" style="top:1206px">See what’s certified<span class="arr"><svg><use href="#i-arrow"/></svg></span></div>
+</section></div>
+
+<!-- ================================================================ -->
+<!-- 3) CAROUSEL 2/3 — the certified range                             -->
+<!-- ================================================================ -->
+<div class="wrap"><div class="label">carousel 2/3 · 1080×1350</div>
+<section class="art" id="c2" data-out="naveen-bis-carousel-2-of-3">
+  <header class="hdr" style="top:60px">
+    <div>
+      <div class="eyebrow">Karaikal plant · BIS certified range</div>
+      <h2 class="h1" style="font-size:62px;margin-top:18px;letter-spacing:-.02em">Every variety. <span class="grad">Approved.</span></h2>
+    </div>
+  </header>
+
+  <div class="cards" style="top:262px">
+    <!-- 1 -->
+    <div class="card">
+      <div class="sw"><div class="tile" style="--w:100px;--h:100px;--edge:1px 1px 0 #7d7468,2px 2px 0 #746c61,3px 3px 0 #6b635a"><img class="tx" src="assets/tiles/600x600-4254-mizar-full.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="body">
+        <div class="nm">Polished Glazed Floor Tile</div>
+        <div class="meta"><b class="num" style="font-weight:800">600 <span class="x">×</span> 600 mm</b> · <span class="num" style="font-weight:700">9.5 mm</span> thick</div>
+        <div class="chips"><span class="chip">Glazed</span><span class="chip">Polished</span><span class="chip">Rectified</span><span class="chip app">Floor</span></div>
+      </div>
+      <div class="grp"><div class="k">Group</div><div class="v">B<sub>Ib</sub></div><div class="ok"><svg><use href="#i-check"/></svg>BIS</div></div>
+    </div>
+    <!-- 2 -->
+    <div class="card">
+      <div class="sw"><div class="tile matte" style="--w:80px;--h:80px;--edge:1px 1px 0 #9a9894,2px 2px 0 #91908c,3px 3px 0 #888783"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="body">
+        <div class="nm">Glazed Floor Tile</div>
+        <div class="meta"><b class="num" style="font-weight:800">400 <span class="x">×</span> 400 mm</b> · <span class="num" style="font-weight:700">11 mm</span> thick</div>
+        <div class="chips"><span class="chip">Glazed</span><span class="chip">Unpolished</span><span class="chip">Rectified</span><span class="chip app">Floor</span></div>
+      </div>
+      <div class="grp"><div class="k">Group</div><div class="v">B<sub>IIa</sub></div><div class="ok"><svg><use href="#i-check"/></svg>BIS</div></div>
+    </div>
+    <!-- 3 -->
+    <div class="card">
+      <div class="sw"><div class="tile matte" style="--w:96px;--h:64px;--edge:1px 1px 0 #d6d4d0,2px 2px 0 #cdcbc7,3px 3px 0 #c3c1bd"><img class="tx" src="assets/tiles/450x300-1115-l.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="body">
+        <div class="nm">Glazed Wall Tile</div>
+        <div class="meta"><b class="num" style="font-weight:800">450 <span class="x">×</span> 300 mm</b> · <span class="num" style="font-weight:700">7.5 mm</span> thick</div>
+        <div class="chips"><span class="chip">Glazed</span><span class="chip">Unpolished</span><span class="chip">Rectified</span><span class="chip app">Wall</span></div>
+      </div>
+      <div class="grp"><div class="k">Group</div><div class="v">B<sub>III</sub></div><div class="ok"><svg><use href="#i-check"/></svg>BIS</div></div>
+    </div>
+    <!-- 4 -->
+    <div class="card">
+      <div class="sw"><div class="tile matte" style="--w:64px;--h:64px;--edge:1px 1px 0 #8f7354,2px 2px 0 #856a4d,3px 3px 0 #7a6146"><img class="tx" src="assets/tiles/300x300-1009-fl.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="body">
+        <div class="nm">Glazed Floor &amp; Wall Tile</div>
+        <div class="meta"><b class="num" style="font-weight:800">300 <span class="x">×</span> 300 mm</b> · <span class="num" style="font-weight:700">7.5 mm</span> thick</div>
+        <div class="chips"><span class="chip">Glazed</span><span class="chip">Unpolished</span><span class="chip">Rectified</span><span class="chip app">Floor &amp; Wall</span></div>
+      </div>
+      <div class="grp"><div class="k">Group</div><div class="v">B<sub>III</sub></div><div class="ok"><svg><use href="#i-check"/></svg>BIS</div></div>
+    </div>
+    <!-- 5 -->
+    <div class="card">
+      <div class="sw"><div class="stack" style="--w:100px;--h:84px"><div class="tile" style="--w:84px;--h:84px;--edge:1px 1px 0 #c2c2c2,2px 2px 0 #b8b8b8;left:0;top:0"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div><div class="tile" style="--w:62px;--h:62px;--edge:1px 1px 0 #7d6040,2px 2px 0 #73583a;left:38px;top:22px"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div></div></div>
+      <div class="body">
+        <div class="nm">Unglazed Vitrified Tile</div>
+        <div class="meta"><b>All sizes</b> · polished</div>
+        <div class="chips"><span class="chip">Unglazed</span><span class="chip">Polished</span><span class="chip">Rectified</span><span class="chip">Unrectified</span></div>
+      </div>
+      <div class="grp"><div class="k">Group</div><div class="v">B<sub>Ia</sub></div><div class="ok"><svg><use href="#i-check"/></svg>BIS</div></div>
+    </div>
+  </div>
+
+  <p class="legend" style="top:1176px"><b>Group</b> = water-absorption class under IS 15622:2017 &nbsp;·&nbsp; B<sub>Ia</sub> ≤ 0.5% &nbsp;·&nbsp; B<sub>Ib</sub> 0.5–3% &nbsp;·&nbsp; B<sub>IIa</sub> 3–6% &nbsp;·&nbsp; B<sub>III</sub> &gt; 10%. Lower absorption = denser, stronger tile.</p>
+
+  <div class="pager" style="position:absolute;left:64px;top:1268px"><span class="num">02</span><i></i><i class="on"></i><i></i></div>
+  <div class="swipe" style="top:1236px;font-size:19px">Licence details<span class="arr" style="width:54px;height:54px"><svg><use href="#i-arrow"/></svg></span></div>
+</section></div>
+
+<!-- ================================================================ -->
+<!-- 4) CAROUSEL 3/3 — licence + why it matters + CTA                  -->
+<!-- ================================================================ -->
+<div class="wrap"><div class="label">carousel 3/3 · 1080×1350</div>
+<section class="art" id="c3" data-out="naveen-bis-carousel-3-of-3">
+  <header class="hdr" style="top:60px">
+    <div>
+      <div class="eyebrow">Why it matters</div>
+      <h2 class="h1" style="font-size:62px;margin-top:18px;letter-spacing:-.02em;line-height:1.02">Quality you can trust.<br><span class="grad">Verified by BIS.</span></h2>
+    </div>
+  </header>
+
+  <div class="cert" style="top:330px;height:330px">
+    <div class="l"><img src="assets/isi-mark.png" alt="ISI mark IS 15622:2017 CM/L-6700069315"><span>ISI Marked</span></div>
+    <div class="r">
+      <div class="t"><h4>BIS Licence Detail</h4><span class="badge-ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#13804A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Active</span></div>
+      <dl class="grid">
+        <div><dt>Licence No.</dt><dd class="o">CM/L-6700069315</dd></div>
+        <div><dt>Indian Standard</dt><dd>IS 15622:2017</dd></div>
+        <div><dt>Brand</dt><dd>Naveen Diamontile</dd></div>
+        <div><dt>Scale</dt><dd>Large</dd></div>
+        <div><dt>Licensed since</dt><dd>20.12.2018</dd></div>
+        <div><dt>Valid till</dt><dd>19.12.2029</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="benefits" style="top:700px">
+    <div class="bf"><div class="ic"><svg><use href="#i-lab"/></svg></div><h3>Built to the Indian Standard</h3><p>Tested to IS 15622:2017 for size, strength, water absorption &amp; surface quality.</p></div>
+    <div class="bf"><div class="ic"><svg><use href="#i-shield"/></svg></div><h3>Independently licensed</h3><p>Certified by the Bureau of Indian Standards and carries the ISI mark.</p></div>
+    <div class="bf"><div class="ic"><svg><use href="#i-factory"/></svg></div><h3>Cleared for production</h3><p>Our Karaikal plant is now set to manufacture the new varieties.</p></div>
+  </div>
+
+  <div class="cta" style="top:1110px">
+    <div class="thanks">Thank you for your trust<br>&amp; support.<span>Explore the full range online.</span></div>
+    <div class="btn">naveentile.com<i><svg><use href="#i-arrow"/></svg></i></div>
+  </div>
+  <div class="pager" style="position:absolute;left:64px;top:1268px"><span class="num">03</span><i></i><i></i><i class="on"></i></div>
+  <div class="ftr" style="top:1260px;left:auto;gap:34px"><div class="it"><svg><use href="#i-phone"/></svg>+91 91087 66677</div></div>
+</section></div>
+
+<!-- ================================================================ -->
+<!-- 5) STORY 1080x1920                                                -->
+<!-- ================================================================ -->
+<div class="wrap"><div class="label">story · 1080×1920</div>
+<section class="art story" id="story" data-out="naveen-bis-story-1080x1920">
+  <header class="hdr" style="top:224px;justify-content:center">
+    <img class="logo-rev" src="assets/naveen-logo-reversed.png" alt="Naveen Ceramic &amp; Vitrified Tiles" style="height:132px">
+  </header>
+
+  <div style="position:absolute;left:0;right:0;top:396px;text-align:center;z-index:3">
+    <div class="eyebrow" style="justify-content:center">Great news<span style="display:block;width:46px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--orange-300),var(--orange))"></span></div>
+    <h1 class="h1" style="font-size:128px;margin-top:30px">Now <span class="grad">BIS</span><br>Certified.</h1>
+    <p class="sub" style="font-size:28px;margin:30px auto 0;width:860px">New product varieties from our <b>Karaikal plant</b> are officially approved &amp; included in our BIS certification.</p>
+  </div>
+
+  <div style="position:absolute;left:50%;top:872px;width:300px;margin-left:-150px;transform:rotate(-6deg);z-index:3" data-use="tpl-seal"></div>
+
+  <div class="stage" style="top:0;height:100%;--floor:1440px;--lbl:16px">
+    <div style="position:absolute;left:0;right:0;top:var(--floor)" data-use="tpl-floor"></div>
+    <div class="floor-glow" style="top:var(--floor)"></div>
+    <div style="position:absolute;left:0;right:0;top:calc(var(--floor) - var(--th,240px))" data-use="tpl-lineup"></div>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;top:1584px;display:flex;flex-direction:column;align-items:center;gap:18px">
+    <div class="btn" style="height:68px;font-size:23px">naveentile.com<i style="width:44px;height:44px"><svg><use href="#i-arrow"/></svg></i></div>
+    <div style="font-size:16.5px;color:var(--soft);letter-spacing:.04em">IS 15622:2017 &nbsp;·&nbsp; BIS Licence CM/L-6700069315</div>
+  </div>
+</section></div>
+
+<script>
+  document.querySelectorAll('[data-use]').forEach(slot=>{
+    const tpl=document.getElementById(slot.dataset.use);
+    slot.appendChild(tpl.content.cloneNode(true));
+  });
+</script>
+</body>
+</html>

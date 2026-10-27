@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Naveen BIS Single Post</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Layout: a tiled showroom corner. A glazed navy wall of 600 mm modules (180 px) meets a glossy floor;
+   the certified tiles stand on the junction. The headline is the one loud element; everything else is quiet proof. */
+:root{
+  --wall:#0D2042;      /* glazed navy wall tile */
+  --grout:#050E22;     /* grout + deepest shadow */
+  --ink:#FFFFFF;       /* primary text */
+  --mute:#B4C3DB;      /* secondary text, blue-biased grey */
+  --accent:#F26522;    /* Naveen orange */
+  --accent-hi:#FF9A5C; /* orange highlight */
+  --font-display:"Raleway",sans-serif;
+  --font-body:"Poppins",sans-serif;
+  --module:180px;      /* 600 mm tile = 180 px */
+  --floor:1000px;      /* wall/floor junction */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#151a24}
+body{padding:40px;display:flex;justify-content:center;font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+
+.art{position:relative;width:1080px;height:1350px;overflow:hidden;isolation:isolate;color:var(--ink);background:var(--grout)}
+
+/* ---- wall ---- */
+.wall{position:absolute;left:0;top:0;width:100%;height:var(--floor)}
+.cell{position:absolute;width:calc(var(--module) - 4px);height:calc(var(--module) - 4px);border-radius:2px;
+  background:linear-gradient(142deg,rgba(255,255,255,.06),rgba(255,255,255,0) 42%,rgba(0,0,0,.10) 100%),var(--c)}
+.light{position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(760px 640px at 86% 6%, rgba(126,176,235,.30), transparent 70%),
+    radial-gradient(560px 420px at 14% 34%, rgba(66,121,183,.14), transparent 70%),
+    linear-gradient(180deg, rgba(5,14,34,0) 55%, rgba(5,14,34,.35) 100%)}
+.light.wall-only{height:var(--floor)}
+
+/* ---- floor ---- */
+.floor{position:absolute;left:0;right:0;top:var(--floor);bottom:0;perspective:620px;perspective-origin:50% 0;overflow:hidden}
+.plane{position:absolute;top:0;left:-720px;width:2520px;height:1600px;transform-origin:50% 0;transform:rotateX(78deg);
+  background:
+    linear-gradient(rgba(5,14,34,.85) 4px, transparent 4px) 0 0/var(--module) var(--module),
+    linear-gradient(90deg, rgba(5,14,34,.85) 4px, transparent 4px) 0 0/var(--module) var(--module),
+    linear-gradient(180deg,#1A3A6E 0%,#0F2549 30%,#0A1A36 100%)}
+.floor{z-index:0}
+.floor-shade{position:absolute;left:0;right:0;top:var(--floor);bottom:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(620px 120px at 50% 0, rgba(242,101,34,.20), transparent 70%),
+    linear-gradient(180deg, rgba(5,14,34,.05) 0%, rgba(5,14,34,.62) 42%, rgba(5,14,34,.9) 100%)}
+.junction{z-index:2;position:absolute;left:0;right:0;top:calc(var(--floor) - 1px);height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22) 20%,rgba(255,255,255,.22) 80%,transparent)}
+
+/* ---- grain ---- */
+.art::after{content:"";position:absolute;inset:0;z-index:40;pointer-events:none;opacity:.08;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* ---- top row ---- */
+.logo{position:absolute;left:58px;top:52px;width:236px;height:auto;z-index:5;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+.isi{position:absolute;right:64px;top:60px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:10px}
+.isi img{width:112px;height:112px;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.4))}
+
+/* ---- headline ---- */
+.hero{position:absolute;left:64px;right:64px;top:262px;z-index:5}
+.eyebrow{display:flex;align-items:center;gap:14px;font-weight:600;font-size:22px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-hi)}
+.eyebrow svg{width:24px;height:24px;flex:none}
+h1{margin-top:22px;font-family:var(--font-display);font-feature-settings:"lnum" 1;font-weight:900;font-size:168px;line-height:.9;letter-spacing:-.035em;text-wrap:balance}
+h1 .bis{background:linear-gradient(100deg,#FFB27A 0%,var(--accent) 48%,#FF7A2F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin-top:30px;max-width:900px;font-size:29px;line-height:1.42;color:var(--mute)}
+.sub b{color:var(--ink);font-weight:600}
+
+/* ---- certified tiles ---- */
+.lineup{position:absolute;left:0;right:0;top:calc(var(--floor) - 240px);display:flex;justify-content:center;gap:20px;z-index:6}
+.item{display:grid;grid-template-rows:240px auto;justify-items:center}
+.item>.tile,.item>.stack{align-self:end}
+.tile{position:relative;width:var(--w);height:var(--h);border-radius:0;
+  box-shadow:var(--edge),0 34px 40px -20px rgba(0,0,0,.75);
+  -webkit-box-reflect:below 6px linear-gradient(transparent 70%, rgba(255,255,255,.20))}
+.tile img.tx{object-fit:cover;position:absolute;inset:0;width:100%;height:100%;border-radius:0;display:block}
+.tile .gloss{position:absolute;inset:0;border-radius:0;
+  background:linear-gradient(128deg,rgba(255,255,255,.62) 0%,rgba(255,255,255,.08) 30%,rgba(255,255,255,0) 52%,rgba(255,255,255,.14) 78%,rgba(255,255,255,0) 100%)}
+.tile.matte .gloss{background:linear-gradient(128deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 45%,rgba(0,0,0,.06) 100%)}
+.lbl .ok{width:30px;height:30px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:var(--accent);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 0 3px rgba(242,101,34,.22),0 8px 18px -6px rgba(242,101,34,.9)}
+.lbl .ok svg{width:16px;height:16px}
+.stack{position:relative;width:var(--w);height:var(--h)}
+.stack .tile{position:absolute}
+.lbl{position:relative;z-index:2;margin-top:18px;text-align:center;white-space:nowrap}
+.lbl .sz{height:36px;line-height:36px;font-family:var(--font-display);font-feature-settings:"lnum" 1;font-weight:800;font-size:30px;letter-spacing:-.01em}
+.lbl .sz .x{font-family:var(--font-body);font-weight:500;margin:0 .05em;position:relative;top:-.04em}
+.lbl .ap{margin-top:6px;font-weight:600;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-hi)}
+
+/* ---- proof + CTA ---- */
+.proof{position:absolute;left:64px;right:64px;top:1188px;display:flex;align-items:center;justify-content:space-between;gap:24px;z-index:6}
+.facts{display:flex;align-items:center;gap:28px}
+.fact .k{font-size:15px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.fact .v{margin-top:4px;font-family:var(--font-display);font-feature-settings:"lnum" 1;font-weight:800;font-size:31px;letter-spacing:-.005em;white-space:nowrap}
+.rule{width:2px;height:58px;background:rgba(255,255,255,.18);border-radius:1px}
+.cta{display:inline-flex;align-items:center;gap:14px;height:76px;padding:0 14px 0 30px;border-radius:999px;white-space:nowrap;
+  background:linear-gradient(140deg,var(--accent-hi),var(--accent) 50%,#D44A0C);font-weight:600;font-size:25px;color:var(--ink);
+  box-shadow:0 22px 44px -16px rgba(242,101,34,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+.cta i{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center}
+.cta i svg{width:24px;height:24px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="none" stroke="#FF9A5C" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="#FF9A5C"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5.5l6.5 6.5-6.5 6.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<section class="art" data-out="naveen-bis-single-1080x1350">
+  <div class="wall" id="wall"></div>
+  <div class="light wall-only"></div>
+  <div class="floor"><div class="plane"></div></div>
+  <div class="floor-shade"></div>
+  <div class="junction"></div>
+
+  <img class="logo" src="assets/naveen-logo-reversed.png" alt="Naveen Ceramic &amp; Vitrified Tiles">
+  <div class="isi"><img src="assets/isi-mark-white.png" alt="ISI mark, IS 15622:2017, CM/L-6700069315"></div>
+
+  <div class="hero">
+    <div class="eyebrow"><svg><use href="#i-pin"/></svg>Karaikal Plant · Puducherry</div>
+    <h1>Now <span class="bis">BIS</span><br>Certified.</h1>
+    <p class="sub">New tile varieties are <b>approved &amp; included</b><br>in our BIS certification.</p>
+  </div>
+
+  <div class="lineup">
+    <div class="item"><div class="tile matte" style="--w:114px;--h:114px;--edge:1px 1px 0 #8f7354,2px 2px 0 #856a4d,3px 3px 0 #7a6146"><img class="tx" src="assets/tiles/300x300-1009-fl.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">300<span class="x">×</span>300</div><div class="ap">Floor &amp; Wall</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:171px;--h:114px;--edge:1px 1px 0 #d6d4d0,2px 2px 0 #cdcbc7,3px 3px 0 #c3c1bd"><img class="tx" src="assets/tiles/450x300-1115-l.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">450<span class="x">×</span>300</div><div class="ap">Wall</div></div></div>
+    <div class="item"><div class="tile" style="--w:228px;--h:228px;--edge:1px 1px 0 #7d7468,2px 2px 0 #746c61,3px 3px 0 #6b635a,4px 4px 0 #625b53"><img class="tx" src="assets/tiles/600x600-4254-mizar-full.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">600<span class="x">×</span>600</div><div class="ap">Floor · Polished</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:152px;--h:152px;--edge:1px 1px 0 #9a9894,2px 2px 0 #91908c,3px 3px 0 #888783,4px 4px 0 #7f7e7a,5px 5px 0 #767571"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">400<span class="x">×</span>400</div><div class="ap">Floor</div></div></div>
+    <div class="item"><div class="stack" style="--w:186px;--h:160px">
+        <div class="tile" style="--w:160px;--h:160px;--edge:1px 1px 0 #c2c2c2,2px 2px 0 #b8b8b8,3px 3px 0 #aeaeae,4px 4px 0 #a4a4a4;left:0;top:0"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:124px;--h:124px;--edge:1px 1px 0 #7d6040,2px 2px 0 #73583a,3px 3px 0 #695034,4px 4px 0 #5f482f;left:40px;top:36px"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:92px;--h:92px;--edge:1px 1px 0 #d8cfae,2px 2px 0 #cec5a4,3px 3px 0 #c4bb9a,4px 4px 0 #bab190;left:94px;top:68px"><img class="tx" src="assets/tiles/bia-5091-grand-crema.jpg" alt=""><div class="gloss"></div></div>
+      </div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">All sizes</div><div class="ap">Unglazed Vitrified</div></div></div>
+  </div>
+
+  <div class="proof">
+    <div class="facts">
+      <div class="fact"><div class="k">BIS Licence</div><div class="v">CM/L-6700069315</div></div>
+      <div class="rule"></div>
+      <div class="fact"><div class="k">Standard</div><div class="v">IS 15622:2017</div></div>
+    </div>
+    <div class="cta">naveentile.com<i><svg><use href="#i-arrow"/></svg></i></div>
+  </div>
+</section>
+
+<script>
+  // Glazed wall: 600 mm modules, bottom row sits on the floor line. Seeded so every render is identical.
+  (function(){
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const wall = document.getElementById('wall'), M = 180, FLOOR = 1000;
+    for (let r = 0; r < 7; r++) for (let c = 0; c < 6; c++) {
+      const d = document.createElement('div'); d.className = 'cell';
+      const l = 13.4 + rnd() * 1.8;               // per-tile shade variation
+      d.style.setProperty('--c', `hsl(218 60% ${l}%)`);
+      d.style.left = (c * M + 2) + 'px'; d.style.top = (FLOOR - (r + 1) * M + 2) + 'px';
+      wall.appendChild(d);
+    }
+  })();
+</script>
+</body>
+</html>
