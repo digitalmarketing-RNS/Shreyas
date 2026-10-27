@@ -206,6 +206,32 @@ cadence matters more than any single message.
 
 ---
 
+## Beyond email (Shreyas, 27 Oct)
+
+Email alone isn't getting replies, so every prospect now gets the same finding through more than
+one channel.
+
+**Screenshot proof.** Each cold email carries a real screenshot of the client at #1 on Google India:
+RNSIT for "best engineering college in Bangalore" (colleges), Naveen Tile for "best tile company"
+(tile companies). Shreyas takes these on his phone in an Incognito tab. Claude can't: Google shows a
+robot check to automated browsers, and a mock-up of a results page would not be a real screenshot.
+Re-take them monthly, or whenever the ranking changes.
+
+| Channel | How | Who |
+|---|---|---|
+| Phone call | Office or principal's line, 10:30 am to 1 pm, the day after the email. 60-second script: the finding, the proof, a 15-minute meeting | Shreyas |
+| WhatsApp | One message, only to a head's own published mobile, after the email | Shreyas |
+| LinkedIn | Connection note to named heads, by hand, about 10 a day | Shreyas |
+| Warm intros | Naveen Tile: dealers and showrooms in other cities (not rival makers). RNSIT: colleges outside Bangalore only | Shreyas asks |
+| Walk-ins | Bangalore tile showrooms, with a printed page: the screenshot plus 3 fixes for their site | Shreyas |
+| Inbound | EEAT Minds Google Business Profile with client reviews; weekly LinkedIn case-study posts | Shreyas, Claude drafts |
+| Own email domain | eeatminds.in has no mailbox yet. One Google Workspace mailbox plus SPF/DKIM/DMARC records gets cold email out of gmail.com | Shreyas sets up |
+
+- Colleges run by the same trust count as one organisation: email one of them, not both.
+- No auto-dialers or recorded calls (TRAI do-not-disturb rules), no bulk WhatsApp tools.
+
+---
+
 ## Files in this folder
 
 - `README.md`: this playbook
