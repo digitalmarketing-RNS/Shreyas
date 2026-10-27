@@ -2,7 +2,7 @@
 
 Selling EEAT Minds SEO to tile companies. Owner: Shreyas V Patil.
 
-**Status (27 Oct 2026):** 76 organisations emailed from eeatminds.in@gmail.com since 23 Oct
+**Status (27 Oct 2026):** 96 organisations emailed from eeatminds.in@gmail.com since 23 Oct
 (tile companies and engineering colleges). One reply so far, a "no". From 27 Oct there are **no
 follow-up emails**: each person is emailed once (see "One email per person"). Up to 20 new emails a day.
 
