@@ -23,7 +23,17 @@ Captions, hashtags and alt text are in [`captions.md`](captions.md).
 - The logo (`assets/naveen-logo.png`) was extracted from the Diamondtile catalogue PDF. It's about 4× sharper than the website copy.
   `assets/naveen-logo-reversed.png` is the dark-background version: white wordmark, dove and tagline, with the brand-orange swoosh and E dots unchanged. It sits straight on the design with no white box.
 - The ISI mark (`assets/isi-mark.png`) is the one shown on naveentile.com. `assets/isi-mark-white.png` is the same mark cleaned up as white line art so it sits straight on the navy.
-- The tile faces are drawn in SVG (marble, stone, satin, salt-and-pepper, geometric décor), so they stay sharp at any size.
+- The tile faces are real Naveen designs, cropped into `assets/tiles/` from the product photos and catalogue PDFs on naveentile.com:
+
+  | Certified variety | Tile shown | Source |
+  |---|---|---|
+  | 600×600 polished glazed floor (BIb) | 4254 Mizar | Website product photo. The catalogue lists it under "PGVT Tiles 600×600". |
+  | 400×400 glazed floor (BIIa) | 14500 | Website product photo, 405×405 outdoor floor series |
+  | 450×300 glazed wall (BIII) | 1035 Snow Beige L | Website product photo, 300×450 wall tile |
+  | 300×300 glazed floor & wall (BIII) | FL 009 | Website product photo, 300×300 ceramic floor tile |
+  | Unglazed vitrified, all sizes (BIa) | Full-body grey, 9051 Royal Brown, 5091 Grand Crema | `full-body-vitrified-tile.pdf`, from the "Full Body (unglazed)" and "Double Charged Tiles" pages |
+
+  To swap in a different design, replace the matching file in `assets/tiles/`, keep its shape (square, or 2:3 for the wall tile), and run `node render.js`.
 
 To re-export after editing:
 
