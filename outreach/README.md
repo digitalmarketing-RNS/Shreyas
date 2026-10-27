@@ -2,9 +2,9 @@
 
 Selling EEAT Minds SEO to tile companies. Owner: Shreyas V Patil.
 
-**Status (24 Oct 2026): 56 cold emails sent from eeatminds.in@gmail.com on 23 Oct** (36 tile
-companies, 20 engineering colleges). No replies yet, which is normal before the Day 3 follow-ups.
-Batch 6 (20 emails, owners and principals only) is drafted. Up to 20 new emails a day.
+**Status (27 Oct 2026):** 76 organisations emailed from eeatminds.in@gmail.com since 23 Oct
+(tile companies and engineering colleges). One reply so far, a "no". From 27 Oct there are **no
+follow-up emails**: each person is emailed once (see "One email per person"). Up to 20 new emails a day.
 
 ### What changed on 24 Oct
 
@@ -170,30 +170,22 @@ profiles via search and writes the LinkedIn notes; Shreyas sends them.
 
 ---
 
-## The sequence (per prospect)
+## One email per person (Shreyas, 27 Oct)
 
-| Day | Channel | What | Who sends |
+**No follow-up emails.** Each person gets one email, and nobody who has already been emailed gets
+another, including a second person at an organisation already contacted. Before any send, search
+Sent for the organisation's domain and name; if anything turns up, don't send.
+
+| Step | Channel | What | Who sends |
 |---|---|---|---|
-| 0 | Email 1 | Specific finding + proof + price (tiles only) + "want the 3 fixes?" or a 15-minute call | Claude (after approval) |
-| 0 | LinkedIn | Connection note to the named decision-maker | Shreyas (Claude drafts) |
-| 1 | WhatsApp / Instagram | Short personal message to the listed mobile | Shreyas (Claude drafts) |
-| 3 | Email 2 | Same thread: one more finding + screenshot of the Naveen #1 result | Claude |
-| 9 | Email 3 | Short breakup: "closing the loop, reply anytime" | Claude |
+| 1 | Email (once) | Specific finding + proof + price (tiles only) + "want the 3 fixes?" or a 15-minute call | Claude (after approval) |
+| 1 | LinkedIn | Connection note to the same decision-maker | Shreyas (Claude drafts) |
+| 2 | WhatsApp | One short personal message to the head's published mobile | Shreyas (Claude drafts) |
 | Any reply | | Claude drafts the reply and the promised fixes (Firecrawl checks), and a proposal deck (Gamma) once they're interested | Claude drafts, Shreyas approves |
 
-**Email 2 template**
-
-> Subject: (same thread)
-> Hi {name}, one more thing I spotted on {domain}: {second verified finding}.
-> Here's the Naveen Tile result I mentioned: {screenshot}. Happy to send the 3 fixes if useful.
-> Shreyas
-
-**Email 3 template**
-
-> Subject: (same thread)
-> Hi {name}, I'll stop here so I'm not filling your inbox. If ranking for {keyword} becomes a
-> priority, just reply and I'll send the fixes the same day.
-> Shreyas
+Since there is only one shot, make it count: the right person, a direct address, a finding checked
+that day, and a subject line they will open. Scheduled checks only look for replies and bounces;
+they never send.
 
 ### Rules
 
@@ -202,9 +194,9 @@ profiles via search and writes the LinkedIn notes; Shreyas sends them.
 - Check the claim before it goes out. Example from the pilot: a "noindex" tag that looked damning
   turned out to come from an embedded chat widget, not the client's site, so it was dropped.
 - Every email has an opt-out line, and a "no" is honoured immediately.
-- Max 20 new cold emails/day from Gmail. Max ~15 WhatsApps/day, one message + one follow-up, then stop.
+- Max 20 new cold emails/day from Gmail. Max ~15 WhatsApps/day, one message each.
 - Never bulk-blast WhatsApp, never automate LinkedIn or Instagram.
-- Stop a sequence the moment anyone replies.
+- A bounce is not a reason to email someone else at that organisation; note it and move on.
 
 ### Realistic expectations
 
