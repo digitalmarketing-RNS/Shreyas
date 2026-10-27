@@ -165,6 +165,23 @@ for company lists only.
 No guessed addresses (firstname@company). They can't be verified from here, and bounces hurt the
 sending reputation of eeatminds.in@gmail.com.
 
+**Checklist before any email (Shreyas, 27 Oct).** The 27 Oct college batch went out with 7
+"Dear Principal" greetings where the name could be found, one name that the newest AICTE filing
+contradicts, and no check of who controls the budget. Every email now needs all of these:
+
+1. **The right person.** At private colleges the trust's chairman, managing trustee, secretary or
+   CEO decides on marketing spend; the principal runs academics. Email the management head when
+   they publish a direct address; otherwise the named principal, with a call to management.
+2. **Name and role from a current source.** The college's own site, plus the latest AICTE
+   Mandatory Disclosure (2025-26 or 2026-27). If the site and a filing disagree, use the newer
+   one; if it's still unclear, don't send.
+3. **Address published by the college or an official listing** (college site, AICTE/NAAC filing,
+   COMEDK, a government site). The VTU principal list alone is not enough: it dates from Feb 2025.
+4. **No "Dear Principal".** If the name can't be confirmed, the email doesn't go.
+5. **A personal inbox where one exists.** A general college inbox (a Gmail on the contact page)
+   is a last resort and is noted as such.
+6. **Mail server check** on the domain, and the source and date logged for every contact.
+
 **LinkedIn:** no connector exists, and logged-in scraping gets accounts banned. Claude reads public
 profiles via search and writes the LinkedIn notes; Shreyas sends them.
 
