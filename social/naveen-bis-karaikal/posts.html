@@ -75,23 +75,21 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
           mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 40%,transparent 90%);}
 .floor-glow{position:absolute;left:50%;width:900px;height:160px;transform:translate(-50%,-50%);
   background:radial-gradient(closest-side, rgba(242,101,34,.28), rgba(66,121,183,.12) 55%, transparent);filter:blur(6px)}
-.lineup{display:flex;justify-content:center;align-items:flex-start;gap:var(--gap,30px)}
-.item{display:grid;grid-template-rows:var(--th,260px) auto;justify-items:center}
+.lineup{display:flex;justify-content:center;align-items:flex-start;gap:var(--gap,18px)}
+.item{display:grid;grid-template-rows:var(--th,240px) auto;justify-items:center}
 .item>.tile,.item>.stack{align-self:end}
-.tile{position:relative;width:var(--w);height:var(--h);border-radius:3px;
+.tile{position:relative;width:var(--w);height:var(--h);border-radius:0;
   box-shadow:var(--edge), 0 30px 40px -18px rgba(0,0,0,.65);
   -webkit-box-reflect:below 5px linear-gradient(transparent 72%, rgba(255,255,255,.22));}
-.tile img.tx{object-fit:cover;position:absolute;inset:0;width:100%;height:100%;border-radius:3px;display:block}
-.tile .gloss{position:absolute;inset:0;border-radius:3px;
+.tile img.tx{object-fit:cover;position:absolute;inset:0;width:100%;height:100%;border-radius:0;display:block}
+.tile .gloss{position:absolute;inset:0;border-radius:0;
   background:linear-gradient(128deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.08) 30%, rgba(255,255,255,0) 52%, rgba(255,255,255,.14) 78%, rgba(255,255,255,.0) 100%)}
 .tile.matte .gloss{background:linear-gradient(128deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 45%, rgba(0,0,0,.06) 100%)}
-.tile .tick{position:absolute;top:-14px;right:-14px;width:34px;height:34px;border-radius:50%;
-  background:linear-gradient(140deg,var(--orange-300),var(--orange) 55%,var(--orange-600));
-  box-shadow:0 0 0 3px var(--navy-900),0 8px 18px -4px rgba(242,101,34,.7);display:grid;place-items:center}
-.tile .tick svg{width:18px;height:18px}
+.lbl .ok{width:28px;height:28px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;background:var(--orange);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 0 3px rgba(242,101,34,.22),0 8px 18px -6px rgba(242,101,34,.9)}
+.lbl .ok svg{width:15px;height:15px}
 .stack{position:relative;width:var(--w);height:var(--h)}
 .stack .tile{position:absolute}
-.lbl{margin-top:var(--lbl,74px);text-align:center;white-space:nowrap}
+.lbl{position:relative;z-index:2;margin-top:var(--lbl,74px);text-align:center;white-space:nowrap}
 .lbl .sz{height:32px;line-height:32px;font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:25px;letter-spacing:-.01em;color:#fff}
 .lbl .sz small{font-size:15px;font-weight:700;color:var(--soft);margin-left:3px;letter-spacing:.02em}
 .lbl .ap{margin-top:4px;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange-300)}
@@ -129,7 +127,6 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
   box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
 .card .sw{flex:none;width:124px;height:124px;display:grid;place-items:center;border-radius:16px;background:rgba(5,15,34,.45);border:1px solid rgba(255,255,255,.08)}
 .card .sw .tile{-webkit-box-reflect:unset;box-shadow:var(--edge),0 12px 20px -10px rgba(0,0,0,.7)}
-.card .sw .tile .tick{display:none}
 .card .body{flex:1;min-width:0}
 .card .nm{font-family:Raleway,sans-serif;font-feature-settings:"lnum" 1;font-weight:800;font-size:31px;letter-spacing:-.01em;line-height:1.1}
 .card .meta{margin-top:6px;font-size:19px;color:var(--mute)}
@@ -227,33 +224,20 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
 
 <template id="tpl-lineup">
   <div class="lineup">
-    <div class="item"><div class="tile matte" style="--w:120px;--h:120px;--edge:1px 1px 0 #b9b2a6,2px 2px 0 #b2ab9f,3px 3px 0 #a8a194">
-      <img class="tx" src="assets/tiles/300x300-fl009.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">300<span class="x">×</span>300<small>mm</small></div><div class="ap">Floor &amp; Wall</div></div></div>
-
-    <div class="item"><div class="tile matte" style="--w:120px;--h:180px;--edge:1px 1px 0 #d2bfae,2px 2px 0 #c8b5a4,3px 3px 0 #bdab9a">
-      <img class="tx" src="assets/tiles/450x300-1035-snow-beige.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">450<span class="x">×</span>300<small>mm</small></div><div class="ap">Wall</div></div></div>
-
-    <div class="item"><div class="tile" style="--w:240px;--h:240px;--edge:1px 1px 0 #6e655c,2px 2px 0 #655d55,3px 3px 0 #5c544d,4px 4px 0 #534c46">
-      <img class="tx" src="assets/tiles/600x600-4254-mizar-pgvt.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">600<span class="x">×</span>600<small>mm</small></div><div class="ap">Floor · Polished</div></div></div>
-
-    <div class="item"><div class="tile matte" style="--w:160px;--h:160px;--edge:1px 1px 0 #a3a19c,2px 2px 0 #9a9893,3px 3px 0 #918f8a,4px 4px 0 #888681,5px 5px 0 #7f7d78">
-      <img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">400<span class="x">×</span>400<small>mm</small></div><div class="ap">Floor</div></div></div>
-
-    <div class="item"><div class="stack" style="--w:196px;--h:220px">
-        <div class="tile" style="left:0;top:0;--w:120px;--h:220px;--edge:1px 1px 0 #bdbab5,2px 2px 0 #b3b0aa,3px 3px 0 #a9a6a0;-webkit-box-reflect:unset"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
-        <div class="tile" style="left:52px;top:56px;--w:144px;--h:164px;--edge:1px 1px 0 #8a6a45,2px 2px 0 #80613e,3px 3px 0 #755836;-webkit-box-reflect:unset;box-shadow:var(--edge),-14px 0 26px -10px rgba(0,0,0,.55)"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
-        <div class="tile" style="left:92px;top:116px;--w:104px;--h:104px;--edge:1px 1px 0 #ddd3b6,2px 2px 0 #d3c9ac,3px 3px 0 #c9bfa2;box-shadow:var(--edge),-14px 0 26px -10px rgba(0,0,0,.55)"><img class="tx" src="assets/tiles/bia-5091-grand-crema.jpg" alt=""><div class="gloss"></div>
-          <div class="tick"><svg><use href="#i-check"/></svg></div></div>
+    <div class="item"><div class="tile matte" style="--w:114px;--h:114px;--edge:1px 1px 0 #8f7354,2px 2px 0 #856a4d,3px 3px 0 #7a6146"><img class="tx" src="assets/tiles/300x300-1009-fl.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">300<span class="x">×</span>300<small>mm</small></div><div class="ap">Floor &amp; Wall</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:171px;--h:114px;--edge:1px 1px 0 #d6d4d0,2px 2px 0 #cdcbc7,3px 3px 0 #c3c1bd"><img class="tx" src="assets/tiles/450x300-1115-l.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">450<span class="x">×</span>300<small>mm</small></div><div class="ap">Wall</div></div></div>
+    <div class="item"><div class="tile" style="--w:228px;--h:228px;--edge:1px 1px 0 #7d7468,2px 2px 0 #746c61,3px 3px 0 #6b635a,4px 4px 0 #625b53"><img class="tx" src="assets/tiles/600x600-4254-mizar-full.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">600<span class="x">×</span>600<small>mm</small></div><div class="ap">Floor · Polished</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:152px;--h:152px;--edge:1px 1px 0 #9a9894,2px 2px 0 #91908c,3px 3px 0 #888783,4px 4px 0 #7f7e7a,5px 5px 0 #767571"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">400<span class="x">×</span>400<small>mm</small></div><div class="ap">Floor</div></div></div>
+    <div class="item"><div class="stack" style="--w:186px;--h:160px">
+        <div class="tile" style="--w:160px;--h:160px;--edge:1px 1px 0 #c2c2c2,2px 2px 0 #b8b8b8,3px 3px 0 #aeaeae,4px 4px 0 #a4a4a4;left:0;top:0"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:124px;--h:124px;--edge:1px 1px 0 #7d6040,2px 2px 0 #73583a,3px 3px 0 #695034,4px 4px 0 #5f482f;left:40px;top:36px"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:92px;--h:92px;--edge:1px 1px 0 #d8cfae,2px 2px 0 #cec5a4,3px 3px 0 #c4bb9a,4px 4px 0 #bab190;left:94px;top:68px"><img class="tx" src="assets/tiles/bia-5091-grand-crema.jpg" alt=""><div class="gloss"></div></div>
       </div>
-      <div class="lbl"><div class="sz">All Sizes</div><div class="ap">Unglazed Vitrified</div></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">All Sizes</div><div class="ap">Unglazed Vitrified</div></div></div>
   </div>
 </template>
 
@@ -278,10 +262,10 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
   </div>
   <div style="position:absolute;right:46px;top:196px;width:310px;transform:rotate(-8deg);z-index:3" data-use="tpl-seal"></div>
 
-  <div class="stage" style="top:0;height:100%;--floor:1030px;--lbl:58px">
+  <div class="stage" style="top:0;height:100%;--floor:1030px;--lbl:16px">
     <div style="position:absolute;left:0;right:0;top:var(--floor)" data-use="tpl-floor"></div>
     <div class="floor-glow" style="top:var(--floor)"></div>
-    <div style="position:absolute;left:0;right:0;top:calc(var(--floor) - var(--th,260px))" data-use="tpl-lineup"></div>
+    <div style="position:absolute;left:0;right:0;top:calc(var(--floor) - var(--th,240px))" data-use="tpl-lineup"></div>
   </div>
 
   <div class="pager" style="position:absolute;left:64px;top:1238px"><span class="num">01</span><i class="on"></i><i></i><i></i></div>
@@ -303,7 +287,7 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
   <div class="cards" style="top:262px">
     <!-- 1 -->
     <div class="card">
-      <div class="sw"><div class="tile" style="--w:104px;--h:104px;--edge:1px 1px 0 #6e655c,2px 2px 0 #655d55,3px 3px 0 #5c544d,4px 4px 0 #534c46"><img class="tx" src="assets/tiles/600x600-4254-mizar-pgvt.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="sw"><div class="tile" style="--w:100px;--h:100px;--edge:1px 1px 0 #7d7468,2px 2px 0 #746c61,3px 3px 0 #6b635a"><img class="tx" src="assets/tiles/600x600-4254-mizar-full.jpg" alt=""><div class="gloss"></div></div></div>
       <div class="body">
         <div class="nm">Polished Glazed Floor Tile</div>
         <div class="meta"><b class="num" style="font-weight:800">600 <span class="x">×</span> 600 mm</b> · <span class="num" style="font-weight:700">9.5 mm</span> thick</div>
@@ -313,7 +297,7 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
     </div>
     <!-- 2 -->
     <div class="card">
-      <div class="sw"><div class="tile matte" style="--w:84px;--h:84px;--edge:1px 1px 0 #a3a19c,2px 2px 0 #9a9893,3px 3px 0 #918f8a,4px 4px 0 #888681,5px 5px 0 #7f7d78"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="sw"><div class="tile matte" style="--w:80px;--h:80px;--edge:1px 1px 0 #9a9894,2px 2px 0 #91908c,3px 3px 0 #888783"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div></div>
       <div class="body">
         <div class="nm">Glazed Floor Tile</div>
         <div class="meta"><b class="num" style="font-weight:800">400 <span class="x">×</span> 400 mm</b> · <span class="num" style="font-weight:700">11 mm</span> thick</div>
@@ -323,7 +307,7 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
     </div>
     <!-- 3 -->
     <div class="card">
-      <div class="sw"><div class="tile matte" style="--w:66px;--h:99px;--edge:1px 1px 0 #d2bfae,2px 2px 0 #c8b5a4,3px 3px 0 #bdab9a"><img class="tx" src="assets/tiles/450x300-1035-snow-beige.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="sw"><div class="tile matte" style="--w:96px;--h:64px;--edge:1px 1px 0 #d6d4d0,2px 2px 0 #cdcbc7,3px 3px 0 #c3c1bd"><img class="tx" src="assets/tiles/450x300-1115-l.jpg" alt=""><div class="gloss"></div></div></div>
       <div class="body">
         <div class="nm">Glazed Wall Tile</div>
         <div class="meta"><b class="num" style="font-weight:800">450 <span class="x">×</span> 300 mm</b> · <span class="num" style="font-weight:700">7.5 mm</span> thick</div>
@@ -333,7 +317,7 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
     </div>
     <!-- 4 -->
     <div class="card">
-      <div class="sw"><div class="tile matte" style="--w:66px;--h:66px;--edge:1px 1px 0 #b9b2a6,2px 2px 0 #b2ab9f,3px 3px 0 #a8a194"><img class="tx" src="assets/tiles/300x300-fl009.jpg" alt=""><div class="gloss"></div></div></div>
+      <div class="sw"><div class="tile matte" style="--w:64px;--h:64px;--edge:1px 1px 0 #8f7354,2px 2px 0 #856a4d,3px 3px 0 #7a6146"><img class="tx" src="assets/tiles/300x300-1009-fl.jpg" alt=""><div class="gloss"></div></div></div>
       <div class="body">
         <div class="nm">Glazed Floor &amp; Wall Tile</div>
         <div class="meta"><b class="num" style="font-weight:800">300 <span class="x">×</span> 300 mm</b> · <span class="num" style="font-weight:700">7.5 mm</span> thick</div>
@@ -343,10 +327,7 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
     </div>
     <!-- 5 -->
     <div class="card">
-      <div class="sw"><div class="stack" style="--w:100px;--h:104px">
-        <div class="tile" style="position:absolute;left:0;top:0;--w:56px;--h:104px;--edge:1px 1px 0 #bdbab5,2px 2px 0 #b3b0aa"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
-        <div class="tile" style="position:absolute;left:30px;top:30px;--w:70px;--h:74px;--edge:1px 1px 0 #8a6a45,2px 2px 0 #80613e;box-shadow:var(--edge),-8px 0 14px -6px rgba(0,0,0,.6)"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
-      </div></div>
+      <div class="sw"><div class="stack" style="--w:100px;--h:84px"><div class="tile" style="--w:84px;--h:84px;--edge:1px 1px 0 #c2c2c2,2px 2px 0 #b8b8b8;left:0;top:0"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div><div class="tile" style="--w:62px;--h:62px;--edge:1px 1px 0 #7d6040,2px 2px 0 #73583a;left:38px;top:22px"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div></div></div>
       <div class="body">
         <div class="nm">Unglazed Vitrified Tile</div>
         <div class="meta"><b>All sizes</b> · polished</div>
@@ -420,10 +401,10 @@ body{font-family:Poppins,sans-serif;padding:40px;display:flex;flex-direction:col
 
   <div style="position:absolute;left:50%;top:872px;width:300px;margin-left:-150px;transform:rotate(-6deg);z-index:3" data-use="tpl-seal"></div>
 
-  <div class="stage" style="top:0;height:100%;--floor:1440px;--lbl:56px">
+  <div class="stage" style="top:0;height:100%;--floor:1440px;--lbl:16px">
     <div style="position:absolute;left:0;right:0;top:var(--floor)" data-use="tpl-floor"></div>
     <div class="floor-glow" style="top:var(--floor)"></div>
-    <div style="position:absolute;left:0;right:0;top:calc(var(--floor) - var(--th,260px))" data-use="tpl-lineup"></div>
+    <div style="position:absolute;left:0;right:0;top:calc(var(--floor) - var(--th,240px))" data-use="tpl-lineup"></div>
   </div>
 
   <div style="position:absolute;left:0;right:0;top:1584px;display:flex;flex-direction:column;align-items:center;gap:18px">

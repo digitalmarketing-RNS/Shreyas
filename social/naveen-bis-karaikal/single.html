@@ -69,23 +69,21 @@ h1 .bis{background:linear-gradient(100deg,#FFB27A 0%,var(--accent) 48%,#FF7A2F 1
 .sub b{color:var(--ink);font-weight:600}
 
 /* ---- certified tiles ---- */
-.lineup{position:absolute;left:0;right:0;top:calc(var(--floor) - 260px);display:flex;justify-content:center;gap:30px;z-index:6}
-.item{display:grid;grid-template-rows:260px auto;justify-items:center}
+.lineup{position:absolute;left:0;right:0;top:calc(var(--floor) - 240px);display:flex;justify-content:center;gap:20px;z-index:6}
+.item{display:grid;grid-template-rows:240px auto;justify-items:center}
 .item>.tile,.item>.stack{align-self:end}
-.tile{position:relative;width:var(--w);height:var(--h);border-radius:3px;
+.tile{position:relative;width:var(--w);height:var(--h);border-radius:0;
   box-shadow:var(--edge),0 34px 40px -20px rgba(0,0,0,.75);
   -webkit-box-reflect:below 6px linear-gradient(transparent 70%, rgba(255,255,255,.20))}
-.tile img.tx{object-fit:cover;position:absolute;inset:0;width:100%;height:100%;border-radius:3px;display:block}
-.tile .gloss{position:absolute;inset:0;border-radius:3px;
+.tile img.tx{object-fit:cover;position:absolute;inset:0;width:100%;height:100%;border-radius:0;display:block}
+.tile .gloss{position:absolute;inset:0;border-radius:0;
   background:linear-gradient(128deg,rgba(255,255,255,.62) 0%,rgba(255,255,255,.08) 30%,rgba(255,255,255,0) 52%,rgba(255,255,255,.14) 78%,rgba(255,255,255,0) 100%)}
 .tile.matte .gloss{background:linear-gradient(128deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 45%,rgba(0,0,0,.06) 100%)}
-.tick{position:absolute;top:-15px;right:-15px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
-  background:linear-gradient(140deg,var(--accent-hi),var(--accent) 55%,#C9440A);
-  box-shadow:0 0 0 4px var(--wall),0 8px 18px -4px rgba(242,101,34,.75)}
-.tick svg{width:19px;height:19px}
+.lbl .ok{width:30px;height:30px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:var(--accent);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 0 3px rgba(242,101,34,.22),0 8px 18px -6px rgba(242,101,34,.9)}
+.lbl .ok svg{width:16px;height:16px}
 .stack{position:relative;width:var(--w);height:var(--h)}
 .stack .tile{position:absolute}
-.lbl{margin-top:54px;text-align:center;white-space:nowrap}
+.lbl{position:relative;z-index:2;margin-top:18px;text-align:center;white-space:nowrap}
 .lbl .sz{height:36px;line-height:36px;font-family:var(--font-display);font-feature-settings:"lnum" 1;font-weight:800;font-size:30px;letter-spacing:-.01em}
 .lbl .sz .x{font-family:var(--font-body);font-weight:500;margin:0 .05em;position:relative;top:-.04em}
 .lbl .ap{margin-top:6px;font-weight:600;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-hi)}
@@ -130,33 +128,20 @@ h1 .bis{background:linear-gradient(100deg,#FFB27A 0%,var(--accent) 48%,#FF7A2F 1
   </div>
 
   <div class="lineup">
-    <div class="item"><div class="tile matte" style="--w:120px;--h:120px;--edge:1px 1px 0 #b9b2a6,2px 2px 0 #b2ab9f,3px 3px 0 #a8a194">
-      <img class="tx" src="assets/tiles/300x300-fl009.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">300<span class="x">×</span>300</div><div class="ap">Floor &amp; Wall</div></div></div>
-
-    <div class="item"><div class="tile matte" style="--w:120px;--h:180px;--edge:1px 1px 0 #d2bfae,2px 2px 0 #c8b5a4,3px 3px 0 #bdab9a">
-      <img class="tx" src="assets/tiles/450x300-1035-snow-beige.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">450<span class="x">×</span>300</div><div class="ap">Wall</div></div></div>
-
-    <div class="item"><div class="tile" style="--w:240px;--h:240px;--edge:1px 1px 0 #6e655c,2px 2px 0 #655d55,3px 3px 0 #5c544d,4px 4px 0 #534c46">
-      <img class="tx" src="assets/tiles/600x600-4254-mizar-pgvt.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">600<span class="x">×</span>600</div><div class="ap">Floor · Polished</div></div></div>
-
-    <div class="item"><div class="tile matte" style="--w:160px;--h:160px;--edge:1px 1px 0 #a3a19c,2px 2px 0 #9a9893,3px 3px 0 #918f8a,4px 4px 0 #888681,5px 5px 0 #7f7d78">
-      <img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div>
-      <div class="tick"><svg><use href="#i-check"/></svg></div></div>
-      <div class="lbl"><div class="sz">400<span class="x">×</span>400</div><div class="ap">Floor</div></div></div>
-
-    <div class="item"><div class="stack" style="--w:196px;--h:220px">
-        <div class="tile" style="left:0;top:0;--w:120px;--h:220px;--edge:1px 1px 0 #bdbab5,2px 2px 0 #b3b0aa,3px 3px 0 #a9a6a0;-webkit-box-reflect:unset"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
-        <div class="tile" style="left:52px;top:56px;--w:144px;--h:164px;--edge:1px 1px 0 #8a6a45,2px 2px 0 #80613e,3px 3px 0 #755836;-webkit-box-reflect:unset;box-shadow:var(--edge),-14px 0 26px -10px rgba(0,0,0,.6)"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
-        <div class="tile" style="left:92px;top:116px;--w:104px;--h:104px;--edge:1px 1px 0 #ddd3b6,2px 2px 0 #d3c9ac,3px 3px 0 #c9bfa2;box-shadow:var(--edge),-14px 0 26px -10px rgba(0,0,0,.6)"><img class="tx" src="assets/tiles/bia-5091-grand-crema.jpg" alt=""><div class="gloss"></div>
-          <div class="tick"><svg><use href="#i-check"/></svg></div></div>
+    <div class="item"><div class="tile matte" style="--w:114px;--h:114px;--edge:1px 1px 0 #8f7354,2px 2px 0 #856a4d,3px 3px 0 #7a6146"><img class="tx" src="assets/tiles/300x300-1009-fl.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">300<span class="x">×</span>300</div><div class="ap">Floor &amp; Wall</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:171px;--h:114px;--edge:1px 1px 0 #d6d4d0,2px 2px 0 #cdcbc7,3px 3px 0 #c3c1bd"><img class="tx" src="assets/tiles/450x300-1115-l.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">450<span class="x">×</span>300</div><div class="ap">Wall</div></div></div>
+    <div class="item"><div class="tile" style="--w:228px;--h:228px;--edge:1px 1px 0 #7d7468,2px 2px 0 #746c61,3px 3px 0 #6b635a,4px 4px 0 #625b53"><img class="tx" src="assets/tiles/600x600-4254-mizar-full.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">600<span class="x">×</span>600</div><div class="ap">Floor · Polished</div></div></div>
+    <div class="item"><div class="tile matte" style="--w:152px;--h:152px;--edge:1px 1px 0 #9a9894,2px 2px 0 #91908c,3px 3px 0 #888783,4px 4px 0 #7f7e7a,5px 5px 0 #767571"><img class="tx" src="assets/tiles/400x400-14500.jpg" alt=""><div class="gloss"></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">400<span class="x">×</span>400</div><div class="ap">Floor</div></div></div>
+    <div class="item"><div class="stack" style="--w:186px;--h:160px">
+        <div class="tile" style="--w:160px;--h:160px;--edge:1px 1px 0 #c2c2c2,2px 2px 0 #b8b8b8,3px 3px 0 #aeaeae,4px 4px 0 #a4a4a4;left:0;top:0"><img class="tx" src="assets/tiles/bia-full-body-grey.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:124px;--h:124px;--edge:1px 1px 0 #7d6040,2px 2px 0 #73583a,3px 3px 0 #695034,4px 4px 0 #5f482f;left:40px;top:36px"><img class="tx" src="assets/tiles/bia-9051-royal-brown.jpg" alt=""><div class="gloss"></div></div>
+        <div class="tile" style="--w:92px;--h:92px;--edge:1px 1px 0 #d8cfae,2px 2px 0 #cec5a4,3px 3px 0 #c4bb9a,4px 4px 0 #bab190;left:94px;top:68px"><img class="tx" src="assets/tiles/bia-5091-grand-crema.jpg" alt=""><div class="gloss"></div></div>
       </div>
-      <div class="lbl"><div class="sz">All sizes</div><div class="ap">Unglazed Vitrified</div></div></div>
+      <div class="lbl"><span class="ok"><svg><use href="#i-check"/></svg></span><div class="sz">All sizes</div><div class="ap">Unglazed Vitrified</div></div></div>
   </div>
 
   <div class="proof">
