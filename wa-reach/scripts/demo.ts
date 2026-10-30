@@ -1,0 +1,447 @@
+/**
+ * Demo mode: runs WA Reach against a simulated OpenWA gateway, with sample contacts, templates,
+ * automations and two weeks of campaign history. Nothing is sent to WhatsApp.
+ *
+ *   npm run demo            -> http://localhost:3000  (password: demo-password)
+ *
+ * The simulated gateway behaves like OpenWA from the app's point of view: sessions, signed
+ * webhooks, delivery/read receipts and customer replies arrive over HTTP.
+ */
+import { mkdtempSync } from 'node:fs';
+import { crc32, deflateSync } from 'node:zlib';
+import { tmpdir } from 'node:os';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { startFakeOpenWA } from '../test/fake-openwa.js';
+import { FakeMeta } from '../test/fake-meta.js';
+import { loadConfig } from '../server/config.js';
+import { OpenWAClient } from '../server/openwa/client.js';
+import { Platform } from '../server/platform/platform.js';
+import { buildApp } from '../server/app.js';
+
+const PORT = Number(process.env.PORT ?? 3000);
+const here = dirname(fileURLToPath(import.meta.url));
+
+const FIRST = ['Aarav', 'Priya', 'Rohan', 'Ananya', 'Vikram', 'Meera', 'Karthik', 'Sneha', 'Arjun', 'Divya', 'Rahul', 'Isha', 'Aditya', 'Kavya', 'Nikhil', 'Pooja', 'Siddharth', 'Neha', 'Varun', 'Riya', 'Manish', 'Tanvi', 'Harsh', 'Anjali', 'Kunal', 'Shreya', 'Amit', 'Nisha', 'Yash', 'Aditi', 'Rajesh', 'Swati', 'Deepak', 'Lakshmi', 'Suresh', 'Farah', 'Imran', 'Zoya', 'Gaurav', 'Pallavi', 'Naveen', 'Asha', 'Ravi', 'Sunita', 'Tarun', 'Bhavna', 'Omkar', 'Jyoti'];
+const LAST = ['Sharma', 'Iyer', 'Reddy', 'Nair', 'Gupta', 'Kulkarni', 'Menon', 'Rao', 'Singh', 'Patel', 'Joshi', 'Das', 'Khan', 'Bose', 'Pillai', 'Shetty'];
+const CITIES = ['Bengaluru', 'Mumbai', 'Pune', 'Chennai', 'Hyderabad', 'Delhi', 'Kochi'];
+
+/** A two-second voice note (a soft tone) for the Inbox demo. */
+function demoVoice(): string {
+  const rate = 8000;
+  const samples = rate * 2;
+  const wav = Buffer.alloc(44 + samples * 2);
+  wav.write('RIFF', 0, 'ascii');
+  wav.writeUInt32LE(36 + samples * 2, 4);
+  wav.write('WAVEfmt ', 8, 'ascii');
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20);
+  wav.writeUInt16LE(1, 22);
+  wav.writeUInt32LE(rate, 24);
+  wav.writeUInt32LE(rate * 2, 28);
+  wav.writeUInt16LE(2, 32);
+  wav.writeUInt16LE(16, 34);
+  wav.write('data', 36, 'ascii');
+  wav.writeUInt32LE(samples * 2, 40);
+  for (let i = 0; i < samples; i++) wav.writeInt16LE(Math.round(Math.sin((2 * Math.PI * 440 * i) / rate) * 6000 * Math.min(1, (samples - i) / 2000)), 44 + i * 2);
+  return wav.toString('base64');
+}
+
+/** A small PNG "photo" (a cup on a warm background) for the Inbox demo. */
+function demoPhoto(): string {
+  const w = 360;
+  const h = 240;
+  const raw = Buffer.alloc((w * 3 + 1) * h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const o = y * (w * 3 + 1) + 1 + x * 3;
+      const cup = (x - 180) ** 2 / 70 ** 2 + (y - 135) ** 2 / 60 ** 2 < 1 && y > 110;
+      const handle = Math.abs(Math.hypot(x - 255, y - 145) - 22) < 7;
+      const [r, g, b] = cup || handle ? [250, 246, 238] : [196 - y / 6, 120 - y / 8, 60 + x / 12];
+      raw[o] = r;
+      raw[o + 1] = g;
+      raw[o + 2] = b;
+    }
+  }
+  const chunk = (type: string, data: Buffer) => {
+    const head = Buffer.alloc(8);
+    head.writeUInt32BE(data.length, 0);
+    head.write(type, 4, 'ascii');
+    const crc = Buffer.alloc(4);
+    crc.writeUInt32BE(crc32(Buffer.concat([Buffer.from(type, 'ascii'), data])) >>> 0, 0);
+    return Buffer.concat([head, data, crc]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0);
+  ihdr.writeUInt32BE(h, 4);
+  ihdr.set([8, 2, 0, 0, 0], 8);
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]).toString('base64');
+}
+
+function rng(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) % 4294967296;
+    return s / 4294967296;
+  };
+}
+
+async function main(): Promise<void> {
+  const random = rng(42);
+  // Receipts and replies are simulated only once the app is listening (history is seeded directly).
+  const gatewayOptions: NonNullable<Parameters<typeof startFakeOpenWA>[0]> = { apiKey: 'demo-openwa-key' };
+  const fake = await startFakeOpenWA(gatewayOptions);
+  const session = fake.addSession('demo-store', 'ready', '919900011122');
+
+  const dataDir = process.env.DATA_DIR ?? mkdtempSync(join(tmpdir(), 'wa-reach-demo-'));
+  process.env.WA_REACH_DEMO = '1';
+  const config = loadConfig({
+    ...process.env,
+    DATA_DIR: dataDir,
+    PORT: String(PORT),
+    OPENWA_URL: fake.url,
+    OPENWA_API_KEY: fake.apiKey,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? 'demo-password',
+    PUBLIC_URL: `http://localhost:${PORT}`,
+    WEBHOOK_URL: `http://127.0.0.1:${PORT}/webhooks/openwa`,
+    ADMIN_EMAIL: 'admin@demo.local',
+  });
+  let offset = 0;
+  // A simulated Meta Cloud API, so the official-number screens (templates, approvals) can be tried.
+  const meta = new FakeMeta();
+  const OFFICIAL = { phoneNumberId: '1098765432101', wabaId: '2098765432101', accessToken: `EAAG${'x'.repeat(60)}`, appSecret: 'abcdef0123456789abcdef0123456789' };
+  meta.addNumber({ id: OFFICIAL.phoneNumberId, wabaId: OFFICIAL.wabaId, token: OFFICIAL.accessToken, display: '+91 98450 00999', name: 'Chai & Co.' });
+  meta.templatesByWaba.set(OFFICIAL.wabaId, [
+    {
+      id: '880001',
+      name: 'diwali_offer',
+      language: 'en',
+      status: 'APPROVED',
+      category: 'MARKETING',
+      quality_score: { score: 'GREEN' },
+      components: [
+        { type: 'BODY', text: 'Hi {{1}} 🪔 Our Diwali hampers are here! Get {{2}} off till Sunday.' },
+        { type: 'FOOTER', text: 'Not interested? Tap Stop promotions' },
+        { type: 'BUTTONS', buttons: [{ type: 'URL', text: 'Shop now', url: 'https://chaico.example/diwali' }, { type: 'QUICK_REPLY', text: 'Stop promotions' }] },
+      ],
+    },
+    {
+      id: '880002',
+      name: 'weekend_sale',
+      language: 'en',
+      status: 'REJECTED',
+      category: 'MARKETING',
+      rejected_reason: 'INVALID_FORMAT',
+      components: [{ type: 'BODY', text: '{{1}} {{2}} weekend sale is live' }],
+    },
+    {
+      id: '880004',
+      name: 'teaware_carousel',
+      language: 'en',
+      status: 'APPROVED',
+      category: 'MARKETING',
+      quality_score: { score: 'UNKNOWN' },
+      components: [
+        { type: 'BODY', text: 'Hi {{1}}, our new teaware has arrived. Swipe to see it all!', example: { body_text: [['Priya']] } },
+        {
+          type: 'CAROUSEL',
+          cards: ['₹499', '₹899'].map(price => ({
+            components: [
+              { type: 'HEADER', format: 'IMAGE' },
+              { type: 'BODY', text: 'Now only {{1}}', example: { body_text: [[price]] } },
+              { type: 'BUTTONS', buttons: [{ type: 'URL', text: 'Buy now', url: 'https://chaico.example/p/{{1}}' }] },
+            ],
+          })),
+        },
+      ],
+    },
+    {
+      id: '880003',
+      name: 'order_shipped',
+      language: 'hi',
+      status: 'PENDING',
+      category: 'UTILITY',
+      components: [{ type: 'BODY', text: 'नमस्ते {{1}}, आपका ऑर्डर {{2}} भेज दिया गया है।' }],
+    },
+  ]);
+  const platform = new Platform({
+    config,
+    meta,
+    openwa: new OpenWAClient({ baseUrl: fake.url, apiKey: fake.apiKey }),
+    clock: () => new Date(Date.now() + offset),
+    log: { info: () => {}, warn: () => {}, error: console.error, debug: () => {} },
+  });
+  platform.bootstrapAdmin(config.adminEmail, config.adminPassword);
+  platform.updateSettings({ brandName: 'WA Reach', supportContact: 'WhatsApp +91 98450 00000' });
+  const DEMO_PASSWORD = config.adminPassword;
+
+  // ---------------------------------------------------------------- businesses (customers of the platform)
+  offset = -75 * 86_400_000;
+  const chai = platform.createTenant({ name: 'Chai & Co.', ownerEmail: 'owner@chaico.demo', ownerName: 'Arjun', ownerPassword: DEMO_PASSWORD, trialDays: 0, maxNumbers: 2, contactPhone: '+91 98450 11111' });
+  const salon = platform.createTenant({ name: 'Sharma Salon', ownerEmail: 'priya@sharmasalon.demo', ownerName: 'Priya', ownerPassword: DEMO_PASSWORD, trialDays: 0 });
+  const cafe = platform.createTenant({ name: 'Green Leaf Cafe', ownerEmail: 'hello@greenleaf.demo', ownerName: 'Rahul', ownerPassword: DEMO_PASSWORD, trialDays: 0 });
+  const admin = platform.authenticate(config.adminEmail, config.adminPassword)!;
+  platform.recordPayment(chai.tenant.id, { months: 1, amount: 1000, method: 'upi', reference: 'UPI-50231' }, admin.id);
+  platform.recordPayment(salon.tenant.id, { months: 1, amount: 1000, method: 'cash' }, admin.id);
+  platform.recordPayment(cafe.tenant.id, { months: 1, amount: 1000, method: 'upi', reference: 'UPI-50388' }, admin.id);
+  offset = -45 * 86_400_000;
+  platform.recordPayment(chai.tenant.id, { months: 3, amount: 2800, method: 'bank_transfer', note: 'Quarterly, ₹200 discount' }, admin.id);
+  platform.recordPayment(salon.tenant.id, { months: 1, amount: 1000, method: 'upi', reference: 'UPI-51120' }, admin.id);
+  offset = 0;
+  // The salon is due for renewal in a few days; the cafe stopped paying 12 days ago.
+  platform.updateTenant(salon.tenant.id, { paidUntil: new Date(Date.now() + 3 * 86_400_000).toISOString() });
+  platform.updateTenant(cafe.tenant.id, { paidUntil: new Date(Date.now() - 12 * 86_400_000).toISOString() });
+
+  const runtime = platform.runtime(chai.tenant.id);
+  runtime.scope.add(session.id);
+  const core = runtime.core;
+  const s = runtime.services;
+
+  // ---------------------------------------------------------------- settings, tags, contacts
+  s.settings.update({
+    businessName: 'Chai & Co.',
+    defaultSessionId: session.id,
+    quietHours: { enabled: false, start: '21:00', end: '09:00' },
+    sending: { sessionMaxPerMinute: 30, defaultPerMinute: 20 },
+  });
+  const tag = (name: string, color: string) => s.tags.create({ name, color }).id;
+  const vip = tag('vip', '#9333EA');
+  const diwali = tag('diwali-2026', '#EA580C');
+  const web = tag('website-lead', '#2563EB');
+  const wholesale = tag('wholesale', '#0891B2');
+
+  offset = -16 * 86_400_000;
+  const rows = ['phone,first name,last name,city,last order,tags'];
+  for (let i = 0; i < 48; i++) {
+    const tags = [random() < 0.25 ? 'vip' : '', random() < 0.3 ? 'website-lead' : '', random() < 0.12 ? 'wholesale' : ''].filter(Boolean).join(';');
+    rows.push(`98450${String(10000 + i * 137).slice(-5)},${FIRST[i]},${LAST[i % LAST.length]},${CITIES[i % CITIES.length]},${Math.round(400 + random() * 4000)},"${tags}"`);
+  }
+  s.contacts.importCsv({
+    csv: rows.join('\n'),
+    mapping: { '0': 'phone', '1': 'first_name', '2': 'last_name', '3': 'attr:city', '4': 'attr:last_order', '5': 'tags' },
+    consent: 'opted_in',
+    consentSource: 'Store checkout opt-in',
+  });
+  const everyone = s.contacts.ids({});
+  s.contacts.addTags(everyone.filter(() => random() < 0.6), [diwali]);
+
+  // ---------------------------------------------------------------- templates, segments, automations
+  s.templates.create({ name: 'Festive offer', body: 'Hi {{first_name|there}} 🪔\n\nOur *Diwali hampers* are here! 20% off for {{city}} customers till Sunday.\n\nOrder: https://chaico.example/diwali' });
+  s.templates.create({ name: 'Order ready', body: 'Hi {{first_name}}, your order is packed and ready for pickup at our {{city}} store. See you soon!' });
+  s.templates.create({ name: 'Win-back', body: "We miss you, {{first_name|friend}}! Here's ₹150 off your next order with code *COMEBACK150*." });
+  s.segments.create({ name: 'Pune & Mumbai VIPs', rules: { match: 'all', conditions: [{ field: 'tag', op: 'has', value: vip }, { field: 'attribute', key: 'city', op: 'contains', value: 'u' }] } });
+  s.segments.create({ name: 'Big spenders', description: 'Last order above ₹2,500', rules: { match: 'all', conditions: [{ field: 'attribute', key: 'last_order', op: 'gt', value: '2500' }] } });
+  const welcome = s.sequences.create({
+    name: 'Website lead welcome',
+    trigger: { type: 'tag_added', tagId: web },
+    steps: [
+      { delayMinutes: 0, body: 'Hi {{first_name|there}}! Thanks for your interest in Chai & Co. ☕ Reply *MENU* anytime to see our blends.' },
+      { delayMinutes: 1440, body: 'Our bestseller is the Masala Chai starter kit. Want a free sample with your first order?' },
+      { delayMinutes: 4320, body: 'Last nudge from us: use *WELCOME10* for 10% off your first order this week.' },
+    ],
+  });
+  s.autoReplies.create({ name: 'Price & menu', matchType: 'contains', keywords: ['price', 'menu', 'catalogue', 'rate'], replyBody: 'Here is our full menu with prices: https://chaico.example/menu\n\nReply with a product name to order.', actions: { addTagIds: [web] }, priority: 10 });
+  s.autoReplies.create({ name: 'Store hours', matchType: 'contains', keywords: ['hours', 'timing', 'open'], replyBody: 'We are open 8am–10pm, every day. 🕗', priority: 20 });
+  s.autoReplies.create({ name: 'After-hours fallback', matchType: 'any', replyBody: 'Thanks for writing to Chai & Co.! A team member will reply shortly.', priority: 900, cooldownMinutes: 720 });
+  void welcome;
+
+  // ---------------------------------------------------------------- two weeks of history
+  const historic = async (name: string, daysAgo: number, audience: object, body: string, variants?: Array<{ key: 'A' | 'B'; body: string; weight: number }>) => {
+    offset = -daysAgo * 86_400_000;
+    const c = s.campaigns.create({ name, audience, variants: variants ?? [{ key: 'A', body, weight: 100 }], options: { perMinute: 60, respectQuietHours: false } });
+    s.campaigns.launch(c.id, {});
+    for (let i = 0; i < 400 && s.campaigns.get(c.id).status === 'running'; i++) {
+      offset += 2100;
+      await s.dispatcher.tick();
+    }
+    // Receipts and replies, delivered through the same webhook processor live traffic uses.
+    const sent = core.db.all<{ wa_message_id: string; contact_id: number; variant: string }>(
+      "SELECT wa_message_id, contact_id, variant FROM campaign_recipients WHERE campaign_id = ? AND status = 'sent'",
+      c.id,
+    );
+    for (const r of sent) {
+      offset += 20_000;
+      if (random() < 0.95) await s.inbound.handle({ event: 'message.ack', sessionId: session.id, data: { messageId: r.wa_message_id, status: 'delivered' } });
+      const readBoost = r.variant === 'B' ? 0.12 : 0;
+      if (random() < 0.66 + readBoost) {
+        await s.inbound.handle({ event: 'message.ack', sessionId: session.id, data: { messageId: r.wa_message_id, status: 'read' } });
+        const phone = core.db.get<{ phone: string }>('SELECT phone FROM contacts WHERE id = ?', r.contact_id)!.phone;
+        const roll = random();
+        const reply = roll < 0.18 ? 'Interested! Do you deliver?' : roll < 0.23 ? 'price?' : roll < 0.25 ? 'STOP' : null;
+        if (reply) {
+          offset += 60_000;
+          await s.inbound.handle({
+            event: 'message.received',
+            sessionId: session.id,
+            data: { id: `hist_${c.id}_${r.contact_id}`, from: `${phone}@c.us`, body: reply, type: 'text', kind: 'individual' },
+          });
+        }
+      }
+    }
+    // Clicks from a share of readers.
+    const links = core.db.all<{ code: string }>('SELECT code FROM links WHERE campaign_id = ?', c.id);
+    if (links.length) {
+      const tokens = core.db.all<{ token: string }>("SELECT token FROM campaign_recipients WHERE campaign_id = ? AND status = 'read'", c.id);
+      for (const t of tokens) if (random() < 0.35) s.campaigns.recordClick(links[0].code, t.token, 'Mozilla/5.0 (Linux; Android 14)', false);
+    }
+    // Flush any queued auto-replies while still "in the past".
+    for (let i = 0; i < 60; i++) {
+      offset += 5000;
+      await s.dispatcher.tick();
+    }
+  };
+
+  await historic('Monsoon chai week', 13, { type: 'all' }, 'Hi {{first_name}}, rainy days call for *ginger chai* ☔ 15% off all week: https://chaico.example/monsoon');
+  await historic('Diwali hampers – A/B', 6, { type: 'tags', tagIds: [diwali] }, '', [
+    { key: 'A', body: 'Hi {{first_name}}! Diwali hampers are live 🪔 https://chaico.example/diwali', weight: 50 },
+    { key: 'B', body: '{{first_name}}, your {{city}} store has *limited* Diwali hampers left 🪔 Reserve yours: https://chaico.example/diwali', weight: 50 },
+  ]);
+  await historic('VIP early access', 2, { type: 'tags', tagIds: [vip] }, 'Hi {{first_name}}, as a VIP you get first pick of our new *Kashmiri Kahwa* blend ✨ https://chaico.example/kahwa');
+
+  // Scheduled + draft campaigns so every state is visible.
+  offset = 0;
+  const scheduled = s.campaigns.create({ name: 'Weekend win-back', audience: { type: 'all' }, variants: [{ key: 'A', body: "We miss you, {{first_name|friend}}! ₹150 off with *COMEBACK150* 🎁", weight: 100 }] });
+  s.campaigns.launch(scheduled.id, { scheduledAt: new Date(Date.now() + 2 * 86_400_000).toISOString() });
+  s.campaigns.create({ name: 'Wholesale price list (draft)', audience: { type: 'tags', tagIds: [wholesale] }, variants: [{ key: 'A', body: 'Hello {{first_name}}, our updated wholesale price list is attached.', weight: 100 }] });
+
+  // A couple of fresh website leads start the drip live.
+  s.contacts.upsert({ phone: '+91 98450 77001', name: 'Farhan Ali', tags: ['website-lead'], consent: 'opted_in', consentSource: 'Website form' });
+  s.contacts.upsert({ phone: '+91 98450 77002', name: 'Gita Menon', tags: ['website-lead'], consent: 'opted_in', consentSource: 'Website form' });
+
+  // Leads from two connected forms over the last month, worked on by the team.
+  const sources = [
+    s.leads.create({ name: 'Website enquiry form', kind: 'website', actions: { tagIds: [web] } }),
+    s.leads.create({ name: 'Instagram ads sheet', kind: 'google_sheet', actions: { tagIds: [web] } }),
+  ];
+  const remarks = [
+    'Called. Wants the Masala Chai starter kit for the office, call back Friday.',
+    'Asked for wholesale rates, sent the price list on WhatsApp.',
+    'Not interested right now, try again after Diwali.',
+    'Ordered 2 hampers. Delivered.',
+  ];
+  const team = ['Priya (sales)', 'Rahul'];
+  for (let i = 0; i < 36; i++) {
+    offset = -Math.floor(random() * 28 + 1) * 86_400_000 - Math.floor(random() * 36_000_000);
+    const source = sources[random() < 0.6 ? 0 : 1];
+    const name = `${FIRST[(i + 7) % FIRST.length]} ${LAST[(i + 3) % LAST.length]}`;
+    const fields: Record<string, string> = { name, phone: `98860${String(20000 + i * 211).slice(-5)}`, city: CITIES[i % CITIES.length] };
+    if (source.kind === 'google_sheet') fields['Sheet tab'] = random() < 0.65 ? 'Instagram leads' : 'Facebook leads';
+    const result = s.leads.receive(source, fields);
+    if (!result.ok) continue;
+    const roll = random();
+    const stage = roll < 0.35 ? 'untouched' : roll < 0.6 ? 'warm' : roll < 0.8 ? 'cold' : 'closed';
+    if (stage !== 'untouched') {
+      offset += 3 * 3_600_000;
+      const remark = stage === 'warm' ? remarks[random() < 0.5 ? 0 : 1] : stage === 'cold' ? remarks[2] : remarks[3];
+      s.contacts.setLead(result.contactId, { stage, remark }, team[i % team.length]);
+    }
+  }
+  // Someone new writes in: Inbox only until the business adds them.
+  offset = -20 * 60_000;
+  await s.inbound.handle({
+    event: 'message.received',
+    sessionId: session.id,
+    data: { id: 'demo_new_person', from: '919900123456@c.us', body: 'Hi, is the Masala Chai starter kit available in Pune?', type: 'text', kind: 'individual', contact: { pushName: 'Kiran' } },
+  });
+
+  // The same person filling the form twice is kept once.
+  offset = -86_400_000;
+  s.leads.receive(sources[0], { name: 'Duplicate entry', phone: '98860 20000' });
+  offset = 0;
+
+  // The ads sheet has three tabs (its script checked in); a second sheet isn't connected yet.
+  s.leads.sheetSync(s.leads.get(sources[1].id), ['Instagram leads', 'Facebook leads', 'Old leads 2025']);
+  s.leads.create({ name: 'Franchise enquiries sheet', kind: 'google_sheet', actions: { tagIds: [] } });
+
+  // Customers abroad: tagged "International" automatically, like every number is tagged.
+  for (const [phone, name, city] of [
+    ['+44 7400 123456', 'Oliver Brown', 'London'],
+    ['+971 50 123 4567', 'Fatima Khan', 'Dubai'],
+    ['+1 415 555 2671', 'Emily Chen', 'San Francisco'],
+    ['+65 9123 4567', 'Wei Ling Tan', 'Singapore'],
+  ]) {
+    s.contacts.upsert({ phone, name, consent: 'opted_in', consentSource: 'Store checkout opt-in', attributes: { city } });
+  }
+
+  // A photo a customer sent today, and the owner's answer typed on the phone.
+  fake.media.set('demo_photo', { mimetype: 'image/png', base64: demoPhoto() });
+  offset = -15 * 60_000;
+  await s.inbound.handle({
+    event: 'message.received',
+    sessionId: session.id,
+    data: { id: 'demo_photo', from: '919900123456@c.us', body: 'This one, in 500 g?', type: 'image', kind: 'individual', media: { mimetype: 'image/png' }, contact: { pushName: 'Kiran' } },
+  });
+  offset = -8 * 60_000;
+  await s.inbound.handle({
+    event: 'message.sent',
+    sessionId: session.id,
+    data: { id: 'demo_phone_reply', from: '919900011122@c.us', to: '919900123456@c.us', chatId: '919900123456@c.us', body: 'Yes! 500 g is ₹450. Shall I keep one for you?', type: 'text', fromMe: true, kind: 'individual' },
+  });
+  // A price list sent as a PDF, and a voice note (the gateway keeps the files it receives).
+  fake.media.set('demo_pdf', { mimetype: 'application/pdf', base64: Buffer.from('%PDF-1.4\n% Chai & Co. wholesale price list\n').toString('base64') });
+  offset = -6 * 60_000;
+  await s.inbound.handle({
+    event: 'message.sent',
+    sessionId: session.id,
+    data: {
+      id: 'demo_pdf', from: '919900011122@c.us', to: '919900123456@c.us', chatId: '919900123456@c.us', body: 'Here is our full price list', type: 'document',
+      fromMe: true, kind: 'individual', media: { mimetype: 'application/pdf', filename: 'Chai & Co price list Oct 2026.pdf', sizeBytes: 248_310 },
+    },
+  });
+  fake.media.set('demo_voice', { mimetype: 'audio/wav', base64: demoVoice() });
+  offset = -2 * 60_000;
+  await s.inbound.handle({
+    event: 'message.received',
+    sessionId: session.id,
+    data: { id: 'demo_voice', from: '919900123456@c.us', body: '', type: 'voice', kind: 'individual', media: { mimetype: 'audio/wav', sizeBytes: 32_044 }, contact: { pushName: 'Kiran' } },
+  });
+  offset = 0;
+
+  // The official number and its templates (one draft made in WA Reach).
+  const official = await s.sessions.addOfficial({ name: 'Chai Co Official', ...OFFICIAL });
+  await s.official.syncTemplates(official.id);
+  const hamper = await s.media.upload({ filename: 'diwali-hamper.png', mimetype: 'image/png', base64: demoPhoto() });
+  await s.official.saveTemplate(official.id, {
+    draft: {
+      name: 'new_arrivals_oct',
+      language: 'en',
+      category: 'MARKETING',
+      header: { type: 'image', mediaId: hamper.id },
+      body: 'Hi {{first_name}}, our new *Kashmiri Kahwa* has arrived at the {{city}} store. Come and taste it this week!',
+      footer: 'Not interested? Tap Stop promotions',
+      buttons: [{ type: 'quick_reply', text: 'Stop promotions' }],
+      samples: { first_name: 'Priya', city: 'Pune' },
+    },
+  });
+
+  // ---------------------------------------------------------------- serve
+  const app = await buildApp(platform, { staticDir: join(here, '..', 'dist', 'web') });
+  await app.listen({ host: '127.0.0.1', port: PORT });
+  platform.start();
+  await s.sessions.syncWebhooks();
+  gatewayOptions.simulate = {
+    readRate: 0.72,
+    replyRate: 0.22,
+    delayMs: 2500,
+    replies: ['Is this available in Pune?', 'price?', 'Interested! Share the catalogue', 'What are your store hours?', 'Thanks 🙏', 'STOP', 'Can I pay by UPI?'],
+  };
+
+  // A live campaign that sends while you watch.
+  const live = s.campaigns.create({
+    name: 'New Kahwa launch',
+    audience: { type: 'all' },
+    variants: [{ key: 'A', body: 'Hi {{first_name}} ✨ Our new *Kashmiri Kahwa* is here. Try it: https://chaico.example/kahwa', weight: 100 }],
+    options: { perMinute: 12 },
+  });
+  s.campaigns.launch(live.id, {});
+
+  console.log(`\n  WA Reach demo running at http://localhost:${PORT}`);
+  console.log(`  Admin panel:   admin@demo.local / ${DEMO_PASSWORD}`);
+  console.log(`  A business:    owner@chaico.demo / ${DEMO_PASSWORD}`);
+  console.log(`  Simulated OpenWA gateway: ${fake.url} (no real WhatsApp messages are sent)\n`);
+}
+
+main().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
